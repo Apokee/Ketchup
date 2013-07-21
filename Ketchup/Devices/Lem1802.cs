@@ -97,7 +97,7 @@ namespace Ketchup.Devices
 
         public Lem1802()
         {
-            _screenTexture = new Texture2D(Width, Height);
+            _screenTexture = new Texture2D(Width, Height) { filterMode = FilterMode.Point };
             _blinkTimer = new Timer(ToggleBlinker, null, BlinkRate, BlinkRate);
         }
 
@@ -138,13 +138,8 @@ namespace Ketchup.Devices
             _borderColorValue = 0;
         }
 
-        public Texture2D GetScreenImage(int scale = 1)
+        public Texture2D GetScreenImage()
         {
-            if (_screenTexture.width != Width * scale || _screenTexture.height != Height * scale)
-            {
-                _screenTexture = new Texture2D(Width * scale, Height * scale);
-            }
-
             if (_screenMap == 0)
             {
                 for (var x = 0; x < _screenTexture.width; x++)
@@ -177,21 +172,15 @@ namespace Ketchup.Devices
                         {
                             Color color;
 
-                            var tx = (i / 8 + (x * CharWidth)) * scale;
-                            var ty = Math.Abs((i % 8 + (y * CharHeight)) - (Height - 1)) * scale;
+                            var tx = (i / 8 + (x * CharWidth));
+                            var ty = Math.Abs((i % 8 + (y * CharHeight)) - (Height - 1));
 
                             if ((fontValue & 1) == 0 || (((value & 0x80) == 0x80) && !_blinkOn))
                                 color = background;
                             else
                                 color = foreground;
 
-                            for (var j = 0; j < scale; j++)
-                            {
-                                for (var k = 0; k < scale; k++)
-                                {
-                                    _screenTexture.SetPixel(tx + j, ty + k, color);
-                                }
-                            }
+                            _screenTexture.SetPixel(tx, ty, color);
 
                             fontValue >>= 1;
                         }
