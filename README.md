@@ -45,7 +45,7 @@ the **ENIAK-16L Computer**, these "Mechanical Kerbal Brains" replace the **RC-00
 guidance unit however. Construct a rocket normally with one of the new parts.
 
 When you're ready to launch you should see a new window with the name of the computer you added. In the text
-field labelled "Memory Image" enter `helloworld.bin`  and then click the **PWR** button. You should know see
+field labelled "Memory Image" enter `helloworld.bin`  and then click the **PWR** button. You should now see
 `Hello, world!` displayed on the monitor. You can write custom programs in DCPU-16 assembly and build them with an
 assembler, such as [Organic][organic]. Copy the built binary to the `GameData/Ketchup/Plugins/PluginData/Ketchup`
 directory, and you should be able to run it like `helloworld.bin`.
