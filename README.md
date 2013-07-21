@@ -15,6 +15,10 @@ notably, there currently exist no devices capable of interacting with the vessel
 control is not currently possible. However, any program written for the DCPU-16 should be able to run within
 Kerbal Space Program.
 
+Downloads
+------------
+Release information and downloads may be found on the GitHub [releases][releases] page.
+
 Building
 ------------
 In order to build *Ketchup* two assemblies are required from your Kerbal Space Program installation. Because
@@ -68,5 +72,6 @@ Name
 [monitor-spec]: http://dcpu.com/monitor/
 [notch]: https://mojang.com/notch/
 [organic]: https://github.com/SirCmpwn/organic
+[releases]: https://github.com/dbent/Ketchup/releases
 [tomato]: https://github.com/SirCmpwn/Tomato
 [tomato-ksp-compat]: https://github.com/dbent/Tomato/tree/ksp-compat
