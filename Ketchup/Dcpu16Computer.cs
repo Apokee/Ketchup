@@ -26,6 +26,8 @@ namespace Ketchup
         private static bool _hasInitPosition;
         private static bool _hasInitStyles;
 
+        private static double _monitorImageScale = 1;
+
         #endregion
 
         #region Devices
@@ -177,7 +179,7 @@ namespace Ketchup
                 }
             }
 
-            var monitorImage = _lem1802.GetScreenImage(scale: 4);
+            var monitorImage = _lem1802.GetScreenImage();
 
             var pressedStyle = new GUIStyle(_styleButton) { normal = _styleButton.active };
 
@@ -190,10 +192,12 @@ namespace Ketchup
             var kbdButtonPressed = GUILayout.Button("KBD", _isKeyboardAttached ? pressedStyle : _styleButton, GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Memory Image:", _styleLabel, GUILayout.Width(100));
+            GUILayout.Label("Memory Image:", new GUIStyle(_styleLabel) { stretchWidth = true });
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
             if (_isPowerOn)
             {
-                GUILayout.Label(_program, _styleLabel, GUILayout.Width(400));
+                GUILayout.Label(_program, new GUIStyle(_styleLabel) { stretchWidth = true });
             }
             else
             {
@@ -201,7 +205,15 @@ namespace Ketchup
             }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Box(monitorImage, _styleBox, GUILayout.Width(monitorImage.width + 8), GUILayout.Height(monitorImage.height + 8));
+            GUILayout.Box(String.Empty, _styleBox, GUILayout.Width((int)(monitorImage.width * _monitorImageScale)), GUILayout.Height((int)(monitorImage.height * _monitorImageScale)));
+            var imageRect = GUILayoutUtility.GetLastRect();
+            GUI.DrawTexture(imageRect, monitorImage, ScaleMode.ScaleToFit);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("1x", _styleButton)) { SetMonitorScale(1); }
+            if (GUILayout.Button("2x", _styleButton)) { SetMonitorScale(2); }
+            if (GUILayout.Button("3x", _styleButton)) { SetMonitorScale(3); }
+            if (GUILayout.Button("4x", _styleButton)) { SetMonitorScale(4); }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.Label(actualClockSpeedFormatted, _styleLabel);
@@ -276,6 +288,12 @@ namespace Ketchup
 
                 _isPowerOn = true;
             }
+        }
+
+        private void SetMonitorScale(double scale)
+        {
+            _monitorImageScale = scale;
+            _windowPosition = new Rect(_windowPosition) { width = 0, height = 0 };
         }
     }
 }
