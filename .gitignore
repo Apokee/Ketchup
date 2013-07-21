@@ -1,0 +1,7 @@
+/Dependencies/KSP
+/Output
+
+bin/
+obj/
+
+*.suo
