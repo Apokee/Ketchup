@@ -1,10 +1,16 @@
 ﻿using System.Linq;
+using Tomato;
 using UnityEngine;
 
 namespace Ketchup.Extensions
 {
     public static class MiscExtensions
     {
+        public static bool IsHalted(this DCPU dcpu)
+        {
+            return dcpu.Memory[dcpu.PC] == 0x8382; // ADD PC, -1
+        }
+
         public static bool IsPrimary(this PartModule partModule)
         {
             return partModule.vessel.parts.FirstOrDefault(i => i.Modules.Contains(partModule.ClassID)) == partModule.part;
