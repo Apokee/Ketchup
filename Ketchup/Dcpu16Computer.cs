@@ -46,6 +46,7 @@ namespace Ketchup
         private bool _isKeyboardAttached;
 
         private ushort? _pcAtHalt;
+        private int? _warpIndexBeforeWake;
 
         private string _program = String.Empty;
 
@@ -109,6 +110,8 @@ namespace Ketchup
                 {
                     if (_dcpu.PC != _pcAtHalt)
                     {
+                        _warpIndexBeforeWake = TimeWarp.CurrentRateIndex;
+
                         _pcAtHalt = null;
                         _isHalted = false;
                     }
@@ -119,6 +122,13 @@ namespace Ketchup
                     {
                         _pcAtHalt = _dcpu.PC;
                         _isHalted = true;
+
+                        if (_warpIndexBeforeWake != null)
+                        {
+                            var index = _warpIndexBeforeWake.Value;
+                            _warpIndexBeforeWake = null;
+                            TimeWarp.SetRate(index, true);
+                        }
                     }
                     else
                     {
