@@ -42,7 +42,11 @@ namespace Ketchup
         #region Emulation
 
         private bool _isPowerOn;
+        private bool _isHalted;
         private bool _isKeyboardAttached;
+
+        private ushort? _pcAtHalt;
+        private int? _warpIndexBeforeWake;
 
         private string _program = String.Empty;
 
@@ -102,29 +106,57 @@ namespace Ketchup
         {
             if (_isPowerOn)
             {
-                var maxPhysicsWarpIndex = _timeWarp.physicsWarpRates.Length - 1;
-
-                if (_timeWarp.physicsWarpRates[maxPhysicsWarpIndex] < TimeWarp.CurrentRate)
+                if (_isHalted)
                 {
-                    TimeWarp.SetRate(TimeWarp.WarpMode == TimeWarp.Modes.LOW ? maxPhysicsWarpIndex : 0, true);
-                }
+                    if (_dcpu.PC != _pcAtHalt)
+                    {
+                        _warpIndexBeforeWake = TimeWarp.CurrentRateIndex;
 
-                var cyclesToExecute = (int)Math.Round(Time.deltaTime * _dcpu.ClockSpeed * TimeWarp.CurrentRate);
-
-                _dcpu.Execute(cyclesToExecute);
-
-                var clockRate = _cyclesExecuted / Time.deltaTime;
-                if (_clockRates.Count < 60)
-                {
-                    _clockRates.Add(clockRate);
+                        _pcAtHalt = null;
+                        _isHalted = false;
+                    }
                 }
                 else
                 {
-                    _clockRates[_clockRateIndex] = clockRate;
-                    _clockRateIndex = ((_clockRateIndex + 1) % 60);
-                }
+                    if (_dcpu.IsHalted())
+                    {
+                        _pcAtHalt = _dcpu.PC;
+                        _isHalted = true;
 
-                _cyclesExecuted = cyclesToExecute;
+                        if (_warpIndexBeforeWake != null)
+                        {
+                            var index = _warpIndexBeforeWake.Value;
+                            _warpIndexBeforeWake = null;
+                            TimeWarp.SetRate(index, true);
+                        }
+                    }
+                    else
+                    {
+                        var maxPhysicsWarpIndex = _timeWarp.physicsWarpRates.Length - 1;
+
+                        if (_timeWarp.physicsWarpRates[maxPhysicsWarpIndex] < TimeWarp.CurrentRate)
+                        {
+                            TimeWarp.SetRate(TimeWarp.WarpMode == TimeWarp.Modes.LOW ? maxPhysicsWarpIndex : 0, true);
+                        }
+
+                        var cyclesToExecute = (int)Math.Round(Time.deltaTime * _dcpu.ClockSpeed * TimeWarp.CurrentRate);
+
+                        _dcpu.Execute(cyclesToExecute);
+
+                        var clockRate = _cyclesExecuted / Time.deltaTime;
+                        if (_clockRates.Count < 60)
+                        {
+                            _clockRates.Add(clockRate);
+                        }
+                        else
+                        {
+                            _clockRates[_clockRateIndex] = clockRate;
+                            _clockRateIndex = ((_clockRateIndex + 1) % 60);
+                        }
+
+                        _cyclesExecuted = cyclesToExecute;
+                    }
+                }
             }
         }
 
@@ -216,7 +248,21 @@ namespace Ketchup
             if (GUILayout.Button("4x", _styleButton)) { SetMonitorScale(4); }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label(actualClockSpeedFormatted, _styleLabel);
+            if (_isPowerOn)
+            {
+                if (_isHalted)
+                {
+                    GUILayout.Label("Halted", new GUIStyle(_styleLabel) { normal = { textColor = Color.yellow } });
+                }
+                else
+                {
+                    GUILayout.Label(actualClockSpeedFormatted, _styleLabel);
+                }
+            }
+            else
+            {
+                GUILayout.Label("Powered Off", new GUIStyle(_styleLabel) { normal = { textColor = Color.red } });
+            }
             GUILayout.EndHorizontal();
 
             GUI.SetNextControlName(KeyboardInputName);
@@ -265,6 +311,9 @@ namespace Ketchup
             if (_isPowerOn)
             {
                 _isPowerOn = false;
+
+                _isHalted = false;
+                _pcAtHalt = 0;
 
                 _dcpu.Reset();
                 _dcpu.FlashMemory(new ushort[_dcpu.Memory.Length]);
