@@ -12,4 +12,4 @@
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
-[assembly: AssemblyVersion("0.4.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]
