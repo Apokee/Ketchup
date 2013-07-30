@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.Api", "Source\Ketch
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{321C0367-C334-4476-BB51-15EC365E65BF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", "{4A237490-DCF2-451D-984D-EE3A5CB0A96B}"
+	ProjectSection(SolutionItems) = preProject
+		Source\Properties\GlobalAssemblyInfo.cs = Source\Properties\GlobalAssemblyInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,7 +33,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6} = {321C0367-C334-4476-BB51-15EC365E65BF}
 		{BF83C18A-AD39-4083-A819-5B42B3812664} = {321C0367-C334-4476-BB51-15EC365E65BF}
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6} = {321C0367-C334-4476-BB51-15EC365E65BF}
+		{4A237490-DCF2-451D-984D-EE3A5CB0A96B} = {321C0367-C334-4476-BB51-15EC365E65BF}
 	EndGlobalSection
 EndGlobal

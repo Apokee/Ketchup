@@ -53,6 +53,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
     <Compile Include="Devices\GenericClock.cs" />
