@@ -63,6 +63,7 @@
     <Compile Include="Devices\Lem1802.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Dcpu16Computer.cs" />
+    <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
     <Compile Include="Interop\TomatoDeviceAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
