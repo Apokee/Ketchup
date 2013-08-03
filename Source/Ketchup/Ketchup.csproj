@@ -63,10 +63,15 @@
     <Compile Include="Devices\Lem1802.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Dcpu16Computer.cs" />
+    <Compile Include="Interop\TomatoDeviceAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Interop\" />
+    <ProjectReference Include="..\Ketchup.Api\Ketchup.Api.csproj">
+      <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
+      <Name>Ketchup.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
