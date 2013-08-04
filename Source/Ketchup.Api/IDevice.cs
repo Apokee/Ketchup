@@ -39,6 +39,7 @@
         /// </summary>
         void OnDisconnect();
 
+
         /// <summary>
         /// Called when the device receives an interrupt.
         /// </summary>

@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using Ketchup.Constants;
-using Tomato.Hardware;
+using Ketchup.Api;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup
 {
-    public sealed class Lem1802 : Device
+    public sealed class Lem1802 : PartModule, IDevice
     {
         #region Constants
+
+        private const string ConfigKeyWindowPositionX = "WindowPositionX";
+        private const string ConfigKeyWindowPositionY = "WindowPositionY";
 
         private static readonly ushort[] DefaultFont =
         {
@@ -61,39 +63,51 @@ namespace Ketchup.Devices
 
         #endregion
 
-        #region Device Identifiers
+        #region Instance Fields
 
-        public override string FriendlyName
-        {
-            get { return "LEM1802 - Low Energy Monitor (compatible)"; }
-        }
-
-        public override uint ManufacturerID
-        {
-            get { return (uint)ManufacturerId.NyaElektriska; }
-        }
-
-        public override uint DeviceID
-        {
-            get { return (uint)DeviceId.Lem1802Monitor; }
-        }
-
-        public override ushort Version
-        {
-            get { return 0x1802; }
-        }
-
-        #endregion
+        private IDcpu16 _dcpu16;
 
         private ushort _screenMap;
         private ushort _fontMap;
         private ushort _paletteMap;
         private ushort _borderColorValue;
 
-        private Texture2D _screenTexture;
+        private readonly Texture2D _screenTexture;
+        private float _imageScale = 1;
+        private Rect _windowPosition;
+        private bool _isWindowPositionInit;
 
         private bool _blinkOn = true;
+        // ReSharper disable once NotAccessedField.Local
         private readonly Timer _blinkTimer;
+
+        #endregion
+
+        #region Device Identifiers
+
+        public string FriendlyName
+        {
+            get { return "LEM1802 - Low Energy Monitor (compatible)"; }
+        }
+
+        public uint ManufacturerId
+        {
+            get { return (uint)Constants.ManufacturerId.NyaElektriska; }
+        }
+
+        public uint DeviceId
+        {
+            get { return (uint)Constants.DeviceId.Lem1802Monitor; }
+        }
+
+        public ushort Version
+        {
+            get { return 0x1802; }
+        }
+
+        #endregion
+
+        #region Constructors
 
         public Lem1802()
         {
@@ -101,46 +115,131 @@ namespace Ketchup.Devices
             _blinkTimer = new Timer(ToggleBlinker, null, BlinkRate, BlinkRate);
         }
 
-        public override int HandleInterrupt()
-        {
-            var action = (ActionId)AttachedCPU.A;
+        #endregion
 
-            switch (action)
+        #region IDevice Methods
+
+        public void OnConnect(IDcpu16 dcpu16)
+        {
+            _dcpu16 = dcpu16;
+        }
+
+        public void OnDisconnect()
+        {
+            _dcpu16 = default(IDcpu16);
+            _screenMap = default(ushort);
+            _fontMap = default(ushort);
+            _paletteMap = default(ushort);
+            _borderColorValue = default(ushort);
+            _blinkOn = true;
+        }
+
+        public int OnInterrupt()
+        {
+            if (_dcpu16 != null)
             {
-                case ActionId.MemMapScreen:
-                    _screenMap = AttachedCPU.B;
-                    break;
-                case ActionId.MemMapFont:
-                    _fontMap = AttachedCPU.B;
-                    break;
-                case ActionId.MemMapPalette:
-                    _paletteMap = AttachedCPU.B;
-                    break;
-                case ActionId.SetBorderColor:
-                    _borderColorValue = (ushort)(AttachedCPU.B & 0xF);
-                    break;
-                case ActionId.MemDumpFont:
-                    Array.Copy(DefaultFont, 0, AttachedCPU.Memory, AttachedCPU.B, DefaultFont.Length);
-                    return 256;
-                case ActionId.MemDumpPalette:
-                    Array.Copy(DefaultPalette, 0, AttachedCPU.Memory, AttachedCPU.B, DefaultPalette.Length);
-                    return 16;
+                var action = (ActionId)_dcpu16.A;
+
+                switch (action)
+                {
+                    case ActionId.MemMapScreen:
+                        _screenMap = _dcpu16.B;
+                        break;
+                    case ActionId.MemMapFont:
+                        _fontMap = _dcpu16.B;
+                        break;
+                    case ActionId.MemMapPalette:
+                        _paletteMap = _dcpu16.B;
+                        break;
+                    case ActionId.SetBorderColor:
+                        _borderColorValue = (ushort)(_dcpu16.B & 0xF);
+                        break;
+                    case ActionId.MemDumpFont:
+                        Array.Copy(DefaultFont, 0, _dcpu16.Memory, _dcpu16.B, DefaultFont.Length);
+                        return 256;
+                    case ActionId.MemDumpPalette:
+                        Array.Copy(DefaultPalette, 0, _dcpu16.Memory, _dcpu16.B, DefaultPalette.Length);
+                        return 16;
+                }
             }
 
             return 0;
         }
 
-        public override void Reset()
+        #endregion
+
+        #region PartModule Methods
+
+        public override void OnLoad(ConfigNode node)
         {
-            _screenMap = 0;
-            _fontMap = 0;
-            _paletteMap = 0;
-            _borderColorValue = 0;
+            float x;
+            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+            {
+                _windowPosition.x = x;
+            }
+
+            float y;
+            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
+            {
+                _windowPosition.y = y;
+            }
+
+            _isWindowPositionInit = true;
         }
 
-        public Texture2D GetScreenImage()
+        public override void OnSave(ConfigNode node)
         {
-            if (_screenMap == 0)
+            node.AddValue(ConfigKeyWindowPositionX, _windowPosition.x);
+            node.AddValue(ConfigKeyWindowPositionY, _windowPosition.y);
+        }
+
+        public override void OnStart(StartState state)
+        {
+            if (state != StartState.Editor)
+            {
+                InitWindowPositionIfNecessary();
+                RenderingManager.AddToPostDrawQueue(1, OnDraw);
+            }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void OnDraw()
+        {
+            if (vessel.isActiveVessel)
+            {
+                GUI.skin = HighLogic.Skin;
+                
+                _windowPosition = GUILayout.Window(3, _windowPosition, OnWindow, "LEM-1802");
+            }
+        }
+
+        private void OnWindow(int windowId)
+        {
+            Refresh();
+
+            GUILayout.BeginHorizontal();
+
+            GUILayout.Box(String.Empty, GUILayout.Width((int)(_screenTexture.width * _imageScale)), GUILayout.Height((int)(_screenTexture.height * _imageScale)));
+            GUI.DrawTexture(GUILayoutUtility.GetLastRect(), _screenTexture, ScaleMode.ScaleToFit);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("1x")) { SetMonitorScale(1); }
+            if (GUILayout.Button("2x")) { SetMonitorScale(2); }
+            if (GUILayout.Button("3x")) { SetMonitorScale(3); }
+            if (GUILayout.Button("4x")) { SetMonitorScale(4); }
+            GUILayout.EndHorizontal();
+
+            GUI.DragWindow();
+        }
+
+        private void Refresh()
+        {
+
+            if (_dcpu16 == null || _screenMap == 0)
             {
                 for (var x = 0; x < _screenTexture.width; x++)
                 {
@@ -157,12 +256,12 @@ namespace Ketchup.Devices
                 {
                     for (var x = 0; x < 32; x++)
                     {
-                        var value = AttachedCPU.Memory[_screenMap + address];
+                        var value = _dcpu16.Memory[_screenMap + address];
                         uint fontValue;
                         if (_fontMap == 0)
                             fontValue = (uint)((DefaultFont[(value & 0x7F) * 2] << 16) | DefaultFont[(value & 0x7F) * 2 + 1]);
                         else
-                            fontValue = (uint)((AttachedCPU.Memory[_fontMap + ((value & 0x7F) * 2)] << 16) | AttachedCPU.Memory[_fontMap + ((value & 0x7F) * 2) + 1]);
+                            fontValue = (uint)((_dcpu16.Memory[_fontMap + ((value & 0x7F) * 2)] << 16) | _dcpu16.Memory[_fontMap + ((value & 0x7F) * 2) + 1]);
 
                         fontValue = BitConverter.ToUInt32(BitConverter.GetBytes(fontValue).Reverse().ToArray(), 0);
 
@@ -190,14 +289,13 @@ namespace Ketchup.Devices
             }
 
             _screenTexture.Apply();
-
-            return _screenTexture;
         }
+
         private Color GetPaletteColor(byte value)
         {
             var color = _paletteMap == 0 ?
                 DefaultPalette[value & 0xF] :
-                AttachedCPU.Memory[_paletteMap + (value & 0xF)];
+                _dcpu16.Memory[_paletteMap + (value & 0xF)];
 
             var b = (byte)(color & 0xF);
             b |= (byte)(b << 4);
@@ -218,14 +316,38 @@ namespace Ketchup.Devices
             _blinkOn = !_blinkOn;
         }
 
+        private void SetMonitorScale(float scale)
+        {
+            _imageScale = scale;
+            _windowPosition = new Rect(_windowPosition) { width = 0, height = 0 };
+        }
+
+        private void InitWindowPositionIfNecessary()
+        {
+            if (!_isWindowPositionInit)
+            {
+                const float defaultTop = 400f;
+
+                _windowPosition = new Rect(Screen.width - 200f, defaultTop, 0, 0);
+
+                _isWindowPositionInit = true;
+            }
+        }
+
+        #endregion
+
+        #region Nested Types
+
         private enum ActionId : ushort
         {
-            MemMapScreen    = 0x0000,
-            MemMapFont      = 0x0001,
-            MemMapPalette   = 0x0002,
-            SetBorderColor  = 0x0003,
-            MemDumpFont     = 0x0004,
-            MemDumpPalette  = 0x0005,
+            MemMapScreen = 0x0000,
+            MemMapFont = 0x0001,
+            MemMapPalette = 0x0002,
+            SetBorderColor = 0x0003,
+            MemDumpFont = 0x0004,
+            MemDumpPalette = 0x0005,
         }
+
+        #endregion
     }
 }

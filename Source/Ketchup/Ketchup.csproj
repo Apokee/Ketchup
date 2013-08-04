@@ -58,13 +58,13 @@
     </Compile>
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
-    <Compile Include="Devices\GenericClock.cs" />
-    <Compile Include="Devices\GenericKeyboard.cs" />
-    <Compile Include="Devices\Lem1802.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
-    <Compile Include="Dcpu16Computer.cs" />
+    <Compile Include="Computer.cs" />
+    <Compile Include="GenericClock.cs" />
+    <Compile Include="GenericKeyboard.cs" />
     <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
     <Compile Include="Interop\TomatoDeviceAdapter.cs" />
+    <Compile Include="Lem1802.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
-using Ketchup.Constants;
-using Tomato.Hardware;
+﻿using System;
+using System.Collections.Generic;
+using Ketchup.Api;
+using KSP.IO;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup
 {
-    public sealed class GenericKeyboard : Device
+    public sealed class GenericKeyboard : PartModule, IDevice
     {
-        #region Key Mappings
+        #region Constants
+
+        private const string HiddenInputName = "KetchupDcpu16ComputerKeyboardInput";
+        private const string ConfigKeyWindowPositionX = "WindowPositionX";
+        private const string ConfigKeyWindowPositionY = "WindowPositionY";
 
         private static readonly Dictionary<KeyCode, KeyCodePair> KeyMappings = new Dictionary<KeyCode, KeyCodePair>
         {
@@ -115,86 +120,234 @@ namespace Ketchup.Devices
 
         #endregion
 
+        #region Static Fields
+
+        private static GUIStyle _styleButtonPressed;
+        private static bool _isStyleInit;
+
+        #endregion
+
+        #region Instance Fields
+
+        private IDcpu16 _dcpu16;
+
         private readonly Queue<ushort> _buffer = new Queue<ushort>();
         private readonly HashSet<ushort> _pressedKeys = new HashSet<ushort>();
 
         private ushort _interruptMessage;
+        private bool _isAttached;
 
-        public override string FriendlyName
+        private Rect _windowRect;
+        private bool _isWindowPositionInit;
+        private bool _isWindowSizeInit;
+
+        #endregion
+
+        #region Device Identifiers
+
+        public string FriendlyName
         {
             get { return "Generic Keyboard (compatible)"; }
         }
 
-        public override uint ManufacturerID
+        public uint ManufacturerId
         {
-            get { return (uint)ManufacturerId.Unknown; }
+            get { return (uint)Constants.ManufacturerId.Unknown; }
         }
 
-        public override uint DeviceID
+        public uint DeviceId
         {
-            get { return (uint)DeviceId.GenericKeyboard; }
+            get { return (uint)Constants.DeviceId.GenericKeyboard; }
         }
 
-        public override ushort Version
+        public ushort Version
         {
             get { return 0x0001; }
         }
 
-        public override int HandleInterrupt()
-        {
-            var action = (ActionId)AttachedCPU.A;
+        #endregion
+        
+        #region IDevice Methods
 
-            switch (action)
+        public void OnConnect(IDcpu16 dcpu16)
+        {
+            _dcpu16 = dcpu16;
+        }
+
+        public void OnDisconnect()
+        {
+            _dcpu16 = default(IDcpu16);
+            _buffer.Clear();
+            _pressedKeys.Clear();
+            _interruptMessage = default(ushort);
+            _isAttached = default(bool);
+        }
+
+        public int OnInterrupt()
+        {
+            if (_dcpu16 != null)
             {
-                case ActionId.ClearBuffer:
-                    _buffer.Clear();
-                    break;
-                case ActionId.StoreNextKey:
-                    AttachedCPU.C = _buffer.Count == 0 ? (ushort)0 : _buffer.Dequeue();
-                    break;
-                case ActionId.CheckNextKey:
-                    AttachedCPU.C = _pressedKeys.Contains(AttachedCPU.B) ? (ushort)1 : (ushort)0;
-                    break;
-                case ActionId.SetInterruptBehavior:
-                    _interruptMessage = AttachedCPU.B;
-                    break;
+                var action = (ActionId)_dcpu16.A;
+
+                switch (action)
+                {
+                    case ActionId.ClearBuffer:
+                        _buffer.Clear();
+                        break;
+                    case ActionId.StoreNextKey:
+                        _dcpu16.C = _buffer.Count == 0 ? (ushort)0 : _buffer.Dequeue();
+                        break;
+                    case ActionId.CheckNextKey:
+                        _dcpu16.C = _pressedKeys.Contains(_dcpu16.B) ? (ushort)1 : (ushort)0;
+                        break;
+                    case ActionId.SetInterruptBehavior:
+                        _interruptMessage = _dcpu16.B;
+                        break;
+                }
             }
 
             return 0;
         }
 
-        public override void Reset()
-        {
-            _interruptMessage = 0;
-            _pressedKeys.Clear();
-            _buffer.Clear();
-        }
+        #endregion
 
-        public ushort GetKeyValue(KeyCode keyCode)
-        {
-            KeyCodePair keyCodePair;
-            return KeyMappings.TryGetValue(keyCode, out keyCodePair) ?
-                (_pressedKeys.Contains(0x90) ? keyCodePair.Shifted : keyCodePair.Normal) :
-                (ushort)0;
-        }
+        #region PartModule Methods
 
-        public void KeyDown(KeyCode keyCode)
+        public override void OnStart(StartState state)
         {
-            var code = GetKeyValue(keyCode);
-
-            if (code != 0)
+            if (state != StartState.Editor)
             {
-                _buffer.Enqueue(code);
-                _pressedKeys.Add(code);
+                InitStylesIfNecessary();
+                InitWindowSizeIfNecessary();
+                InitWindowPositionIfNecessary();
+                RenderingManager.AddToPostDrawQueue(1, OnDraw);
+            }
+        }
 
-                if (_interruptMessage != 0)
+        public override void OnLoad(ConfigNode node)
+        {
+            float x;
+            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+            {
+                _windowRect.x = x;
+            }
+
+            float y;
+            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
+            {
+                _windowRect.y = y;
+            }
+
+            _isWindowPositionInit = true;
+        }
+
+        public override void OnSave(ConfigNode node)
+        {
+            node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
+            node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void OnDraw()
+        {
+            if (vessel.isActiveVessel)
+            {
+                GUI.skin = HighLogic.Skin;
+                
+                _windowRect = GUILayout.Window(2, _windowRect, OnWindow, "Keyboard");
+            }
+        }
+
+        private void OnWindow(int windowId)
+        {
+            GUI.skin = HighLogic.Skin;
+
+            if (_isAttached)
+            {
+                GUI.FocusControl(HiddenInputName);
+                HandleKeyEvents();
+            }
+
+            GUILayout.BeginHorizontal();
+            var attachButtonPressed = GUILayout.Button("Attach", _isAttached ? _styleButtonPressed : GUI.skin.button);
+            GUILayout.EndHorizontal();
+
+            GUI.SetNextControlName(HiddenInputName);
+            GUI.TextField(new Rect(0, 0, 0, 0), String.Empty, GUIStyle.none);
+
+            GUI.DragWindow();
+
+            if (GUI.changed)
+            {
+                if (attachButtonPressed) { OnAttachButtonPressed(); }
+            }
+        }
+
+        private void OnAttachButtonPressed()
+        {
+            _isAttached = !_isAttached;
+        }
+
+        private void HandleKeyEvents()
+        {
+            var currentEvent = Event.current;
+
+            if (currentEvent.isKey)
+            {
+                var eventType = currentEvent.type;
+
+                if (currentEvent.alt)
+                    OnKeyDown(KeyCode.LeftAlt);
+                else
+                    OnKeyUp(KeyCode.LeftAlt);
+
+                if (currentEvent.control)
+                    OnKeyDown(KeyCode.LeftControl);
+                else
+                    OnKeyUp(KeyCode.LeftControl);
+
+                if (currentEvent.shift)
+                    OnKeyDown(KeyCode.LeftShift);
+                else
+                    OnKeyUp(KeyCode.LeftShift);
+
+                switch (eventType)
                 {
-                    AttachedCPU.FireInterrupt(_interruptMessage);
+                    case EventType.KeyDown:
+                        OnKeyDown(currentEvent.keyCode);
+                        currentEvent.Use();
+                        break;
+                    case EventType.KeyUp:
+                        OnKeyUp(currentEvent.keyCode);
+                        currentEvent.Use();
+                        break;
                 }
             }
         }
 
-        public void KeyUp(KeyCode keyCode)
+        private void OnKeyDown(KeyCode keyCode)
+        {
+            if (_dcpu16 != null)
+            {
+                var code = GetKeyValue(keyCode);
+
+                if (code != 0)
+                {
+                    _buffer.Enqueue(code);
+                    _pressedKeys.Add(code);
+
+                    if (_interruptMessage != 0)
+                    {
+                        _dcpu16.Interrupt(_interruptMessage);
+                    }
+                }
+            }
+        }
+
+        private void OnKeyUp(KeyCode keyCode)
         {
             var code = GetKeyValue(keyCode);
 
@@ -204,12 +357,60 @@ namespace Ketchup.Devices
             }
         }
 
+        private ushort GetKeyValue(KeyCode keyCode)
+        {
+            KeyCodePair keyCodePair;
+            return KeyMappings.TryGetValue(keyCode, out keyCodePair) ?
+                (_pressedKeys.Contains(0x90) ? keyCodePair.Shifted : keyCodePair.Normal) :
+                (ushort)0;
+        }
+
+        private void InitWindowPositionIfNecessary()
+        {
+            if (!_isWindowPositionInit)
+            {
+                const float defaultTop = 325f;
+                const float defaultWidth = 100f;
+
+                _windowRect = new Rect(_windowRect) { x = Screen.width - defaultWidth, y = defaultTop };
+
+                _isWindowPositionInit = true;
+            }
+        }
+
+        private void InitWindowSizeIfNecessary()
+        {
+            if (!_isWindowSizeInit)
+            {
+                const float defaultWidth = 100f;
+                const float defaultHeight = 0f;
+
+                _windowRect = new Rect(_windowRect) { width = defaultWidth, height = defaultHeight };
+
+                _isWindowSizeInit = true;
+            }
+        }
+
+        private static void InitStylesIfNecessary()
+        {
+            if (!_isStyleInit)
+            {
+                _styleButtonPressed = new GUIStyle(HighLogic.Skin.button) { normal = HighLogic.Skin.button.active };
+
+                _isStyleInit = true;
+            }
+        }
+
+        #endregion
+
+        #region Nested Types
+
         private enum ActionId : ushort
         {
-            ClearBuffer             = 0x0000,
-            StoreNextKey            = 0x0001,
-            CheckNextKey            = 0x0002,
-            SetInterruptBehavior    = 0x0003,
+            ClearBuffer = 0x0000,
+            StoreNextKey = 0x0001,
+            CheckNextKey = 0x0002,
+            SetInterruptBehavior = 0x0003,
         }
 
         private struct KeyCodePair
@@ -229,5 +430,7 @@ namespace Ketchup.Devices
                 Shifted = shifted;
             }
         }
+
+        #endregion
     }
 }
