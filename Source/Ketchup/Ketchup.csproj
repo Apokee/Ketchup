@@ -67,7 +67,9 @@
     <Compile Include="Lem1802.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="IO\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ketchup.Api\Ketchup.Api.csproj">
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
