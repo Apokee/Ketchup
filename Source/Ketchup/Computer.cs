@@ -4,6 +4,7 @@ using System.Linq;
 using Ketchup.Api;
 using Ketchup.Extensions;
 using Ketchup.Interop;
+using Ketchup.IO;
 using KSP.IO;
 using Tomato;
 using UnityEngine;
@@ -15,8 +16,14 @@ namespace Ketchup
         #region Constants
 
         private const int ClockFrequency = 100000;
+        private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyDcpu16State = "Dcpu16State";
+        private const string ConfigKeyIsPowerOn = "IsPowerOn";
+        private const string ConfigKeyMemoryImage = "MemoryImage";
+
+        private const uint ConfigVersion = 1;
 
         #endregion
 
@@ -32,13 +39,15 @@ namespace Ketchup
         private IDcpu16 _dcpu16;
         private readonly List<IDevice> _devices = new List<IDevice>();
 
+        private Dcpu16StateManager _dcpu16StateManager;
+
         private bool _isPowerOn;
         private bool _isHalted;
 
         private ushort? _pcAtHalt;
         private int? _warpIndexBeforeWake;
 
-        private string _program = String.Empty;
+        private string _memoryImage = String.Empty;
 
         private readonly List<double> _clockRates = new List<double>(60);
         private int _cyclesExecuted;
@@ -49,6 +58,8 @@ namespace Ketchup
         private Rect _windowRect;
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
+
+        private string _dcpu16State;
 
         #endregion
 
@@ -64,35 +75,68 @@ namespace Ketchup
                 InitWindowPositionIfNecessary();
                 InitWindowSizeIfNecessary();
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
+
+                if (_isPowerOn)
+                    TurnOn(useState: true);
+                else
+                    TurnOff();
             }
         }
 
         public override void OnLoad(ConfigNode node)
         {
-            float x;
-            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+            uint version;
+            if (UInt32.TryParse(node.GetValue(ConfigKeyVersion), out version) && version == 1)
             {
-                _windowRect.x = x;
-            }
+                float windowPositionX;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out windowPositionX))
+                {
+                    _windowRect.x = windowPositionX;
+                }
 
-            float y;
-            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
-            {
-                _windowRect.y = y;
-            }
+                float windowPositionY;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out windowPositionY))
+                {
+                    _windowRect.y = windowPositionY;
+                }
 
-            _isWindowPositionInit = true;
+                _isWindowPositionInit = true;
+
+                bool isPowerOn;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyIsPowerOn), out isPowerOn))
+                {
+                    _isPowerOn = isPowerOn;
+                }
+
+                _memoryImage = node.GetValue(ConfigKeyMemoryImage) ?? String.Empty;
+                _dcpu16State = node.GetValue(ConfigKeyDcpu16State);
+            }
         }
 
         public override void OnSave(ConfigNode node)
         {
+            node.AddValue(ConfigKeyVersion, ConfigVersion);
+
             node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+            node.AddValue(ConfigKeyIsPowerOn, _isPowerOn);
+
+            if (!String.IsNullOrEmpty(_memoryImage))
+            {
+                node.AddValue(ConfigKeyMemoryImage, _memoryImage);
+            }
+
+            if (_dcpu16StateManager != null)
+            {
+                var state = _dcpu16StateManager.SaveAsBase64();
+
+                node.AddValue(ConfigKeyDcpu16State, state);
+            }
         }
 
         public override void OnUpdate()
         {
-            if (_isPowerOn)
+            if (_isPowerOn && _dcpu16 != null)
             {
                 if (_isHalted)
                 {
@@ -180,11 +224,11 @@ namespace Ketchup
             GUILayout.BeginHorizontal();
             if (_isPowerOn)
             {
-                GUILayout.Label(_program, GUILayout.ExpandWidth(true));
+                GUILayout.Label(_memoryImage, GUILayout.ExpandWidth(true));
             }
             else
             {
-                _program = GUILayout.TextField(_program);
+                _memoryImage = GUILayout.TextField(_memoryImage);
             }
             GUILayout.EndHorizontal();
 
@@ -221,7 +265,7 @@ namespace Ketchup
             {
                 const float defaultTop = 200f;
 
-                _windowRect = new Rect(_windowRect) { x = 0f, y = defaultTop }; 
+                _windowRect = new Rect(_windowRect) { x = Screen.width - 250f, y = defaultTop }; 
 
                 _isWindowPositionInit = true;
             }
@@ -253,51 +297,85 @@ namespace Ketchup
         private void OnPowerButtonPressed()
         {
             if (_isPowerOn)
+                TurnOff();
+            else
+                TurnOn(useState: false);
+        }
+
+        private void InitializeDcpu16(string state)
+        {
+            _dcpu16 = new TomatoDcpu16Adapter(new DCPU());
+            _dcpu16StateManager = new Dcpu16StateManager(_dcpu16);
+
+            if (String.IsNullOrEmpty(state))
             {
-                _isPowerOn = false;
+                var memoryImage = LoadMemoryImage();
 
-                _isHalted = false;
-                _pcAtHalt = 0;
-
-                _dcpu16 = null;
-
-                foreach (var device in _devices)
-                {
-                    device.OnDisconnect();
-                }
-
-                _devices.Clear();
-
-                _clockRates.RemoveAll(i => true);
-                _clockRateIndex = 0;
+                Array.Copy(memoryImage, _dcpu16.Memory, memoryImage.Length);
             }
             else
             {
-                _dcpu16 = new TomatoDcpu16Adapter(new DCPU());
-
-                foreach (var device in vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()))
-                {
-                    _devices.Add(device);
-                    Connect(_dcpu16, device);
-
-                    Debug.Log(String.Format("[Ketchup] Connected CPU to {0}", device.FriendlyName)); 
-                }
-
-                var programBytes = File.ReadAllBytes<Computer>(_program);
-                var programUShorts = new ushort[programBytes.Length / 2];
-
-                for (var i = 0; i < programBytes.Length; i += 2)
-                {
-                    var a = programBytes[i];
-                    var b = programBytes[i + 1];
-
-                    programUShorts[i / 2] = (ushort)((a << 8) | b);
-                }
-
-                Array.Copy(programUShorts, _dcpu16.Memory, programUShorts.Length);
-
-                _isPowerOn = true;
+                _dcpu16StateManager.LoadFromBase64(state);
             }
+        }
+
+        private ushort[] LoadMemoryImage()
+        {
+            var memoryImageBytes = File.ReadAllBytes<Computer>(_memoryImage);
+            var memoryImageUShorts = new ushort[memoryImageBytes.Length / 2];
+
+            for (var i = 0; i < memoryImageBytes.Length; i += 2)
+            {
+                var a = memoryImageBytes[i];
+                var b = memoryImageBytes[i + 1];
+
+                memoryImageUShorts[i / 2] = (ushort)((a << 8) | b);
+            }
+
+            return memoryImageUShorts;
+        }
+
+        private void TurnOn(bool useState)
+        {
+            if (useState && !String.IsNullOrEmpty(_dcpu16State))
+            {
+                InitializeDcpu16(_dcpu16State);
+            }
+            else
+            {
+                InitializeDcpu16(null);
+            }
+
+            foreach (var device in vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()))
+            {
+                _devices.Add(device);
+                Connect(_dcpu16, device);
+
+                Debug.Log(String.Format("[Ketchup] Connected CPU to {0}", device.FriendlyName));
+            }
+
+            _isPowerOn = true;
+        }
+
+        private void TurnOff()
+        {
+            _isPowerOn = false;
+
+            _isHalted = false;
+            _pcAtHalt = 0;
+
+            _dcpu16 = null;
+            _dcpu16StateManager = null;
+
+            foreach (var device in _devices)
+            {
+                device.OnDisconnect();
+            }
+
+            _devices.Clear();
+
+            _clockRates.RemoveAll(i => true);
+            _clockRateIndex = 0;
         }
 
         private static void Connect(IDcpu16 dcpu16, IDevice device)

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using Ketchup.Api;
 using Ketchup.Exceptions;
+using SharpCompress.Compressor;
+using SharpCompress.Compressor.Deflate;
 
 namespace Ketchup.IO
 {
@@ -50,7 +51,7 @@ namespace Ketchup.IO
         {
             try
             {
-                using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
+                using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress, true))
                 using (var reader = new BinaryReader(gzipStream))
                 {
                     // Header
@@ -122,7 +123,7 @@ namespace Ketchup.IO
 
         public void SaveToStream(Stream stream)
         {
-            using (var gzipStream = new GZipStream(stream, CompressionMode.Compress))
+            using (var gzipStream = new GZipStream(stream, CompressionMode.Compress, true))
             using (var writer = new BinaryWriter(gzipStream))
             {
                 // Header

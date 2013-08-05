@@ -10,8 +10,16 @@ namespace Ketchup
     {
         #region Constants
 
+        private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyScreenMap = "ScreenMap";
+        private const string ConfigKeyFontMap = "FontMap";
+        private const string ConfigKeyPaletteMap = "PaletteMap";
+        private const string ConfigKeyBorderColorValue = "BorderColorValue";
+        private const string ConfigKeyImageScale = "ImageScale";
+
+        private const uint ConfigVersion = 1;
 
         private static readonly ushort[] DefaultFont =
         {
@@ -172,25 +180,65 @@ namespace Ketchup
 
         public override void OnLoad(ConfigNode node)
         {
-            float x;
-            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+            uint version;
+            if (UInt32.TryParse(node.GetValue(ConfigKeyVersion), out version) && version == 1)
             {
-                _windowPosition.x = x;
-            }
+                float x;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+                {
+                    _windowPosition.x = x;
+                }
 
-            float y;
-            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
-            {
-                _windowPosition.y = y;
-            }
+                float y;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
+                {
+                    _windowPosition.y = y;
+                }
 
-            _isWindowPositionInit = true;
+                _isWindowPositionInit = true;
+
+                ushort screenMap;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyScreenMap), out screenMap))
+                {
+                    _screenMap = screenMap;
+                }
+
+                ushort fontMap;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyFontMap), out fontMap))
+                {
+                    _fontMap = fontMap;
+                }
+
+                ushort paletteMap;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyPaletteMap), out paletteMap))
+                {
+                    _paletteMap = paletteMap;
+                }
+
+                ushort borderColorValue;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyBorderColorValue), out borderColorValue))
+                {
+                    _borderColorValue = borderColorValue;
+                }
+
+                float imageScale;
+                if (Single.TryParse(node.GetValue(ConfigKeyImageScale), out imageScale))
+                {
+                    _imageScale = imageScale;
+                }
+            }
         }
 
         public override void OnSave(ConfigNode node)
         {
+            node.AddValue(ConfigKeyVersion, ConfigVersion);
             node.AddValue(ConfigKeyWindowPositionX, _windowPosition.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowPosition.y);
+            node.AddValue(ConfigKeyScreenMap, _screenMap);
+            node.AddValue(ConfigKeyFontMap, _fontMap);
+            node.AddValue(ConfigKeyPaletteMap, _paletteMap);
+            node.AddValue(ConfigKeyBorderColorValue, _borderColorValue);
+            node.AddValue(ConfigKeyImageScale, _imageScale);
         }
 
         public override void OnStart(StartState state)
@@ -238,7 +286,6 @@ namespace Ketchup
 
         private void Refresh()
         {
-
             if (_dcpu16 == null || _screenMap == 0)
             {
                 for (var x = 0; x < _screenTexture.width; x++)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ketchup.Api;
-using KSP.IO;
 using UnityEngine;
 
 namespace Ketchup
@@ -11,8 +11,15 @@ namespace Ketchup
         #region Constants
 
         private const string HiddenInputName = "KetchupDcpu16ComputerKeyboardInput";
+        private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyBuffer = "Buffer";
+        private const string ConfigKeyPressedKeys = "PressedKeys";
+        private const string ConfigKeyInterruptMessage = "InterruptMessage";
+        private const string ConfigKeyIsAttached = "IsAttached";
+
+        private const uint ConfigVersion = 1;
 
         private static readonly Dictionary<KeyCode, KeyCodePair> KeyMappings = new Dictionary<KeyCode, KeyCodePair>
         {
@@ -226,25 +233,75 @@ namespace Ketchup
 
         public override void OnLoad(ConfigNode node)
         {
-            float x;
-            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+            uint version;
+            if (UInt32.TryParse(node.GetValue(ConfigKeyVersion), out version) && version == 1)
             {
-                _windowRect.x = x;
-            }
+                float x;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+                {
+                    _windowRect.x = x;
+                }
 
-            float y;
-            if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
-            {
-                _windowRect.y = y;
-            }
+                float y;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
+                {
+                    _windowRect.y = y;
+                }
+             
+                _isWindowPositionInit = true;
 
-            _isWindowPositionInit = true;
+                var buffer = node.GetValue(ConfigKeyBuffer);
+                if (!String.IsNullOrEmpty(buffer))
+                {
+                    _buffer.Clear();
+                    foreach (var key in buffer.Split(',').Select(UInt16.Parse))
+                    {
+                        _buffer.Enqueue(key);
+                    }
+                }
+
+                var pressedKeys = node.GetValue(ConfigKeyPressedKeys);
+                if (!String.IsNullOrEmpty(pressedKeys))
+                {
+                    _pressedKeys.Clear();
+                    foreach (var key in pressedKeys.Split(',').Select(UInt16.Parse))
+                    {
+                        _pressedKeys.Add(key);
+                    }
+                }
+
+                ushort interruptMessage;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyInterruptMessage), out interruptMessage))
+                {
+                    _interruptMessage = interruptMessage;
+                }
+
+                bool isAttached;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyIsAttached), out isAttached))
+                {
+                    _isAttached = isAttached;
+                }
+            }
         }
 
         public override void OnSave(ConfigNode node)
         {
+            node.AddValue(ConfigKeyVersion, ConfigVersion);
             node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+
+            if (_buffer.Any())
+            {
+                node.AddValue(ConfigKeyBuffer, String.Join(",", _buffer.Select(i => i.ToString()).ToArray()));
+            }
+
+            if (_pressedKeys.Any())
+            {
+                node.AddValue(ConfigKeyPressedKeys, String.Join(",", _pressedKeys.Select(i => i.ToString()).ToArray()));
+            }
+
+            node.AddValue(ConfigKeyInterruptMessage, _interruptMessage);
+            node.AddValue(ConfigKeyIsAttached, _isAttached);
         }
 
         #endregion
