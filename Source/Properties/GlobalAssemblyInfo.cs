@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("Ketchup")]
-[assembly: AssemblyDescription("Ketchup Mod for Kerbal Space Program")]
+[assembly: AssemblyProduct("Ketchup Add-on")]
 [assembly: AssemblyCompany("Dwayne Bent")]
-[assembly: AssemblyProduct("Ketchup Mod")]
 [assembly: AssemblyCopyright("Copyright © 2013")]
 
 #if DEBUG
