@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using Ketchup.Api;
 using UnityEngine;
 
@@ -67,7 +66,7 @@ namespace Ketchup
         private const int Height = 96;
         private const int CharWidth = 4;
         private const int CharHeight = 8;
-        private const int BlinkRate = 1000;
+        private const float BlinkRate = 1f;
 
         #endregion
 
@@ -85,9 +84,8 @@ namespace Ketchup
         private Rect _windowPosition;
         private bool _isWindowPositionInit;
 
-        private bool _blinkOn = true;
-        // ReSharper disable once NotAccessedField.Local
-        private readonly Timer _blinkTimer;
+        private bool _blinkOn;
+        private float _timeUntilNextBlinkToggle = BlinkRate;
 
         #endregion
 
@@ -120,7 +118,6 @@ namespace Ketchup
         public Lem1802()
         {
             _screenTexture = new Texture2D(Width, Height) { filterMode = FilterMode.Point };
-            _blinkTimer = new Timer(ToggleBlinker, null, BlinkRate, BlinkRate);
         }
 
         #endregion
@@ -250,6 +247,17 @@ namespace Ketchup
             }
         }
 
+        public override void OnUpdate()
+        {
+            _timeUntilNextBlinkToggle -= TimeWarp.deltaTime;
+
+            if (_timeUntilNextBlinkToggle <= 0)
+            {
+                ToggleBlinker();
+                _timeUntilNextBlinkToggle = BlinkRate;
+            }
+        }
+
         #endregion
 
         #region Helper Methods
@@ -358,7 +366,7 @@ namespace Ketchup
             return new Color(rf, gf, bf, 1);
         }
 
-        private void ToggleBlinker(object o)
+        private void ToggleBlinker()
         {
             _blinkOn = !_blinkOn;
         }
