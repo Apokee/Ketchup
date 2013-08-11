@@ -3,7 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.20617.1 PREVIEW
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup", "Ketchup\Ketchup.csproj", "{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup", "Source\Ketchup\Ketchup.csproj", "{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.Api", "Source\Ketchup.Api\Ketchup.Api.csproj", "{BF83C18A-AD39-4083-A819-5B42B3812664}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{321C0367-C334-4476-BB51-15EC365E65BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", "{4A237490-DCF2-451D-984D-EE3A5CB0A96B}"
+	ProjectSection(SolutionItems) = preProject
+		Source\Properties\GlobalAssemblyInfo.cs = Source\Properties\GlobalAssemblyInfo.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +24,17 @@ Global
 		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BF83C18A-AD39-4083-A819-5B42B3812664} = {321C0367-C334-4476-BB51-15EC365E65BF}
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6} = {321C0367-C334-4476-BB51-15EC365E65BF}
+		{4A237490-DCF2-451D-984D-EE3A5CB0A96B} = {321C0367-C334-4476-BB51-15EC365E65BF}
 	EndGlobalSection
 EndGlobal
