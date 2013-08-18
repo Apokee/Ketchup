@@ -500,7 +500,8 @@ namespace Ketchup
 
             var savesDirectory = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
             var profileDirectory = Path.Combine(savesDirectory, HighLogic.SaveFolder);
-            var diskImageDirectory = Path.Combine(profileDirectory, "FloppyDisks");
+            var ketchupDirectory = Path.Combine(profileDirectory, "Ketchup");
+            var diskImageDirectory = Path.Combine(ketchupDirectory, "FloppyDisks");
 
             if (Directory.Exists(diskImageDirectory))
             {
