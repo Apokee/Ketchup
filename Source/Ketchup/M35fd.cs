@@ -47,7 +47,8 @@ namespace Ketchup
 
         private int _currentTrack;
 
-        private Rect _windowM35FdRect;
+        private Rect _windowPosition;
+        private bool _isWindowPositionInit;
         private GuiMode _guiMode;
         private readonly Dictionary<FloppyDisk, string> _disksBeingLabeled = new Dictionary<FloppyDisk, string>();
 
@@ -125,6 +126,7 @@ namespace Ketchup
             if (state != StartState.Editor)
             {
                 InitStylesIfNecessary();
+                InitWindowPositionIfNecessary();
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
             }
         }
@@ -306,7 +308,7 @@ namespace Ketchup
             {
                 GUI.skin = HighLogic.Skin;
 
-                _windowM35FdRect = GUILayout.Window(4, _windowM35FdRect, OnM35FdWindow, "M35FD");
+                _windowPosition = GUILayout.Window(4, _windowPosition, OnM35FdWindow, "M35FD");
             }
         }
 
@@ -356,11 +358,11 @@ namespace Ketchup
                         case GuiMode.Get:
                             if (_disksBeingLabeled.ContainsKey(disk))
                             {
-                                _disksBeingLabeled[disk] = GUILayout.TextField(_disksBeingLabeled[disk], GUILayout.Width(200));
+                                _disksBeingLabeled[disk] = GUILayout.TextField(_disksBeingLabeled[disk], GUILayout.Width(125));
                             }
                             else
                             {
-                                GUILayout.Label(disk.Label, GUILayout.Width(200));
+                                GUILayout.Label(disk.Label, GUILayout.Width(125));
                             }
 
                             if (GUILayout.Button("Label"))
@@ -470,11 +472,25 @@ namespace Ketchup
                 {
                     _guiMode = GuiMode.Normal;
                 }
+
+                _windowPosition = new Rect(_windowPosition) { width = 300, height = 0 };
             }
 
             foreach (var disk in disksToDestroy)
             {
                 _allDisks.Remove(disk);
+            }
+        }
+
+        private void InitWindowPositionIfNecessary()
+        {
+            if (!_isWindowPositionInit)
+            {
+                const float defaultTop = 200f;
+
+                _windowPosition = new Rect(Screen.width - 550f, defaultTop, 300f, 0);
+
+                _isWindowPositionInit = true;
             }
         }
 
