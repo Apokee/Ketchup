@@ -58,13 +58,13 @@ namespace Ketchup.IO
                     var magicNumber = reader.ReadUInt32();
                     if (magicNumber != MagicNumber)
                     {
-                        throw new LoadStateException(String.Format("Magic number is incorrect. Expected: {0:X}. Found: {1:X}.", MagicNumber, magicNumber));
+                        throw new LoadStateException("DCPU-16", String.Format("Magic number is incorrect. Expected: {0:X}. Found: {1:X}.", MagicNumber, magicNumber));
                     }
 
                     var versionNumber = reader.ReadUInt32();
                     if (versionNumber != VersionNumber)
                     {
-                        throw new LoadStateException(String.Format("Unsupported version number: {0}", versionNumber));
+                        throw new LoadStateException("DCPU-16", String.Format("Unsupported version number: {0}", versionNumber));
                     }
 
                     // Registers
