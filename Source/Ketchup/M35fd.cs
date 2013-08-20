@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ketchup.Api;
+using Ketchup.Exceptions;
+using SharpCompress.Compressor;
+using SharpCompress.Compressor.Deflate;
 using UnityEngine;
 
 namespace Ketchup
@@ -11,6 +14,20 @@ namespace Ketchup
     public sealed class M35Fd : PartModule, IDevice
     {
         #region Constants
+
+        private const string ConfigKeyVersion = "Version";
+        private const string ConfigKeyWindowPositionX = "WindowPositionX";
+        private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyCurrentStateCode = "CurrentStateCode";
+        private const string ConfigKeyLastErrorCode = "LastErrorCode";
+        private const string ConfigKeyCurrentTrack = "CurrentTrack";
+        private const string ConfigKeyInsertedDiskIndex = "InsertedDiskIndex";
+        private const string ConfigKeyDiskPrefix = "Disk";
+        private const string ConfigKeyLabel = "Label";
+        private const string ConfigKeyIsWriteProtected = "IsWriteProtected";
+        private const string ConfigKeyData = "Data";
+
+        private const uint ConfigVersion = 1;
 
         private const int WordsPerSector = 512;
         private const int SectorsPerTrack = 18;
@@ -128,6 +145,86 @@ namespace Ketchup
                 InitStylesIfNecessary();
                 InitWindowPositionIfNecessary();
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
+            }
+        }
+
+        public override void OnLoad(ConfigNode node)
+        {
+            uint version;
+            if (UInt32.TryParse(node.GetValue(ConfigKeyVersion), out version) && version == 1)
+            {
+                float x;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+                {
+                    _windowPosition.x = x;
+                }
+
+                float y;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
+                {
+                    _windowPosition.y = y;
+                }
+
+                _isWindowPositionInit = true;
+
+                ushort currentStateCode;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyCurrentStateCode), out currentStateCode))
+                {
+                    _currentStateCode = (StateCode)currentStateCode;
+                }
+
+                ushort lastErrorCode;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyLastErrorCode), out lastErrorCode))
+                {
+                    _lastErrorCode = (ErrorCode)lastErrorCode;
+                }
+
+                int currentTrack;
+                if (Int32.TryParse(node.GetValue(ConfigKeyCurrentTrack), out currentTrack))
+                {
+                    _currentTrack = currentTrack;
+                }
+
+                var i = 0;
+                while (node.HasNode(ConfigKeyDiskPrefix + i))
+                {
+                    var diskNode = node.GetNode(ConfigKeyDiskPrefix + i);
+
+                    var label = diskNode.GetValue(ConfigKeyLabel);
+                    bool isWriteProtected; Boolean.TryParse(diskNode.GetValue(ConfigKeyIsWriteProtected), out isWriteProtected);
+                    var data = diskNode.GetValue(ConfigKeyData);
+
+                    _allDisks.Add(new FloppyDisk(data) { Label = label, IsWriteProtected = isWriteProtected });
+
+                    i++;
+                }
+
+                int diskIndex;
+                if (Int32.TryParse(node.GetValue(ConfigKeyInsertedDiskIndex), out diskIndex))
+                {
+                    if (diskIndex >= 0)
+                    {
+                        _disk = _allDisks[diskIndex];
+                    }
+                }
+            }
+        }
+
+        public override void OnSave(ConfigNode node)
+        {
+            node.AddValue(ConfigKeyVersion, ConfigVersion);
+            node.AddValue(ConfigKeyWindowPositionX, _windowPosition.x);
+            node.AddValue(ConfigKeyWindowPositionY, _windowPosition.y);
+            node.AddValue(ConfigKeyCurrentStateCode, (ushort)_currentStateCode);
+            node.AddValue(ConfigKeyLastErrorCode, (ushort)_lastErrorCode);
+            node.AddValue(ConfigKeyCurrentTrack, _currentTrack);
+            node.AddValue(ConfigKeyInsertedDiskIndex, _allDisks.IndexOf(_disk));
+            for (var i = 0; i < _allDisks.Count; i++)
+            {
+                var diskNode = node.AddNode(ConfigKeyDiskPrefix + i);
+                diskNode.AddValue(ConfigKeyLabel, _allDisks[i].Label);
+                diskNode.AddValue(ConfigKeyIsWriteProtected, _allDisks[i].IsWriteProtected);
+                diskNode.AddValue(ConfigKeyData, _allDisks[i].Serialize());
             }
         }
 
@@ -601,6 +698,13 @@ namespace Ketchup
 
         private sealed class FloppyDisk
         {
+            #region Constants
+
+            private const uint MagicNumber = 0xdbb0cae1;
+            private const uint VersionNumber = 0x00000001;
+
+            #endregion
+
             #region Instance Fields
 
             private readonly Dictionary<ushort, ushort[]> _sectors;
@@ -636,6 +740,43 @@ namespace Ketchup
                 _sectors = ConvertDiskImage(diskImage);
             }
 
+            public FloppyDisk(string serializedData)
+            {
+                _sectors = new Dictionary<ushort,ushort[]>();
+
+                using (var inputStream = new MemoryStream(Convert.FromBase64String(serializedData)))
+                using (var gzipStream = new GZipStream(inputStream, CompressionMode.Decompress, true))
+                using (var reader = new BinaryReader(gzipStream))
+                {
+                    // Header
+                    var magicNumber = reader.ReadUInt32();
+                    if (magicNumber != MagicNumber)
+                    {
+                        throw new LoadStateException("M35FD Floppy Disk", String.Format("Magic number is incorrect. Expected: {0:X}. Found: {1:X}.", MagicNumber, magicNumber));
+                    }
+
+                    var versionNumber = reader.ReadUInt32();
+                    if (versionNumber != VersionNumber)
+                    {
+                        throw new LoadStateException("M35FD Floppy Disk", String.Format("Unsupported version number: {0}", versionNumber));
+                    }
+
+                    // Data
+                    var sectorCount = reader.ReadInt32();
+                    for (var i = 0; i < sectorCount; i++)
+                    {
+                        var sectorNumber = reader.ReadUInt16();
+                        var sectorData = new ushort[WordsPerSector];
+                        for (var j = 0; j < WordsPerSector; j++)
+                        {
+                            sectorData[j] = reader.ReadUInt16();
+                        }
+
+                        _sectors.Add(sectorNumber, sectorData);
+                    }
+                }
+            }
+
             #endregion
 
             #region Methods
@@ -663,6 +804,35 @@ namespace Ketchup
                 }
 
                 return _sectors[sector];
+            }
+
+            public string Serialize()
+            {
+                using (var outputStream = new MemoryStream())
+                {
+                    using (var gzipStream = new GZipStream(outputStream, CompressionMode.Compress, true))
+                    using (var writer = new BinaryWriter(gzipStream))
+                    {
+                        // Header
+                        writer.Write(MagicNumber);
+                        writer.Write(VersionNumber);
+
+                        // Data
+                        writer.Write(_sectors.Count);
+                        foreach (var sectorKeyValue in _sectors)
+                        {
+                            var sectorNumber = sectorKeyValue.Key;
+                            var sectorData = sectorKeyValue.Value;
+                            writer.Write(sectorNumber);
+                            for (var i = 0; i < WordsPerSector; i++)
+                            {
+                                writer.Write(sectorData[i]);
+                            }
+                        }
+                    }
+
+                    return Convert.ToBase64String(outputStream.ToArray());
+                }
             }
 
             #endregion
