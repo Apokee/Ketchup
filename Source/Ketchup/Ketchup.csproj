@@ -70,6 +70,7 @@
     <Compile Include="Interop\TomatoDeviceAdapter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
     <Compile Include="Lem1802.cs" />
+    <Compile Include="M35fd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
