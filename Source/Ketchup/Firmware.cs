@@ -3,7 +3,7 @@ using Ketchup.Api;
 
 namespace Ketchup
 {
-    internal sealed class Firmware : IDevice
+    internal sealed class Firmware : PartModule, IDevice
     {
         #region Constants
 

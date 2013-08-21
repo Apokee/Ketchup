@@ -282,16 +282,25 @@ namespace Ketchup
             _dcpu16 = new TomatoDcpu16Adapter(new DCPU());
             _dcpu16StateManager = new Dcpu16StateManager(_dcpu16);
 
-            var firmware = new Firmware();
-            _devices.Add(firmware);
-            Connect(_dcpu16, firmware);
-
+            Firmware cpuFirmware = null;
             foreach (var device in vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()))
             {
-                _dcpu16StateManager.Load(state);
+                var firmware = device as Firmware;
+                if (firmware != null)
+                {
+                    if (firmware.part == part)
+                    {
+                        _devices.Add(firmware);
+                        Connect(_dcpu16, firmware);
 
-                _devices.Add(device);
-                Connect(_dcpu16, device);
+                        cpuFirmware = firmware;
+                    }
+                }
+                else
+                {
+                    _devices.Add(device);
+                    Connect(_dcpu16, device);
+                }
 
                 Debug.Log(String.Format("[Ketchup] Connected CPU to {0}", device.FriendlyName));
             }
@@ -302,7 +311,10 @@ namespace Ketchup
             }
             else
             {
-                firmware.OnInterrupt();
+                if (cpuFirmware != null)
+                {
+                    cpuFirmware.OnInterrupt();
+                }
             }
 
             _isPowerOn = true;
