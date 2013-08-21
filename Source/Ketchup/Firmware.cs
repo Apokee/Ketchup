@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Ketchup.Api;
+using UnityEngine;
 
 namespace Ketchup
 {
     internal sealed class Firmware : PartModule, IDevice
     {
         #region Constants
+
+        private const int MaxFirmwareWords = 512;
 
         private static readonly ushort[] DefaultFirmware =
         {
@@ -40,6 +46,13 @@ namespace Ketchup
 
         private IDcpu16 _dcpu16;
 
+        private FirmwareRom _firmware;
+
+        private Rect _windowRect;
+        private bool _flashingRom;
+
+        private List<FirmwareRom> _firmwares;
+
         #endregion
 
         #region Device Identifiers
@@ -68,6 +81,15 @@ namespace Ketchup
 
         #endregion
 
+        #region Constructors
+
+        public Firmware()
+        {
+            _firmware = new FirmwareRom("<Default>", DefaultFirmware);
+        }
+
+        #endregion
+
         #region IDevice Methods
 
         public void OnConnect(IDcpu16 dcpu16)
@@ -84,10 +106,131 @@ namespace Ketchup
         {
             if (_dcpu16 != null)
             {
-                Array.Copy(DefaultFirmware, 0, _dcpu16.Memory, _dcpu16.B, DefaultFirmware.Length);
+                Array.Copy(_firmware.Data, 0, _dcpu16.Memory, _dcpu16.B, _firmware.Data.Length);
             }
 
             return 0;
+        }
+
+        #endregion
+
+        #region PartModule Methods
+
+        public override void OnStart(StartState state)
+        {
+            if (state != StartState.Editor)
+            {
+                RenderingManager.AddToPostDrawQueue(1, OnDraw);
+            }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void OnDraw()
+        {
+            if (vessel.isActiveVessel)
+            {
+                GUI.skin = HighLogic.Skin;
+
+                _windowRect = GUILayout.Window(5, _windowRect, OnWindow, "Firmware");
+            }
+        }
+
+        private void OnWindow(int windowId)
+        {
+            GUILayout.BeginHorizontal();
+            var flashRomButtonPressed = GUILayout.Button("Flash");
+            GUILayout.Label(_firmware.Name, GUILayout.Width(125));
+            GUILayout.EndHorizontal();
+
+            if (_flashingRom)
+            {
+                foreach (var firmware in _firmwares)
+                {
+                    if (GUILayout.Button(firmware.Name))
+                    {
+                        _firmware = firmware;
+                        _flashingRom = false;
+                    }
+                }
+            }
+
+            GUI.DragWindow();
+
+            if (GUI.changed)
+            {
+                if (flashRomButtonPressed) { OnFlashRomButtonPressed(); }
+
+                _windowRect = new Rect(_windowRect) { width = 0, height = 0 };
+            }
+        }
+
+        private void OnFlashRomButtonPressed()
+        {
+            _flashingRom = !_flashingRom;
+
+            if (_flashingRom)
+            {
+                _firmwares = GetFirmwareRoms().ToList();
+            }
+        }
+
+        private static IEnumerable<FirmwareRom> GetFirmwareRoms()
+        {
+            yield return new FirmwareRom("<Default>", DefaultFirmware);
+
+            var savesDirectory = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
+            var profileDirectory = Path.Combine(savesDirectory, HighLogic.SaveFolder);
+            var ketchupDirectory = Path.Combine(profileDirectory, "Ketchup");
+            var firmwareDirectory = Path.Combine(ketchupDirectory, "Firmware");
+
+            if (Directory.Exists(firmwareDirectory))
+            {
+                foreach (var file in Directory.GetFiles(firmwareDirectory))
+                {
+                    var fileLower = file.ToLowerInvariant();
+
+                    if (fileLower.EndsWith(".bin") || fileLower.EndsWith(".img"))
+                    {
+                        var fileInfo = new FileInfo(file);
+
+                        if (fileInfo.Length / 2 <= MaxFirmwareWords)
+                        {
+                            var firmwareBytes = File.ReadAllBytes(file);
+                            var firmwareUShorts = new ushort[firmwareBytes.Length / 2];
+
+                            for (var i = 0; i < firmwareBytes.Length; i += 2)
+                            {
+                                var a = firmwareBytes[i];
+                                var b = firmwareBytes[i + 1];
+
+                                firmwareUShorts[i / 2] = (ushort)((a << 8) | b);
+                            }
+
+                            yield return new FirmwareRom(fileInfo.Name.Substring(0, fileInfo.Name.Length - 4), firmwareUShorts);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        #endregion
+
+        #region Nested Types
+
+        private sealed class FirmwareRom
+        {
+            public string Name { get; private set; }
+            public ushort[] Data { get; private set; }
+
+            public FirmwareRom(string name, ushort[] data)
+            {
+                Name = name;
+                Data = data;
+            }
         }
 
         #endregion
