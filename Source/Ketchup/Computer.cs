@@ -307,7 +307,7 @@ namespace Ketchup
 
             if (useState && !String.IsNullOrEmpty(_dcpu16State))
             {
-                _dcpu16StateManager.LoadFromBase64(_dcpu16State);
+                _dcpu16StateManager.Load(_dcpu16State);
             }
             else
             {

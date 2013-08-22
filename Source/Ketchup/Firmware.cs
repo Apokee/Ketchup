@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ketchup.Api;
+using Ketchup.Exceptions;
+using Ketchup.IO;
 using UnityEngine;
 
 namespace Ketchup
@@ -10,6 +12,14 @@ namespace Ketchup
     internal sealed class Firmware : PartModule, IDevice
     {
         #region Constants
+
+        private const string ConfigKeyVersion = "Version";
+        private const string ConfigKeyWindowPositionX = "WindowPositionX";
+        private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyFirmwareName = "FirmwareName";
+        private const string ConfigKeyFirmwareData = "FirmwareData";
+
+        private const uint ConfigVersion = 1;
 
         private const int MaxFirmwareWords = 512;
 
@@ -49,6 +59,7 @@ namespace Ketchup
         private FirmwareRom _firmware;
 
         private Rect _windowRect;
+        private bool _isWindowPositionInit;
         private bool _flashingRom;
 
         private List<FirmwareRom> _firmwares;
@@ -120,8 +131,47 @@ namespace Ketchup
         {
             if (state != StartState.Editor)
             {
+                InitWindowPositionIfNecessary();
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
             }
+        }
+
+        public override void OnLoad(ConfigNode node)
+        {
+            uint version;
+            if (UInt32.TryParse(node.GetValue(ConfigKeyVersion), out version) && version == 1)
+            {
+                float x;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionX), out x))
+                {
+                    _windowRect.x = x;
+                }
+
+                float y;
+                if (Single.TryParse(node.GetValue(ConfigKeyWindowPositionY), out y))
+                {
+                    _windowRect.y = y;
+                }
+
+                _isWindowPositionInit = true;
+
+                if (node.HasValue(ConfigKeyFirmwareName) && node.HasValue(ConfigKeyFirmwareData))
+                {
+                    var firmwareName = node.GetValue(ConfigKeyFirmwareName);
+                    var firmwareData = node.GetValue(ConfigKeyFirmwareData);
+
+                    _firmware = new FirmwareRom(firmwareName, firmwareData);
+                }
+            }
+        }
+
+        public override void OnSave(ConfigNode node)
+        {
+            node.AddValue(ConfigKeyVersion, ConfigVersion);
+            node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
+            node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+            node.AddValue(ConfigKeyFirmwareName, _firmware.Name);
+            node.AddValue(ConfigKeyFirmwareData, _firmware.Serialize());
         }
 
         #endregion
@@ -177,6 +227,18 @@ namespace Ketchup
             }
         }
 
+        private void InitWindowPositionIfNecessary()
+        {
+            if (!_isWindowPositionInit)
+            {
+                const float defaultTop = 325f;
+
+                _windowRect = new Rect(Screen.width - 300f, defaultTop, 0, 0);
+
+                _isWindowPositionInit = true;
+            }
+        }
+
         private static IEnumerable<FirmwareRom> GetFirmwareRoms()
         {
             yield return new FirmwareRom("<Default>", DefaultFirmware);
@@ -223,6 +285,9 @@ namespace Ketchup
 
         private sealed class FirmwareRom
         {
+            private const uint MagicNumber = 0xdbb0cae2;
+            private const uint VersionNumber = 0x00000001;
+
             public string Name { get; private set; }
             public ushort[] Data { get; private set; }
 
@@ -230,6 +295,54 @@ namespace Ketchup
             {
                 Name = name;
                 Data = data;
+            }
+
+            public FirmwareRom(string name, string serializedData)
+            {
+                Name = name;
+
+                using (var reader = new BinaryStateReader(serializedData))
+                {
+                    // Header
+                    var magicNumber = reader.ReadUInt32();
+                    if (magicNumber != MagicNumber)
+                    {
+                        throw new LoadStateException("Firmware ROM", String.Format("Magic number is incorrect. Expected: {0:X}. Found: {1:X}.", MagicNumber, magicNumber));
+                    }
+
+                    var versionNumber = reader.ReadUInt32();
+                    if (versionNumber != VersionNumber)
+                    {
+                        throw new LoadStateException("Firmware ROM", String.Format("Unsupported version number: {0}", versionNumber));
+                    }
+
+                    // Data
+                    var wordCount = reader.ReadInt32();
+                    Data = new ushort[wordCount];
+                    for (var i = 0; i < wordCount; i++)
+                    {
+                        Data[i] = reader.ReadUInt16();
+                    }
+                }
+            }
+
+            public string Serialize()
+            {
+                using (var writer = new BinaryStateWriter())
+                {
+                    // Header
+                    writer.Write(MagicNumber);
+                    writer.Write(VersionNumber);
+
+                    // Data
+                    writer.Write(Data.Length);
+                    foreach (var word in Data)
+                    {
+                        writer.Write(word);
+                    }
+
+                    return writer.ToString();
+                }
             }
         }
 
