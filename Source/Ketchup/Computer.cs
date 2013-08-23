@@ -128,7 +128,7 @@ namespace Ketchup
 
             if (_dcpu16StateManager != null)
             {
-                var state = _dcpu16StateManager.SaveAsBase64();
+                var state = _dcpu16StateManager.Save();
 
                 node.AddValue(ConfigKeyDcpu16State, state);
             }
@@ -315,7 +315,7 @@ namespace Ketchup
             }
             else
             {
-                _dcpu16StateManager.LoadFromBase64(state);
+                _dcpu16StateManager.Load(state);
             }
         }
 
