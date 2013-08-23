@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
 using Ketchup.Api;
 using Ketchup.Exceptions;
-using SharpCompress.Compressor;
-using SharpCompress.Compressor.Deflate;
 
 namespace Ketchup.IO
 {
@@ -34,25 +31,11 @@ namespace Ketchup.IO
 
         #region Methods
 
-        public void LoadFromBase64(string state)
-        {
-            LoadFromByteArray(Convert.FromBase64String(state));
-        }
-
-        public void LoadFromByteArray(byte[] state)
-        {
-            using (var stream = new MemoryStream(state))
-            {
-                LoadFromStream(stream);
-            }
-        }
-
-        public void LoadFromStream(Stream stream)
+        public void Load(string state)
         {
             try
             {
-                using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress, true))
-                using (var reader = new BinaryReader(gzipStream))
+                using (var reader = new BinaryStateReader(state))
                 {
                     // Header
                     var magicNumber = reader.ReadUInt32();
@@ -106,25 +89,9 @@ namespace Ketchup.IO
             }
         }
 
-        public string SaveAsBase64()
+        public string Save()
         {
-            return Convert.ToBase64String(SaveAsByteArray());
-        }
-
-        public byte[] SaveAsByteArray()
-        {
-            using (var stream = new MemoryStream())
-            {
-                SaveToStream(stream);
-
-                return stream.ToArray();
-            }
-        }
-
-        public void SaveToStream(Stream stream)
-        {
-            using (var gzipStream = new GZipStream(stream, CompressionMode.Compress, true))
-            using (var writer = new BinaryWriter(gzipStream))
+            using (var writer = new BinaryStateWriter())
             {
                 // Header
                 writer.Write(MagicNumber);
@@ -160,6 +127,8 @@ namespace Ketchup.IO
                 {
                     writer.Write(interrupt);
                 }
+
+                return writer.ToString();
             }
         }
 
