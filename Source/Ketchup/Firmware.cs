@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Ketchup.Api;
 using Ketchup.Exceptions;
+using Ketchup.Extensions;
 using Ketchup.IO;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace Ketchup
         private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyFirmwareName = "FirmwareName";
         private const string ConfigKeyFirmwareData = "FirmwareData";
 
@@ -59,6 +61,8 @@ namespace Ketchup
         private FirmwareRom _firmware;
 
         private Rect _windowRect;
+        private bool _showWindow;
+
         private bool _isWindowPositionInit;
         private bool _flashingRom;
 
@@ -155,6 +159,12 @@ namespace Ketchup
 
                 _isWindowPositionInit = true;
 
+                bool showWindow;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyShowWindow), out showWindow))
+                {
+                    _showWindow = showWindow;
+                }
+
                 if (node.HasValue(ConfigKeyFirmwareName) && node.HasValue(ConfigKeyFirmwareData))
                 {
                     var firmwareName = node.GetValue(ConfigKeyFirmwareName);
@@ -170,8 +180,19 @@ namespace Ketchup
             node.AddValue(ConfigKeyVersion, ConfigVersion);
             node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+            node.AddValue(ConfigKeyShowWindow, _showWindow);
             node.AddValue(ConfigKeyFirmwareName, _firmware.Name);
             node.AddValue(ConfigKeyFirmwareData, _firmware.Serialize());
+        }
+
+        #endregion
+
+        #region KSP Events
+
+        [KSPEvent(guiActive = true, guiName = "Toggle Firmware Interface")]
+        public void ToggleInterface()
+        {
+            _showWindow = !_showWindow;
         }
 
         #endregion
@@ -180,7 +201,7 @@ namespace Ketchup
 
         private void OnDraw()
         {
-            if (vessel.isActiveVessel)
+            if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
 
@@ -231,9 +252,7 @@ namespace Ketchup
         {
             if (!_isWindowPositionInit)
             {
-                const float defaultTop = 325f;
-
-                _windowRect = new Rect(Screen.width - 300f, defaultTop, 0, 0);
+                _windowRect = _windowRect.CenteredOnScreen();
 
                 _isWindowPositionInit = true;
             }
