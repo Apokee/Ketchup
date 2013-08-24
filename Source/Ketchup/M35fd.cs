@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Ketchup.Api;
 using Ketchup.Exceptions;
+using Ketchup.IO;
 using SharpCompress.Compressor;
 using SharpCompress.Compressor.Deflate;
 using UnityEngine;
@@ -744,9 +745,7 @@ namespace Ketchup
             {
                 _sectors = new Dictionary<ushort,ushort[]>();
 
-                using (var inputStream = new MemoryStream(Convert.FromBase64String(serializedData)))
-                using (var gzipStream = new GZipStream(inputStream, CompressionMode.Decompress, true))
-                using (var reader = new BinaryReader(gzipStream))
+                using (var reader = new BinaryStateReader(serializedData))
                 {
                     // Header
                     var magicNumber = reader.ReadUInt32();
@@ -808,30 +807,26 @@ namespace Ketchup
 
             public string Serialize()
             {
-                using (var outputStream = new MemoryStream())
+                using (var writer = new BinaryStateWriter())
                 {
-                    using (var gzipStream = new GZipStream(outputStream, CompressionMode.Compress, true))
-                    using (var writer = new BinaryWriter(gzipStream))
-                    {
-                        // Header
-                        writer.Write(MagicNumber);
-                        writer.Write(VersionNumber);
+                    // Header
+                    writer.Write(MagicNumber);
+                    writer.Write(VersionNumber);
 
-                        // Data
-                        writer.Write(_sectors.Count);
-                        foreach (var sectorKeyValue in _sectors)
+                    // Data
+                    writer.Write(_sectors.Count);
+                    foreach (var sectorKeyValue in _sectors)
+                    {
+                        var sectorNumber = sectorKeyValue.Key;
+                        var sectorData = sectorKeyValue.Value;
+                        writer.Write(sectorNumber);
+                        for (var i = 0; i < WordsPerSector; i++)
                         {
-                            var sectorNumber = sectorKeyValue.Key;
-                            var sectorData = sectorKeyValue.Value;
-                            writer.Write(sectorNumber);
-                            for (var i = 0; i < WordsPerSector; i++)
-                            {
-                                writer.Write(sectorData[i]);
-                            }
+                            writer.Write(sectorData[i]);
                         }
                     }
 
-                    return Convert.ToBase64String(outputStream.ToArray());
+                    return writer.ToString();
                 }
             }
 
