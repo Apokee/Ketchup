@@ -18,6 +18,7 @@ namespace Ketchup
         private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyDcpu16State = "Dcpu16State";
         private const string ConfigKeyIsPowerOn = "IsPowerOn";
 
@@ -52,8 +53,11 @@ namespace Ketchup
         private TimeWarp _timeWarp;
 
         private Rect _windowRect;
+        private bool _showWindow;
+
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
+        
 
         private string _dcpu16State;
 
@@ -68,8 +72,8 @@ namespace Ketchup
                 _timeWarp = TimeWarp.fetch;
 
                 InitStylesIfNecessary();
-                InitWindowPositionIfNecessary();
                 InitWindowSizeIfNecessary();
+                InitWindowPositionIfNecessary();
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
 
                 if (_isPowerOn)
@@ -98,6 +102,12 @@ namespace Ketchup
 
                 _isWindowPositionInit = true;
 
+                bool showWindow;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyShowWindow), out showWindow))
+                {
+                    _showWindow = showWindow;
+                }
+
                 bool isPowerOn;
                 if (Boolean.TryParse(node.GetValue(ConfigKeyIsPowerOn), out isPowerOn))
                 {
@@ -114,6 +124,7 @@ namespace Ketchup
 
             node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+            node.AddValue(ConfigKeyShowWindow, _showWindow);
             node.AddValue(ConfigKeyIsPowerOn, _isPowerOn);
 
             if (_dcpu16StateManager != null)
@@ -189,11 +200,21 @@ namespace Ketchup
 
         #endregion
 
+        #region KSP Events
+
+        [KSPEvent(guiActive = true, guiName = "Toggle Computer Interface")]
+        public void ToggleInterface()
+        {
+            _showWindow = !_showWindow;
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private void OnDraw()
         {
-            if (vessel.isActiveVessel)
+            if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
 
@@ -238,9 +259,7 @@ namespace Ketchup
         {
             if (!_isWindowPositionInit)
             {
-                const float defaultTop = 200f;
-
-                _windowRect = new Rect(_windowRect) { x = Screen.width - 250f, y = defaultTop }; 
+                _windowRect = _windowRect.CenteredOnScreen();
 
                 _isWindowPositionInit = true;
             }
