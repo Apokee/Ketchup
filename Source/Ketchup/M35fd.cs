@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Ketchup.Api;
 using Ketchup.Exceptions;
+using Ketchup.Extensions;
 using Ketchup.IO;
 using SharpCompress.Compressor;
 using SharpCompress.Compressor.Deflate;
@@ -19,6 +20,7 @@ namespace Ketchup
         private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyCurrentStateCode = "CurrentStateCode";
         private const string ConfigKeyLastErrorCode = "LastErrorCode";
         private const string ConfigKeyCurrentTrack = "CurrentTrack";
@@ -66,6 +68,7 @@ namespace Ketchup
         private int _currentTrack;
 
         private Rect _windowPosition;
+        private bool _showWindow;
         private bool _isWindowPositionInit;
         private GuiMode _guiMode;
         private readonly Dictionary<FloppyDisk, string> _disksBeingLabeled = new Dictionary<FloppyDisk, string>();
@@ -168,6 +171,12 @@ namespace Ketchup
 
                 _isWindowPositionInit = true;
 
+                bool showWindow;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyShowWindow), out showWindow))
+                {
+                    _showWindow = showWindow;
+                }
+
                 ushort currentStateCode;
                 if (UInt16.TryParse(node.GetValue(ConfigKeyCurrentStateCode), out currentStateCode))
                 {
@@ -216,6 +225,7 @@ namespace Ketchup
             node.AddValue(ConfigKeyVersion, ConfigVersion);
             node.AddValue(ConfigKeyWindowPositionX, _windowPosition.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowPosition.y);
+            node.AddValue(ConfigKeyShowWindow, _showWindow);
             node.AddValue(ConfigKeyCurrentStateCode, (ushort)_currentStateCode);
             node.AddValue(ConfigKeyLastErrorCode, (ushort)_lastErrorCode);
             node.AddValue(ConfigKeyCurrentTrack, _currentTrack);
@@ -227,6 +237,16 @@ namespace Ketchup
                 diskNode.AddValue(ConfigKeyIsWriteProtected, _allDisks[i].IsWriteProtected);
                 diskNode.AddValue(ConfigKeyData, _allDisks[i].Serialize());
             }
+        }
+
+        #endregion
+
+        #region KSP Events
+
+        [KSPEvent(guiActive = true, guiName = "Toggle M35FD Interface")]
+        public void ToggleInterface()
+        {
+            _showWindow = !_showWindow;
         }
 
         #endregion
@@ -402,7 +422,7 @@ namespace Ketchup
 
         private void OnDraw()
         {
-            if (vessel.isActiveVessel)
+            if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
 
@@ -584,9 +604,7 @@ namespace Ketchup
         {
             if (!_isWindowPositionInit)
             {
-                const float defaultTop = 200f;
-
-                _windowPosition = new Rect(Screen.width - 550f, defaultTop, 300f, 0);
+                _windowPosition = _windowPosition.CenteredOnScreen();
 
                 _isWindowPositionInit = true;
             }

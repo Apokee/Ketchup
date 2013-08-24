@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ketchup.Api;
+using Ketchup.Extensions;
 using UnityEngine;
 
 namespace Ketchup
@@ -14,6 +15,7 @@ namespace Ketchup
         private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyBuffer = "Buffer";
         private const string ConfigKeyPressedKeys = "PressedKeys";
         private const string ConfigKeyInterruptMessage = "InterruptMessage";
@@ -145,6 +147,8 @@ namespace Ketchup
         private bool _isAttached;
 
         private Rect _windowRect;
+        private bool _showWindow;
+
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
 
@@ -250,6 +254,12 @@ namespace Ketchup
              
                 _isWindowPositionInit = true;
 
+                bool showWindow;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyShowWindow), out showWindow))
+                {
+                    _showWindow = showWindow;
+                }
+
                 var buffer = node.GetValue(ConfigKeyBuffer);
                 if (!String.IsNullOrEmpty(buffer))
                 {
@@ -289,6 +299,7 @@ namespace Ketchup
             node.AddValue(ConfigKeyVersion, ConfigVersion);
             node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
+            node.AddValue(ConfigKeyShowWindow, _showWindow);
 
             if (_buffer.Any())
             {
@@ -306,11 +317,21 @@ namespace Ketchup
 
         #endregion
 
+        #region KSP Events
+
+        [KSPEvent(guiActive = true, guiName = "Toggle Keyboard Interface")]
+        public void ToggleInterface()
+        {
+            _showWindow = !_showWindow;
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private void OnDraw()
         {
-            if (vessel.isActiveVessel)
+            if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
                 
@@ -426,10 +447,7 @@ namespace Ketchup
         {
             if (!_isWindowPositionInit)
             {
-                const float defaultTop = 325f;
-                const float defaultWidth = 100f;
-
-                _windowRect = new Rect(_windowRect) { x = Screen.width - defaultWidth, y = defaultTop };
+                _windowRect = _windowRect.CenteredOnScreen();
 
                 _isWindowPositionInit = true;
             }
