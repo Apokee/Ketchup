@@ -64,6 +64,7 @@
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Computer.cs" />
+    <Compile Include="Firmware.cs" />
     <Compile Include="GenericClock.cs" />
     <Compile Include="GenericKeyboard.cs" />
     <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
