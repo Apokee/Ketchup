@@ -5,7 +5,6 @@ using Ketchup.Api;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
-using KSP.IO;
 using Tomato;
 using UnityEngine;
 
@@ -21,7 +20,6 @@ namespace Ketchup
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
         private const string ConfigKeyDcpu16State = "Dcpu16State";
         private const string ConfigKeyIsPowerOn = "IsPowerOn";
-        private const string ConfigKeyMemoryImage = "MemoryImage";
 
         private const uint ConfigVersion = 1;
 
@@ -46,8 +44,6 @@ namespace Ketchup
 
         private ushort? _pcAtHalt;
         private int? _warpIndexBeforeWake;
-
-        private string _memoryImage = String.Empty;
 
         private readonly List<double> _clockRates = new List<double>(60);
         private int _cyclesExecuted;
@@ -108,7 +104,6 @@ namespace Ketchup
                     _isPowerOn = isPowerOn;
                 }
 
-                _memoryImage = node.GetValue(ConfigKeyMemoryImage) ?? String.Empty;
                 _dcpu16State = node.GetValue(ConfigKeyDcpu16State);
             }
         }
@@ -120,11 +115,6 @@ namespace Ketchup
             node.AddValue(ConfigKeyWindowPositionX, _windowRect.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowRect.y);
             node.AddValue(ConfigKeyIsPowerOn, _isPowerOn);
-
-            if (!String.IsNullOrEmpty(_memoryImage))
-            {
-                node.AddValue(ConfigKeyMemoryImage, _memoryImage);
-            }
 
             if (_dcpu16StateManager != null)
             {
@@ -218,21 +208,6 @@ namespace Ketchup
             var actualClockSpeedFormatted = actualClockSpeed.ToString("F3") + " KHz";
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Memory Image:", GUILayout.ExpandWidth(true));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            if (_isPowerOn)
-            {
-                GUILayout.Label(_memoryImage, GUILayout.ExpandWidth(true));
-            }
-            else
-            {
-                _memoryImage = GUILayout.TextField(_memoryImage);
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
             var pwrButtonPressed = GUILayout.Button("PWR", _isPowerOn ? _styleButtonPressed : GUI.skin.button, GUILayout.ExpandWidth(false));
             if (_isPowerOn)
             {
@@ -302,56 +277,44 @@ namespace Ketchup
                 TurnOn(useState: false);
         }
 
-        private void InitializeDcpu16(string state)
+        private void TurnOn(bool useState)
         {
             _dcpu16 = new TomatoDcpu16Adapter(new DCPU());
             _dcpu16StateManager = new Dcpu16StateManager(_dcpu16);
 
-            if (String.IsNullOrEmpty(state))
-            {
-                var memoryImage = LoadMemoryImage();
-
-                Array.Copy(memoryImage, _dcpu16.Memory, memoryImage.Length);
-            }
-            else
-            {
-                _dcpu16StateManager.Load(state);
-            }
-        }
-
-        private ushort[] LoadMemoryImage()
-        {
-            var memoryImageBytes = File.ReadAllBytes<Computer>(_memoryImage);
-            var memoryImageUShorts = new ushort[memoryImageBytes.Length / 2];
-
-            for (var i = 0; i < memoryImageBytes.Length; i += 2)
-            {
-                var a = memoryImageBytes[i];
-                var b = memoryImageBytes[i + 1];
-
-                memoryImageUShorts[i / 2] = (ushort)((a << 8) | b);
-            }
-
-            return memoryImageUShorts;
-        }
-
-        private void TurnOn(bool useState)
-        {
-            if (useState && !String.IsNullOrEmpty(_dcpu16State))
-            {
-                InitializeDcpu16(_dcpu16State);
-            }
-            else
-            {
-                InitializeDcpu16(null);
-            }
-
+            Firmware cpuFirmware = null;
             foreach (var device in vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()))
             {
-                _devices.Add(device);
-                Connect(_dcpu16, device);
+                var firmware = device as Firmware;
+                if (firmware != null)
+                {
+                    if (firmware.part == part)
+                    {
+                        _devices.Add(firmware);
+                        Connect(_dcpu16, firmware);
+
+                        cpuFirmware = firmware;
+                    }
+                }
+                else
+                {
+                    _devices.Add(device);
+                    Connect(_dcpu16, device);
+                }
 
                 Debug.Log(String.Format("[Ketchup] Connected CPU to {0}", device.FriendlyName));
+            }
+
+            if (useState && !String.IsNullOrEmpty(_dcpu16State))
+            {
+                _dcpu16StateManager.Load(_dcpu16State);
+            }
+            else
+            {
+                if (cpuFirmware != null)
+                {
+                    cpuFirmware.OnInterrupt();
+                }
             }
 
             _isPowerOn = true;
