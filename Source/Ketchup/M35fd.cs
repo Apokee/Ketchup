@@ -7,8 +7,6 @@ using Ketchup.Api;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;
-using SharpCompress.Compressor;
-using SharpCompress.Compressor.Deflate;
 using UnityEngine;
 
 namespace Ketchup
