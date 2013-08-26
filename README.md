@@ -51,6 +51,8 @@ guidance unit however. Construct a rocket normally with one of the new parts.
 When you're reading to launch, right click on the computer part to bring up its context menu. Among the usual
 options will be several options to toggle the interface of several devices. Toggle each of them on.
 
+![Ketchup Windows](Documentation/Images/ketchup-0.5.0.png)
+
 ### Computer
 The computer window allows you to control power to the computer via the **PWR** button, it also displays if the
 computer is powered off, is halted, or is running by showing the average clock speed.
