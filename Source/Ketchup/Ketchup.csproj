@@ -64,6 +64,7 @@
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Computer.cs" />
+    <Compile Include="Firmware.cs" />
     <Compile Include="GenericClock.cs" />
     <Compile Include="GenericKeyboard.cs" />
     <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
     <Compile Include="Lem1802.cs" />
+    <Compile Include="M35fd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
