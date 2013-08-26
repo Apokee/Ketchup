@@ -1,0 +1,124 @@
+; Move the firmware to 0xFDFF to free up space for the boot sector
+:init
+    SET I, firmware
+    SET J, 0xFDFF
+:move
+    IFE I, 0xFDFF
+        SET PC, load
+    STI [J], [I]
+    SET PC, move
+
+:firmware
+.org 0xFDFF
+:load
+    ; Enumerate devices
+    HWN I
+:device_loop
+    SUB I, 1
+    IFE I, 0xFFFF
+        SET PC, device_loop_complete
+    ; Query selected device and see if it's a hard disk or LEM-1802
+    HWQ I
+    IFE A, 0x24c5
+        IFE B, 0x4fd5
+            SET [io_m35fd], I
+    IFE A, 0xF615
+        IFE B, 0x7349
+            SET [io_lem1802], I
+    SET PC, device_loop
+:device_loop_complete
+    ; Check for error conditions
+    IFE [io_m35fd], 0xFFFF
+        SET PC, error_nodrive
+    ; Check for disk
+    SET A, 0 ; Poll device
+    HWI [io_m35fd]
+    IFE B, 0 ; STATE_NO_MEDIA
+        SET PC, error_nodisk
+:copy_disk
+    ; Copy the first 127 sectors from the disk to memory
+    SET A, 2 ; Read sector
+    SET X, 0 ; sector
+    SET Y, 0 ; memory address
+:copy_loop
+    HWI [io_m35fd]
+    IFN B, 1
+        SET PC, error_readerror
+:wait_for_completion
+    SET A, 0
+    HWI [io_m35fd]
+    IFE B, 1 ; Device ready
+        SET PC, copy_next_sector            
+    SET PC, wait_for_completion
+    
+:copy_next_sector
+    IFE X, 127 ; copied last sector
+        SET PC, boot ; Launch boot sector (DONE)
+    SET A, 2
+    ADD X, 1
+    ADD Y, 512
+    SET PC, copy_loop    
+
+:error_nodrive
+    IFE [io_lem1802], 0xFFFF
+        SET PC, end ; Hang forever if there is no screen
+    JSR map_screen
+    SET I, msg_nodrive
+    SET PC, print_err
+
+:error_nodisk
+    IFE [io_lem1802], 0xFFFF
+        SET PC, end ; Hang forever if there is no screen
+    JSR map_screen
+    SET I, msg_nodisk
+    SET PC, print_err
+
+:error_readerror
+    IFE [io_lem1802], 0xFFFF
+        SUB PC, 1 ; Hang forever if there is no screen
+    JSR map_screen
+    SET I, msg_readerror
+    SET PC, print_err
+
+:map_screen
+    SET A, 0
+    SET B, 0x8000
+    HWI [io_lem1802]
+    SET PC, POP
+
+:print_err
+    SET J, 0x8000
+:print_loop
+    IFE [I], 0
+        SET PC, end ; Hang
+    SET C, [I]
+    BOR C, 0xF000
+    STI [J], C
+    SET PC, print_loop
+
+:end
+    SET PC, end
+
+:boot
+    ; Zero registers
+    SET A, 0
+    SET B, 0
+    SET C, 0
+    SET X, 0
+    SET Y, 0
+    SET I, 0
+    SET J, 0
+    SET SP, 0
+    SET PC, 0
+
+:msg_nodrive
+    dat "ATTACH M35FD AND REBOOT", 0
+:msg_nodisk
+    dat "INSERT DISK AND REBOOT", 0
+:msg_readerror
+    dat "DRIVE READ ERROR", 0
+
+:io_m35fd
+    dat 0xFFFF
+:io_lem1802
+    dat 0xFFFF
