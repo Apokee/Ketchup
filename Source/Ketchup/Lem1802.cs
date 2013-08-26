@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Ketchup.Api;
+using Ketchup.Extensions;
 using UnityEngine;
 
 namespace Ketchup
@@ -12,6 +13,7 @@ namespace Ketchup
         private const string ConfigKeyVersion = "Version";
         private const string ConfigKeyWindowPositionX = "WindowPositionX";
         private const string ConfigKeyWindowPositionY = "WindowPositionY";
+        private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyScreenMap = "ScreenMap";
         private const string ConfigKeyFontMap = "FontMap";
         private const string ConfigKeyPaletteMap = "PaletteMap";
@@ -82,6 +84,7 @@ namespace Ketchup
         private readonly Texture2D _screenTexture;
         private float _imageScale = 1;
         private Rect _windowPosition;
+        private bool _showWindow;
         private bool _isWindowPositionInit;
 
         private bool _blinkOn;
@@ -194,6 +197,12 @@ namespace Ketchup
 
                 _isWindowPositionInit = true;
 
+                bool showWindow;
+                if (Boolean.TryParse(node.GetValue(ConfigKeyShowWindow), out showWindow))
+                {
+                    _showWindow = showWindow;
+                }
+
                 ushort screenMap;
                 if (UInt16.TryParse(node.GetValue(ConfigKeyScreenMap), out screenMap))
                 {
@@ -231,6 +240,7 @@ namespace Ketchup
             node.AddValue(ConfigKeyVersion, ConfigVersion);
             node.AddValue(ConfigKeyWindowPositionX, _windowPosition.x);
             node.AddValue(ConfigKeyWindowPositionY, _windowPosition.y);
+            node.AddValue(ConfigKeyShowWindow, _showWindow);
             node.AddValue(ConfigKeyScreenMap, _screenMap);
             node.AddValue(ConfigKeyFontMap, _fontMap);
             node.AddValue(ConfigKeyPaletteMap, _paletteMap);
@@ -260,11 +270,21 @@ namespace Ketchup
 
         #endregion
 
+        #region KSP Events
+
+        [KSPEvent(guiActive = true, guiName = "Toggle LEM-1802 Interface")]
+        public void ToggleInterface()
+        {
+            _showWindow = !_showWindow;
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private void OnDraw()
         {
-            if (vessel.isActiveVessel)
+            if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
                 
@@ -381,9 +401,7 @@ namespace Ketchup
         {
             if (!_isWindowPositionInit)
             {
-                const float defaultTop = 400f;
-
-                _windowPosition = new Rect(Screen.width - 200f, defaultTop, 0, 0);
+                _windowPosition = _windowPosition.CenteredOnScreen();
 
                 _isWindowPositionInit = true;
             }
