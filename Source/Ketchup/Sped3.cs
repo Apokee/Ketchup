@@ -19,6 +19,15 @@ namespace Ketchup
         private readonly Vector3 _scaleVector = new Vector3(ProjectedWidthXMeters / 255f, ProjectedWidthYMeters / 255f, ProjectedWidthZMeters / 255f);
         private readonly Vector3 _translateVector = new Vector3(-0.5f, -0.5f, 0.5f);
 
+        private const string ConfigKeyVersion = "Version";
+        private const string ConfigKeyState = "State";
+        private const string ConfigKeyMemoryMap = "MemoryMap";
+        private const string ConfigKeyVertexCount = "VertexCount";
+        private const string ConfigKeyTargetRotation = "TargetRotation";
+        private const string ConfigKeyCurrentRotation = "CurrentRotation";
+
+        private const uint ConfigVersion = 1;
+
         #endregion
 
         #region Instance Fields
@@ -115,6 +124,53 @@ namespace Ketchup
         #endregion
 
         #region PartModule Methods
+
+        public override void OnLoad(ConfigNode node)
+        {
+            uint version;
+            if (UInt32.TryParse(node.GetValue(ConfigKeyVersion), out version) && version == 1)
+            {
+                ushort state;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyState), out state))
+                {
+                    _state = (StateCode)state;
+                }
+
+                ushort memoryMap;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyMemoryMap), out memoryMap))
+                {
+                    _memoryMap = memoryMap;
+                }
+
+                ushort vertexCount;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyVertexCount), out vertexCount))
+                {
+                    _vertexCount = vertexCount;
+                }
+
+                ushort targetRotation;
+                if (UInt16.TryParse(node.GetValue(ConfigKeyTargetRotation), out targetRotation))
+                {
+                    _targetRotation = targetRotation;
+                }
+
+                float currentRotation;
+                if (Single.TryParse(node.GetValue(ConfigKeyCurrentRotation), out  currentRotation))
+                {
+                    _currentRotation = currentRotation;
+                }
+            }
+        }
+
+        public override void OnSave(ConfigNode node)
+        {
+            node.AddValue(ConfigKeyVersion, ConfigVersion);
+            node.AddValue(ConfigKeyState, (ushort)_state);
+            node.AddValue(ConfigKeyMemoryMap, _memoryMap);
+            node.AddValue(ConfigKeyVertexCount, _vertexCount);
+            node.AddValue(ConfigKeyTargetRotation, _targetRotation);
+            node.AddValue(ConfigKeyCurrentRotation, _currentRotation);
+        }
 
         public override void OnUpdate()
         {
