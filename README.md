@@ -8,7 +8,8 @@ Description
 The CPU is an implementation of the [DCPU-16][dcpu] [spec][dcpu-spec], originally designed by
 [Markus "Notch" Persson][notch] for the game [0x10c][0x10c]. Emulation of the CPU is provided by the
 [Tomato][tomato] library. Implementations of the [monitor][monitor-spec], [keyboard][keyboard-spec],
-[clock][clock-spec], and [floppy drive][floppy-spec] deivces are also provided.
+[clock][clock-spec], [floppy drive][floppy-spec], and [3D vector display][3d-vector-display-spec] devices are also
+provided.
 
 Ketchup is currently in the alpha stage, with *many* features and improvements to be made. Most notably, there
 currently exist no devices capable of interacting with the vessel, so using the CPU for flight control is not
@@ -46,9 +47,11 @@ Usage
 Two new parts will appear in game under the "Pods" section of the craft editor: the *ENIAK-16S Computer* and the
 *ENIAK-16L Computer*, these "Mechanical Kerbal Brains" replace the *RC-001S Remote Guidance Unit* and the
 *RC-L01 Remote Guidance Unit* respectively. The computers will consume twice as much electricity as a remote
-guidance unit however. Construct a rocket normally with one of the new parts.
+guidance unit however. If you wish to use the 3D vector display, add the
+*Suspended Particle Excited Display, Rev 3 (SPED-3)* part found under the "Utility" section. Construct a rocket
+normally with one of the new parts.
 
-When you're reading to launch, right click on the computer part to bring up its context menu. Among the usual
+When you're ready to launch, right click on the computer part to bring up its context menu. Among the usual
 options will be several options to toggle the interface of several devices. Toggle each of them on.
 
 ![Ketchup Windows](Documentation/Images/ketchup-0.5.0.png)
@@ -109,6 +112,7 @@ Name
 *Ketchup* is derived predominantly from the Tomato project, and its name begins with a *K* so... yeah.
 
 [0x10c]: http://0x10c.com/
+[3d-vector-display-spec]: http://dcpu.com/3d-vector-display/
 [clock-spec]: http://dcpu.com/clock/
 [dcpu]: http://dcpu.com/
 [dcpu-spec]: http://dcpu.com/dcpu-16/
