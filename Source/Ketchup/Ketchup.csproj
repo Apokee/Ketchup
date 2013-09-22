@@ -72,6 +72,7 @@
     <Compile Include="IO\BinaryStateReader.cs" />
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
+    <Compile Include="IO\Utility.cs" />
     <Compile Include="Lem1802.cs" />
     <Compile Include="M35fd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

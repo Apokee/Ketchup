@@ -56,7 +56,8 @@ namespace Ketchup
         private IDcpu16 _dcpu16;
         private FloppyDisk _disk;
 
-        private List<FloppyDisk> _allDisks = new List<FloppyDisk>();
+        private List<FloppyDisk> _allLoadedDisks = new List<FloppyDisk>();
+        private List<FloppyDisk> _allAvailableDisks = new List<FloppyDisk>();
 
         private ushort _interruptMessage;
 
@@ -205,7 +206,7 @@ namespace Ketchup
                     bool isWriteProtected; Boolean.TryParse(diskNode.GetValue(ConfigKeyIsWriteProtected), out isWriteProtected);
                     var data = diskNode.GetValue(ConfigKeyData);
 
-                    _allDisks.Add(new FloppyDisk(data) { Label = label, IsWriteProtected = isWriteProtected });
+                    _allLoadedDisks.Add(new FloppyDisk(data) { Label = label, IsWriteProtected = isWriteProtected });
 
                     i++;
                 }
@@ -215,7 +216,7 @@ namespace Ketchup
                 {
                     if (diskIndex >= 0)
                     {
-                        _disk = _allDisks[diskIndex];
+                        _disk = _allLoadedDisks[diskIndex];
                     }
                 }
             }
@@ -230,13 +231,13 @@ namespace Ketchup
             node.AddValue(ConfigKeyCurrentStateCode, (ushort)_currentStateCode);
             node.AddValue(ConfigKeyLastErrorCode, (ushort)_lastErrorCode);
             node.AddValue(ConfigKeyCurrentTrack, _currentTrack);
-            node.AddValue(ConfigKeyInsertedDiskIndex, _allDisks.IndexOf(_disk));
-            for (var i = 0; i < _allDisks.Count; i++)
+            node.AddValue(ConfigKeyInsertedDiskIndex, _allLoadedDisks.IndexOf(_disk));
+            for (var i = 0; i < _allLoadedDisks.Count; i++)
             {
                 var diskNode = node.AddNode(ConfigKeyDiskPrefix + i);
-                diskNode.AddValue(ConfigKeyLabel, _allDisks[i].Label);
-                diskNode.AddValue(ConfigKeyIsWriteProtected, _allDisks[i].IsWriteProtected);
-                diskNode.AddValue(ConfigKeyData, _allDisks[i].Serialize());
+                diskNode.AddValue(ConfigKeyLabel, _allLoadedDisks[i].Label);
+                diskNode.AddValue(ConfigKeyIsWriteProtected, _allLoadedDisks[i].IsWriteProtected);
+                diskNode.AddValue(ConfigKeyData, _allLoadedDisks[i].Serialize());
             }
         }
 
@@ -444,7 +445,7 @@ namespace Ketchup
             switch(_guiMode)
             {
                 case GuiMode.Normal:
-                    if (_allDisks.Any())
+                    if (_allLoadedDisks.Any())
                     {
                         insertEjectButtonPressed = GUILayout.Button(_currentStateCode == StateCode.NoMedia ? "Insert" : "Eject");
                     }
@@ -459,7 +460,7 @@ namespace Ketchup
 
             var disksToDestroy = new List<FloppyDisk>();
 
-            var availableDisks = _allDisks.Where(i => i != _disk).ToList();
+            var availableDisks = _allLoadedDisks.Where(i => i != _disk).ToList();
 
             if (availableDisks.Any())
             {
@@ -550,20 +551,27 @@ namespace Ketchup
 
             if (_guiMode == GuiMode.Get)
             {
-                var disks = GetDiskImages().ToList();
+                if (_allAvailableDisks == null)
+                {
+                    _allAvailableDisks = GetDiskImages().ToList();
+                }
 
                 GUILayout.Label("Disk Images:");
 
-                foreach (var disk in disks)
+                foreach (var disk in _allAvailableDisks)
                 {
                     if (GUILayout.Button(disk.Label))
                     {
-                        _allDisks.Add(disk);
-                        _allDisks = _allDisks.OrderBy(i => i.Label).ToList();
+                        _allLoadedDisks.Add(disk);
+                        _allLoadedDisks = _allLoadedDisks.OrderBy(i => i.Label).ToList();
 
                         _guiMode = GuiMode.Normal;
                     }
                 }
+            }
+            else
+            {
+                _allAvailableDisks = null;
             }
 
             GUI.DragWindow();
@@ -597,7 +605,7 @@ namespace Ketchup
 
             foreach (var disk in disksToDestroy)
             {
-                _allDisks.Remove(disk);
+                _allLoadedDisks.Remove(disk);
             }
         }
 
@@ -615,38 +623,22 @@ namespace Ketchup
         {
             yield return new FloppyDisk("<Blank Disk>", new ushort[0]);
 
-            var savesDirectory = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
-            var profileDirectory = Path.Combine(savesDirectory, HighLogic.SaveFolder);
-            var ketchupDirectory = Path.Combine(profileDirectory, "Ketchup");
-            var diskImageDirectory = Path.Combine(ketchupDirectory, "FloppyDisks");
-
-            if (Directory.Exists(diskImageDirectory))
+            foreach (var file in Utility.GetFloppyFiles())
             {
-                foreach (var file in Directory.GetFiles(diskImageDirectory))
+                if (file.Length / 2 <= WordsPerDisk)
                 {
-                    var fileLower = file.ToLowerInvariant();
+                    var diksImageBytes = File.ReadAllBytes(file.FullName);
+                    var diskImageUShorts = new ushort[diksImageBytes.Length / 2];
 
-                    if (fileLower.EndsWith(".bin") || fileLower.EndsWith(".img"))
+                    for (var i = 0; i < diksImageBytes.Length; i += 2)
                     {
-                        var fileInfo = new FileInfo(file);
+                        var a = diksImageBytes[i];
+                        var b = diksImageBytes[i + 1];
 
-                        if (fileInfo.Length / 2 <= WordsPerDisk)
-                        {
-
-                            var diksImageBytes = File.ReadAllBytes(file);
-                            var diskImageUShorts = new ushort[diksImageBytes.Length / 2];
-
-                            for (var i = 0; i < diksImageBytes.Length; i += 2)
-                            {
-                                var a = diksImageBytes[i];
-                                var b = diksImageBytes[i + 1];
-
-                                diskImageUShorts[i / 2] = (ushort)((a << 8) | b);
-                            }
-
-                            yield return new FloppyDisk(fileInfo.Name.Substring(0, fileInfo.Name.Length - 4), diskImageUShorts);
-                        }
+                        diskImageUShorts[i / 2] = (ushort)((a << 8) | b);
                     }
+
+                    yield return new FloppyDisk(file.Name.Substring(0, file.Name.Length - 4), diskImageUShorts);
                 }
             }
         }
