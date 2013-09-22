@@ -262,37 +262,22 @@ namespace Ketchup
         {
             yield return new FirmwareRom("<Default>", DefaultFirmware);
 
-            var savesDirectory = Path.Combine(KSPUtil.ApplicationRootPath, "saves");
-            var profileDirectory = Path.Combine(savesDirectory, HighLogic.SaveFolder);
-            var ketchupDirectory = Path.Combine(profileDirectory, "Ketchup");
-            var firmwareDirectory = Path.Combine(ketchupDirectory, "Firmware");
-
-            if (Directory.Exists(firmwareDirectory))
+            foreach (var file in Utility.GetFirmwareFiles())
             {
-                foreach (var file in Directory.GetFiles(firmwareDirectory))
+                if (file.Length / 2 <= MaxFirmwareWords)
                 {
-                    var fileLower = file.ToLowerInvariant();
+                    var firmwareBytes = File.ReadAllBytes(file.FullName);
+                    var firmwareUShorts = new ushort[firmwareBytes.Length / 2];
 
-                    if (fileLower.EndsWith(".bin") || fileLower.EndsWith(".img"))
+                    for (var i = 0; i < firmwareBytes.Length; i += 2)
                     {
-                        var fileInfo = new FileInfo(file);
+                        var a = firmwareBytes[i];
+                        var b = firmwareBytes[i + 1];
 
-                        if (fileInfo.Length / 2 <= MaxFirmwareWords)
-                        {
-                            var firmwareBytes = File.ReadAllBytes(file);
-                            var firmwareUShorts = new ushort[firmwareBytes.Length / 2];
-
-                            for (var i = 0; i < firmwareBytes.Length; i += 2)
-                            {
-                                var a = firmwareBytes[i];
-                                var b = firmwareBytes[i + 1];
-
-                                firmwareUShorts[i / 2] = (ushort)((a << 8) | b);
-                            }
-
-                            yield return new FirmwareRom(fileInfo.Name.Substring(0, fileInfo.Name.Length - 4), firmwareUShorts);
-                        }
+                        firmwareUShorts[i / 2] = (ushort)((a << 8) | b);
                     }
+
+                    yield return new FirmwareRom(file.Name.Substring(0, file.Name.Length - 4), firmwareUShorts);
                 }
             }
         }
