@@ -107,6 +107,10 @@ namespace Ketchup
         public void OnDisconnect()
         {
             _dcpu16 = null;
+            _disk = default(FloppyDisk);
+            _currentStateCode = default(StateCode);
+            _lastErrorCode = default(ErrorCode);
+            _currentTrack = default(int);
         }
 
         public int OnInterrupt()
