@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ketchup.IO
 {
-    internal static class Utility
+    internal static class IoUtility
     {
         public static IEnumerable<FileInfo> GetFirmwareFiles()
         {

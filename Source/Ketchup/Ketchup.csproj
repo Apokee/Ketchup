@@ -43,10 +43,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="Tomato">
       <HintPath>..\..\Dependencies\Tomato\Tomato.dll</HintPath>
     </Reference>
@@ -61,6 +57,7 @@
     </Compile>
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
+    <Compile Include="Devices\Avionics.cs" />
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Computer.cs" />
@@ -72,13 +69,12 @@
     <Compile Include="IO\BinaryStateReader.cs" />
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
-    <Compile Include="IO\Utility.cs" />
+    <Compile Include="IO\IoUtility.cs" />
     <Compile Include="Lem1802.cs" />
     <Compile Include="M35fd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sped3.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Ketchup.Api\Ketchup.Api.csproj">
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>

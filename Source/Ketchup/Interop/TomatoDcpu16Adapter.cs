@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Ketchup.Api;
 using Tomato;
 
 namespace Ketchup.Interop
@@ -7,6 +6,14 @@ namespace Ketchup.Interop
     internal sealed class TomatoDcpu16Adapter : IDcpu16
     {
         private readonly DCPU _dcpu16;
+
+        /// <summary>
+        /// Is true if Interrupt() has been called, but no call to Execute() has occurred since.
+        /// </summary>
+        /// <remarks>
+        /// This is necessary to tell if the DCPU needs to wake up after a halt to process an interrupt.
+        /// </remarks>
+        private bool _interruptWakeFlag;
 
         public ushort A
         {
@@ -105,6 +112,7 @@ namespace Ketchup.Interop
         public TomatoDcpu16Adapter(DCPU dcpu16)
         {
             _dcpu16 = dcpu16;
+            _interruptWakeFlag = false;
         }
 
         public ushort OnConnect(IDevice device)
@@ -121,6 +129,8 @@ namespace Ketchup.Interop
 
         public int Execute()
         {
+            _interruptWakeFlag = false;
+
             var cyclesBefore = _dcpu16.TotalCycles;
             _dcpu16.Execute(1);
             var cyclesAfter = _dcpu16.TotalCycles;
@@ -130,7 +140,19 @@ namespace Ketchup.Interop
 
         public void Interrupt(ushort message)
         {
+            _interruptWakeFlag = true;
+
             _dcpu16.FireInterrupt(message);
+        }
+
+        public bool IsHalted()
+        {
+            return _dcpu16.Memory[_dcpu16.PC] == 0x8382; // ADD PC, -1
+        }
+
+        public bool IsPendingWakeUp()
+        {
+            return IsHalted() && _interruptWakeFlag;
         }
     }
 }
