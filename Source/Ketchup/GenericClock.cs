@@ -151,9 +151,11 @@ namespace Ketchup
             {
                 var gameTimePassed = TimeWarp.deltaTime;
 
-                if (gameTimePassed > _timeUntilNextTick)
+                if (gameTimePassed >= _timeUntilNextTick)
                 {
-                    _timeUntilNextTick = _period;
+                    var correction = gameTimePassed - _timeUntilNextTick;
+
+                    _timeUntilNextTick = _period - correction;
                     _elapsedTicks += 1;
 
                     if (_interruptMessage != 0)
