@@ -6,6 +6,7 @@ let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program
 let kspDepDir = kspDir + "/KSP_Data/Managed"
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
+let testDir = outputDir + "/Test"
 
 let buildMode = getBuildParamOrDefault "BuildMode" "Debug"
 
@@ -35,6 +36,12 @@ Target "BuildMod" (fun _ ->
         -- "**/*.Tests.csproj"
         |> MSBuild (buildDir + "/" + buildMode) "Build" ["Configuration", buildMode]
         |> Log "BuildMod-Output: "
+)
+
+Target "BuildTests" (fun _ ->
+    !! "Source/**/*.Tests.csproj"
+        |> MSBuildDebug testDir "Build"
+        |> Log "BuildTests-Output: "
 )
 
 Target "Clean" (fun _ ->
