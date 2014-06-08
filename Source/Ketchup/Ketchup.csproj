@@ -85,9 +85,5 @@
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-    <ItemGroup>
-      <GameDataFiles Include="$(SolutionDir)\GameData\**" />
-    </ItemGroup>
-    <Copy SourceFiles="@(GameDataFiles)" DestinationFolder="$(OutputPath)\..\..\%(RecursiveDir)" />
   </Target>
 </Project>

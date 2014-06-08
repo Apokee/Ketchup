@@ -48,4 +48,5 @@ function Install-FakeIfNecessary {
 }
 
 Install-FakeIfNecessary
-iex "$FakeExe @args"
+
+iex "$FakeExe $args"

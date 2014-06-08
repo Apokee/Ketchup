@@ -2,9 +2,23 @@
 open Fake
 
 // Properties
-let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program"
+let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program" // TODO: make configurable
 let kspDepDir = kspDir + "/KSP_Data/Managed"
-let buildDir = "./Output"
+let outputDir = "./Output"
+let buildDir = outputDir + "/Build"
+
+let buildMode = getBuildParamOrDefault "BuildMode" "Debug"
+
+// TODO: figure out a more elegant solution
+//if buildMode <> "Debug" && buildMode <> "Release"
+//    then raise (System.ArgumentException("Unknown BuildMode " + buildMode))    
+
+MSBuildDefaults <- MSBuildDefaults |> (fun p ->
+    { p with
+        Verbosity = Some(Minimal)
+        Properties = []
+    }
+)
 
 // Targets
 Target "Default" (fun _ ->
@@ -16,13 +30,25 @@ Target "Init" (fun _ ->
     Copy "./Dependencies/KSP" [kspDepDir + "/Assembly-CSharp.dll"; kspDepDir + "/UnityEngine.dll"]
 )
 
-Target "Clean" (fun _ ->
-    CleanDir buildDir
+Target "BuildMod" (fun _ ->
+    !! "Source/**/*.csproj"
+        -- "**/*.Tests.csproj"
+        |> MSBuild (buildDir + "/" + buildMode) "Build" ["Configuration", buildMode]
+        |> Log "BuildMod-Output: "
 )
 
+Target "Clean" (fun _ ->
+    CleanDir outputDir
+)
+
+// Dependencies
 "Init"
-    ==> "Default"
+    ==> "BuildMod"
 "Clean"
+    ==> "BuildMod"
+
+"BuildMod"
     ==> "Default"
 
+// Start
 RunTargetOrDefault "Default"
