@@ -96,6 +96,7 @@
     <Compile Include="Mathematics\VesselReferenceFrameTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mathematics\RangeTests.cs" />
+    <Compile Include="Utility\MachineWordTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -128,6 +129,7 @@
       <Name>Ketchup.Api</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
