@@ -97,15 +97,17 @@ Target "Clean" (fun _ ->
     ==> "Clean"
     ==> "BuildMod"
     ==> "BuildTest"
-    ==> "Test"
-    ==> "Stage"
     ==> "Default"
 
 "Default"
+    ==> "Test"
+    ==> "Stage"
+
+"Stage"
     ==> "Deploy"
     ==> "Run"
 
-"Default"
+"Stage"
     ==> "Package"
 
 // Start
