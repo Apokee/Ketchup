@@ -1,5 +1,4 @@
-﻿using Ketchup.Api;
-using Tomato.Hardware;
+﻿using Tomato.Hardware;
 
 namespace Ketchup.Interop
 {

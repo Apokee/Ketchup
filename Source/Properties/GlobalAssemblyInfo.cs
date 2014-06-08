@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
-[assembly: AssemblyProduct("Ketchup Add-on")]
+[assembly: AssemblyProduct("Ketchup Mod")]
 [assembly: AssemblyCompany("Dwayne Bent")]
-[assembly: AssemblyCopyright("Copyright © 2013")]
+[assembly: AssemblyCopyright("Copyright © 2013-2014")]
 
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]
@@ -10,4 +11,6 @@
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
-[assembly: AssemblyVersion("0.6.0.0")]
+[assembly: AssemblyInformationalVersion("0.6.0 Alpha")]
+
+[assembly: ComVisible(false)]

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Ketchup.Api
+namespace Ketchup
 {
     /// <summary>
     /// DCPU-16 Processor.

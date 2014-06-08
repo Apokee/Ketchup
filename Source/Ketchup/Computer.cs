@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ketchup.Api;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
@@ -35,7 +34,7 @@ namespace Ketchup
 
         #region Instance Fields
 
-        private IDcpu16 _dcpu16;
+        private TomatoDcpu16Adapter _dcpu16;
         private readonly List<IDevice> _devices = new List<IDevice>();
 
         private Dcpu16StateManager _dcpu16StateManager;
@@ -43,7 +42,6 @@ namespace Ketchup
         private bool _isPowerOn;
         private bool _isHalted;
 
-        private ushort? _pcAtHalt;
         private int? _warpIndexBeforeWake;
 
         private readonly List<double> _clockRates = new List<double>(60);
@@ -137,33 +135,22 @@ namespace Ketchup
 
         public override void OnUpdate()
         {
+            // TODO: this code is gnarly, refactor for clarity
+            // Do we really need to keep track of a halt condition in two places?
             if (_isPowerOn && _dcpu16 != null)
             {
                 if (_isHalted)
                 {
-                    if (_dcpu16.PC != _pcAtHalt)
+                    if (_dcpu16.IsPendingWakeUp())
                     {
                         _warpIndexBeforeWake = TimeWarp.CurrentRateIndex;
 
-                        _pcAtHalt = null;
                         _isHalted = false;
                     }
                 }
                 else
                 {
-                    if (_dcpu16.IsHalted())
-                    {
-                        _pcAtHalt = _dcpu16.PC;
-                        _isHalted = true;
-
-                        if (_warpIndexBeforeWake != null)
-                        {
-                            var index = _warpIndexBeforeWake.Value;
-                            _warpIndexBeforeWake = null;
-                            TimeWarp.SetRate(index, true);
-                        }
-                    }
-                    else
+                    if (_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted())
                     {
                         var maxPhysicsWarpIndex = _timeWarp.physicsWarpRates.Length - 1;
 
@@ -193,6 +180,17 @@ namespace Ketchup
                         }
 
                         _cyclesExecuted = cyclesExecuted;
+                    }
+                    else
+                    {
+                        _isHalted = true;
+
+                        if (_warpIndexBeforeWake != null)
+                        {
+                            var index = _warpIndexBeforeWake.Value;
+                            _warpIndexBeforeWake = null;
+                            TimeWarp.SetRate(index, true);
+                        }
                     }
                 }
             }
@@ -344,7 +342,6 @@ namespace Ketchup
             _isPowerOn = false;
 
             _isHalted = false;
-            _pcAtHalt = 0;
 
             _dcpu16 = null;
             _dcpu16StateManager = null;

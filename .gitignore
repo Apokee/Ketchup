@@ -1,7 +1,9 @@
 /Dependencies/KSP
 /Output
+/packages
 
 bin/
 obj/
 
 *.suo
+*.user

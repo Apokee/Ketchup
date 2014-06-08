@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ketchup.Api;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;
@@ -262,7 +261,7 @@ namespace Ketchup
         {
             yield return new FirmwareRom("<Default>", DefaultFirmware);
 
-            foreach (var file in Utility.GetFirmwareFiles())
+            foreach (var file in IoUtility.GetFirmwareFiles())
             {
                 if (file.Length / 2 <= MaxFirmwareWords)
                 {
