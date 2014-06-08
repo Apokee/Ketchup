@@ -25,6 +25,8 @@ Release information and downloads may be found on the GitHub [releases][releases
 
 Building
 ------------
+[![Build status][build-badge]][build]
+
 In order to build Ketchup two assemblies are required from your Kerbal Space Program installation. Because there
 are no obvious distribution licenses for these libraries, they cannot be commited to source control.
 
@@ -113,6 +115,8 @@ Name
 
 [0x10c]: http://0x10c.com/
 [3d-vector-display-spec]: https://web.archive.org/web/20130905084712/http://dcpu.com/3d-vector-display/
+[build]: https://ci.appveyor.com/project/DwayneBent/ketchup
+[build-badge]: https://ci.appveyor.com/api/projects/status/1kuas9hw4va1i6vv
 [clock-spec]: https://web.archive.org/web/20130905080349/http://dcpu.com/clock/
 [dcpu]: https://web.archive.org/web/20140101092129/http://dcpu.com/
 [dcpu-spec]: https://web.archive.org/web/20130905082541/http://dcpu.com/dcpu-16/
