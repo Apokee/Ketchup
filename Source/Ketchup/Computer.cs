@@ -35,7 +35,7 @@ namespace Ketchup
         #region Instance Fields
 
         private TomatoDcpu16Adapter _dcpu16;
-        private readonly List<IDevice> _devices = new List<IDevice>();
+        private readonly List<IDevice> _connectedDevices = new List<IDevice>();
 
         private Dcpu16StateManager _dcpu16StateManager;
 
@@ -296,42 +296,20 @@ namespace Ketchup
 
         private void TurnOn(bool useState)
         {
-            _dcpu16 = new TomatoDcpu16Adapter(new DCPU());
-            _dcpu16StateManager = new Dcpu16StateManager(_dcpu16);
+            InitializeDcpu16();
 
-            Firmware cpuFirmware = null;
-            foreach (var device in vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()))
-            {
-                var firmware = device as Firmware;
-                if (firmware != null)
-                {
-                    if (firmware.part == part)
-                    {
-                        _devices.Add(firmware);
-                        Connect(_dcpu16, firmware);
+            var firmware = GetFirmware();
 
-                        cpuFirmware = firmware;
-                    }
-                }
-                else
-                {
-                    _devices.Add(device);
-                    Connect(_dcpu16, device);
-                }
+            Connect(firmware);
+            Connect(DeviceScan());
 
-                Debug.Log(String.Format("[Ketchup] Connected CPU to {0}", device.FriendlyName));
-            }
-
-            if (useState && !String.IsNullOrEmpty(_dcpu16State))
+            if (useState && HasPersistedState())
             {
                 _dcpu16StateManager.Load(_dcpu16State);
             }
             else
             {
-                if (cpuFirmware != null)
-                {
-                    cpuFirmware.OnInterrupt();
-                }
+                firmware.OnInterrupt();
             }
 
             _isPowerOn = true;
@@ -346,21 +324,57 @@ namespace Ketchup
             _dcpu16 = null;
             _dcpu16StateManager = null;
 
-            foreach (var device in _devices)
+            foreach (var device in _connectedDevices)
             {
                 device.OnDisconnect();
             }
 
-            _devices.Clear();
+            _connectedDevices.Clear();
 
             _clockRates.RemoveAll(i => true);
             _clockRateIndex = 0;
         }
 
-        private static void Connect(IDcpu16 dcpu16, IDevice device)
+        private void InitializeDcpu16()
         {
-            dcpu16.OnConnect(device);
-            device.OnConnect(dcpu16);
+            var dcpu16 = new TomatoDcpu16Adapter(new DCPU());
+            var dcpu16StateManager = new Dcpu16StateManager(dcpu16);
+
+            _dcpu16 = dcpu16;
+            _dcpu16StateManager = dcpu16StateManager;
+        }
+
+        private Firmware GetFirmware()
+        {
+            return part.Modules.OfType<Firmware>().Single();
+        }
+
+        private IEnumerable<IDevice> DeviceScan()
+        {
+            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is Firmware)).ToList();
+        }
+
+        private void Connect(IEnumerable<IDevice> devices)
+        {
+            foreach (var device in devices)
+            {
+                Connect(device);
+            }
+        }
+
+        private void Connect(IDevice device)
+        {
+            _connectedDevices.Add(device);
+
+            _dcpu16.OnConnect(device);
+            device.OnConnect(_dcpu16);
+
+            Debug.Log(String.Format("[Ketchup:Computer] Connected DCPU-16 to {0}", device.FriendlyName));
+        }
+
+        private bool HasPersistedState()
+        {
+            return !String.IsNullOrEmpty(_dcpu16State);
         }
 
         #endregion
