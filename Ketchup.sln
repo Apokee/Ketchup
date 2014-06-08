@@ -16,6 +16,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.Tests", "Source\Ketchup.Tests\Ketchup.Tests.csproj", "{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{00503FAD-71D0-418D-B91D-6FB2CEEC7153}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
