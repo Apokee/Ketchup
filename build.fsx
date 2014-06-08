@@ -2,14 +2,13 @@
 open Fake
 
 // Properties
-let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program" // TODO: make configurable
-let kspDepDir = kspDir + "/KSP_Data/Managed"
-let kspDeployDir = kspDir + "/GameData/Ketchup"
+let kspDir = lazy (ReadFileAsString "./KSPDIR")
+let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
+let kspDeployDir = lazy (kspDir.Force() + "/GameData/Ketchup")
 let kspLocalDepDir = "./Dependencies/KSP"
 
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
-
 
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
@@ -40,7 +39,7 @@ Target "Default" (fun _ ->
 Target "Init" (fun _ ->
     if not (TestDir kspLocalDepDir) then (
         CreateDir "./Dependencies/KSP"
-        Copy "./Dependencies/KSP" [kspDepDir + "/Assembly-CSharp.dll"; kspDepDir + "/UnityEngine.dll"]
+        Copy "./Dependencies/KSP" [kspDepDir.Force() + "/Assembly-CSharp.dll"; kspDepDir.Force() + "/UnityEngine.dll"]
     )
 )
 
@@ -71,15 +70,15 @@ Target "Stage" (fun _ ->
 )
 
 Target "Deploy" (fun _ ->
-    CleanDir kspDeployDir
-    CopyDir kspDeployDir stageDir (fun f -> true)
+    CleanDir (kspDeployDir.Force())
+    CopyDir (kspDeployDir.Force()) stageDir (fun f -> true)
 )
 
 Target "Run" (fun _ ->
     // TODO: this should be asynchronous but FAKE kills the process if you use StartProcess
     ExecProcess (fun psi ->
-        psi.FileName <- kspDir + "/KSP.exe"
-        psi.WorkingDirectory <- kspDir
+        psi.FileName <- kspDir.Force() + "/KSP.exe"
+        psi.WorkingDirectory <- kspDir.Force()
     ) (System.TimeSpan.FromMinutes 60.0) |> ignore
 )
 
