@@ -4,6 +4,7 @@ open Fake
 // Properties
 let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program" // TODO: make configurable
 let kspDepDir = kspDir + "/KSP_Data/Managed"
+let kspDeployDir = kspDir + "/GameData/Ketchup"
 
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
@@ -64,6 +65,19 @@ Target "Stage" (fun _ ->
     CopyDir (stageDir + "/Plugins") (buildDir + "/" + buildMode) (fun f -> true)
 )
 
+Target "Deploy" (fun _ ->
+    CleanDir kspDeployDir
+    CopyDir kspDeployDir stageDir (fun f -> true)
+)
+
+Target "Run" (fun _ ->
+    // TODO: this should be asynchronous but FAKE kills the process if you use StartProcess
+    ExecProcess (fun psi ->
+        psi.FileName <- kspDir + "/KSP.exe"
+        psi.WorkingDirectory <- kspDir
+    ) (System.TimeSpan.FromMinutes 60.0) |> ignore
+)
+
 Target "Clean" (fun _ ->
     CleanDir outputDir
 )
@@ -76,6 +90,8 @@ Target "Clean" (fun _ ->
     ==> "Test"
     ==> "Stage"
     ==> "Default"
+    ==> "Deploy"
+    ==> "Run"
 
 // Start
 RunTargetOrDefault "Default"
