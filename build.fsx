@@ -5,9 +5,11 @@ open Fake
 let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program" // TODO: make configurable
 let kspDepDir = kspDir + "/KSP_Data/Managed"
 let kspDeployDir = kspDir + "/GameData/Ketchup"
+let kspLocalDepDir = "./Dependencies/KSP"
 
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
+
 
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
@@ -36,8 +38,10 @@ Target "Default" (fun _ ->
 )
 
 Target "Init" (fun _ ->
-    CreateDir "./Dependencies/KSP"
-    Copy "./Dependencies/KSP" [kspDepDir + "/Assembly-CSharp.dll"; kspDepDir + "/UnityEngine.dll"]
+    if not (TestDir kspLocalDepDir) then (
+        CreateDir "./Dependencies/KSP"
+        Copy "./Dependencies/KSP" [kspDepDir + "/Assembly-CSharp.dll"; kspDepDir + "/UnityEngine.dll"]
+    )
 )
 
 Target "BuildMod" (fun _ ->
