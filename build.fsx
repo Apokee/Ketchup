@@ -4,9 +4,14 @@ open Fake
 // Properties
 let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program" // TODO: make configurable
 let kspDepDir = kspDir + "/KSP_Data/Managed"
+
+let contribDir = "./Contrib"
+let partsDir = "./Parts"
+
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
 let testDir = outputDir + "/Test"
+let stageDir = outputDir + "/Stage/Ketchup"
 
 let buildMode = getBuildParamOrDefault "BuildMode" "Debug"
 
@@ -37,13 +42,13 @@ Target "BuildMod" (fun _ ->
     !! "Source/**/*.csproj"
         -- "**/*.Tests.csproj"
         |> MSBuild (buildDir + "/" + buildMode) "Build" ["Configuration", buildMode]
-        |> Log "BuildMod-Output: "
+        |> ignore
 )
 
 Target "BuildTest" (fun _ ->
     !! "Source/**/*.Tests.csproj"
         |> MSBuildDebug testDir "Build"
-        |> Log "BuildTest-Output: "
+        |> ignore
 )
 
 Target "Test" (fun _ ->
@@ -51,6 +56,12 @@ Target "Test" (fun _ ->
         |> xUnit (fun p ->
             p
         )
+)
+
+Target "Stage" (fun _ ->
+    CopyDir (stageDir + "/Contrib") contribDir (fun f -> true)
+    CopyDir (stageDir + "/Parts") partsDir (fun f -> true)
+    CopyDir (stageDir + "/Plugins") (buildDir + "/" + buildMode) (fun f -> true)
 )
 
 Target "Clean" (fun _ ->
@@ -63,6 +74,7 @@ Target "Clean" (fun _ ->
     ==> "BuildMod"
     ==> "BuildTest"
     ==> "Test"
+    ==> "Stage"
     ==> "Default"
 
 // Start
