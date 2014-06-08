@@ -13,6 +13,7 @@ let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
 let testDir = outputDir + "/Test"
 let stageDir = outputDir + "/Stage/Ketchup"
+let packageDir = outputDir + "/Package"
 
 let buildMode = getBuildParamOrDefault "BuildMode" "Debug"
 
@@ -31,7 +32,7 @@ RestorePackages()
 
 // Targets
 Target "Default" (fun _ ->
-    trace "Hello World"
+    trace "Default Target"
 )
 
 Target "Init" (fun _ ->
@@ -78,6 +79,15 @@ Target "Run" (fun _ ->
     ) (System.TimeSpan.FromMinutes 60.0) |> ignore
 )
 
+Target "Package" (fun _ ->
+    // TODO: assert that this has a value
+    let version = getBuildParam "Version"
+
+    CreateDir packageDir
+    !! (stageDir + "/**/*.*")
+        |> Zip (stageDir + "/..") (packageDir + "/Ketchup-" + version + ".zip")
+)
+
 Target "Clean" (fun _ ->
     CleanDir outputDir
 )
@@ -90,8 +100,13 @@ Target "Clean" (fun _ ->
     ==> "Test"
     ==> "Stage"
     ==> "Default"
+
+"Default"
     ==> "Deploy"
     ==> "Run"
+
+"Default"
+    ==> "Package"
 
 // Start
 RunTargetOrDefault "Default"
