@@ -21,6 +21,8 @@ MSBuildDefaults <- MSBuildDefaults |> (fun p ->
     }
 )
 
+RestorePackages()
+
 // Targets
 Target "Default" (fun _ ->
     trace "Hello World"
@@ -38,10 +40,10 @@ Target "BuildMod" (fun _ ->
         |> Log "BuildMod-Output: "
 )
 
-Target "BuildTests" (fun _ ->
+Target "BuildTest" (fun _ ->
     !! "Source/**/*.Tests.csproj"
         |> MSBuildDebug testDir "Build"
-        |> Log "BuildTests-Output: "
+        |> Log "BuildTest-Output: "
 )
 
 Target "Clean" (fun _ ->
@@ -51,10 +53,12 @@ Target "Clean" (fun _ ->
 // Dependencies
 "Init"
     ==> "BuildMod"
+
 "Clean"
     ==> "BuildMod"
 
 "BuildMod"
+    ==> "BuildTest"
     ==> "Default"
 
 // Start
