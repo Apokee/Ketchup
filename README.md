@@ -1,11 +1,9 @@
-Ketchup
-===========
+Ketchup [![Build status][build-badge]][build]
+=================================================
 
 **Ketchup** is a mod for [Kerbal Space Program][ksp] which implements a [programmable CPU][dcpu].
 
 More information may be found on the project [wiki][wiki].
-
-[![Build status][build-badge]][build]
 
 [dcpu]: https://web.archive.org/web/20140101092129/http://dcpu.com/
 [ksp]: https://kerbalspaceprogram.com/
