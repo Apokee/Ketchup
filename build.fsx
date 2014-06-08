@@ -4,6 +4,7 @@ open Fake
 // Properties
 let kspDir = "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program"
 let kspDepDir = kspDir + "/KSP_Data/Managed"
+let buildDir = "./Output"
 
 // Targets
 Target "Default" (fun _ ->
@@ -15,7 +16,13 @@ Target "Init" (fun _ ->
     Copy "./Dependencies/KSP" [kspDepDir + "/Assembly-CSharp.dll"; kspDepDir + "/UnityEngine.dll"]
 )
 
+Target "Clean" (fun _ ->
+    CleanDir buildDir
+)
+
 "Init"
+    ==> "Default"
+"Clean"
     ==> "Default"
 
 RunTargetOrDefault "Default"
