@@ -52,12 +52,8 @@ Target "Clean" (fun _ ->
 
 // Dependencies
 "Init"
+    ==> "Clean"
     ==> "BuildMod"
-
-"Clean"
-    ==> "BuildMod"
-
-"BuildMod"
     ==> "BuildTest"
     ==> "Default"
 
