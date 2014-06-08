@@ -46,6 +46,13 @@ Target "BuildTest" (fun _ ->
         |> Log "BuildTest-Output: "
 )
 
+Target "Test" (fun _ ->
+    !! (testDir + "/*.Tests.dll")
+        |> xUnit (fun p ->
+            p
+        )
+)
+
 Target "Clean" (fun _ ->
     CleanDir outputDir
 )
@@ -55,6 +62,7 @@ Target "Clean" (fun _ ->
     ==> "Clean"
     ==> "BuildMod"
     ==> "BuildTest"
+    ==> "Test"
     ==> "Default"
 
 // Start
