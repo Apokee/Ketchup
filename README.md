@@ -112,15 +112,15 @@ Name
 *Ketchup* is derived predominantly from the Tomato project, and its name begins with a *K* so... yeah.
 
 [0x10c]: http://0x10c.com/
-[3d-vector-display-spec]: http://dcpu.com/3d-vector-display/
-[clock-spec]: http://dcpu.com/clock/
-[dcpu]: http://dcpu.com/
-[dcpu-spec]: http://dcpu.com/dcpu-16/
-[floppy-spec]: http://dcpu.com/floppy-drive/
+[3d-vector-display-spec]: https://web.archive.org/web/20130905084712/http://dcpu.com/3d-vector-display/
+[clock-spec]: https://web.archive.org/web/20130905080349/http://dcpu.com/clock/
+[dcpu]: https://web.archive.org/web/20140101092129/http://dcpu.com/
+[dcpu-spec]: https://web.archive.org/web/20130905082541/http://dcpu.com/dcpu-16/
+[floppy-spec]: https://web.archive.org/web/20130905072724/http://dcpu.com/floppy-drive/
 [issues]: https://github.com/dbent/Ketchup/issues
-[keyboard-spec]: http://dcpu.com/keyboard/
+[keyboard-spec]: https://web.archive.org/web/20130905061706/http://dcpu.com/keyboard/
 [ksp]: https://kerbalspaceprogram.com/
-[monitor-spec]: http://dcpu.com/monitor/
+[monitor-spec]: https://web.archive.org/web/20130905063459/http://dcpu.com/monitor/
 [notch]: https://mojang.com/notch/
 [organic]: https://github.com/SirCmpwn/organic
 [releases]: https://github.com/dbent/Ketchup/releases
