@@ -11,7 +11,7 @@ namespace Ketchup.Utility
         /// <returns>Canonical machine word representation.</returns>
         public static ushort FromBoolean(bool boolean)
         {
-            return (ushort)(boolean ? 0 : 1);
+            return (ushort)(boolean ? 1 : 0);
         }
 
         /// <summary>
