@@ -31,6 +31,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{10E7B68B-615C-4FA2-BD54-A058DD5F0572}"
 	ProjectSection(SolutionItems) = preProject
 		build.fsx = build.fsx
+		fake.ps1 = fake.ps1
 	EndProjectSection
 EndProject
 Global
