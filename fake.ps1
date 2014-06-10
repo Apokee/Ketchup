@@ -43,10 +43,10 @@ function Install-FakeIfNecessary {
         }
 
         Install-Fake $Version
-        Write-Host
     }
 }
 
 Install-FakeIfNecessary
 
 iex "$FakeExe $args"
+exit $LASTEXITCODE
