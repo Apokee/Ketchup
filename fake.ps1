@@ -42,7 +42,7 @@ function Install-FakeIfNecessary {
             Remove-Item -Recurse -Force $FakePackagePath
         }
 
-        Install-Fake $Version
+        Install-Fake
     }
 }
 
