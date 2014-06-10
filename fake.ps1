@@ -3,11 +3,12 @@ $Package    = "FAKE"
 $Version    = "2.17.9"
 
 # Globals
-$PackagesPath       = "$PSScriptRoot\packages"
+$ScriptPath			= "$PSScriptRoot"
+$PackagesPath       = "$ScriptPath\packages"
 $FakePackagePath    = "$PackagesPath\$Package"
 $VersionFile        = "$FakePackagePath\VERSION"
-$FakeExe            = "$FakePackagePath\tools\Fake.exe"
-$NugetExe           = "$PSScriptRoot\.nuget\nuget.exe"
+$FakeExe            = "$FakePackagePath\tools\FAKE.exe"
+$NugetExe           = "$ScriptPath\.nuget\NuGet.exe"
 
 function Get-InstalledFakeVersion {
     if (Test-Path $VersionFile) {
@@ -27,15 +28,7 @@ function Install-FakeIfNecessary {
 
     if ($installedVersion -ne $Version) {
         if ($installedVersion -ne $null) {
-            if ([version]$installedVersion -lt [version]$Version) {
-                $verb = "Upgrading"
-                $color = "Green"
-            } else {
-                $verb = "Downgrading"
-                $color = "Yellow"
-            }
-
-            Write-Host -ForegroundColor $color "$verb $Package $installedVersion to $Version..."            
+            Write-Host -ForegroundColor Green "Replacing $Package $installedVersion with $Version..."
         }
 
         if (Test-Path $FakePackagePath) {
