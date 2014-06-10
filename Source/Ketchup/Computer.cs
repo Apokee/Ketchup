@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Ketchup
 {
-    public class Computer : PartModule
+    internal class Computer : PartModule
     {
         #region Constants
 

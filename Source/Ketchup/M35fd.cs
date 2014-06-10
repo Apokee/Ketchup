@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Ketchup
 {
-    public sealed class M35Fd : PartModule, IDevice
+    internal sealed class M35Fd : PartModule, IDevice
     {
         #region Constants
 

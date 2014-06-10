@@ -2,7 +2,7 @@
 
 namespace Ketchup.Exceptions
 {
-    public sealed class LoadStateException : Exception
+    internal sealed class LoadStateException : Exception
     {
         private const string StandardMessage = "Failed to load {0} state.";
 

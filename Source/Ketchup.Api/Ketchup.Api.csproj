@@ -46,6 +46,8 @@
     <Compile Include="..\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Constants\DeviceId.cs" />
+    <Compile Include="Constants\ManufacturerId.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="Extensions\VesselExtensions.cs" />
     <Compile Include="IDcpu16.cs" />

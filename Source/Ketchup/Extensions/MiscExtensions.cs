@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Ketchup.Extensions
 {
-    public static class MiscExtensions
+    internal static class MiscExtensions
     {
         public static Rect CenteredOnScreen(this Rect rect)
         {
