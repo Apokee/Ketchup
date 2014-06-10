@@ -59,19 +59,19 @@
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Computer.cs" />
-    <Compile Include="Firmware.cs" />
-    <Compile Include="GenericClock.cs" />
-    <Compile Include="GenericKeyboard.cs" />
+    <Compile Include="Devices\Firmware.cs" />
+    <Compile Include="Devices\GenericClock.cs" />
+    <Compile Include="Devices\GenericKeyboard.cs" />
     <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
     <Compile Include="Interop\TomatoDeviceAdapter.cs" />
     <Compile Include="IO\BinaryStateReader.cs" />
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
     <Compile Include="IO\IoUtility.cs" />
-    <Compile Include="Lem1802.cs" />
-    <Compile Include="M35fd.cs" />
+    <Compile Include="Devices\Lem1802.cs" />
+    <Compile Include="Devices\M35fd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sped3.cs" />
+    <Compile Include="Devices\Sped3.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ketchup.Api\Ketchup.Api.csproj">
