@@ -55,8 +55,6 @@
     <Compile Include="..\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Constants\DeviceId.cs" />
-    <Compile Include="Constants\ManufacturerId.cs" />
     <Compile Include="Devices\Avionics.cs" />
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />

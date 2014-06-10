@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Ketchup
 {
-    public sealed class Lem1802 : PartModule, IDevice
+    internal sealed class Lem1802 : PartModule, IDevice
     {
         #region Constants
 
