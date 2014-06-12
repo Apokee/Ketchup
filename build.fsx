@@ -6,6 +6,7 @@ let kspDir = lazy (ReadFileAsString "./KSPDIR")
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
 let kspDeployDir = lazy (kspDir.Force() + "/GameData/Ketchup")
 let kspLocalDepDir = "./Dependencies/KSP"
+let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
 
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
@@ -38,9 +39,14 @@ Target "Default" (fun _ ->
 
 Target "Init" (fun _ ->
     if not (TestDir kspLocalDepDir) then (
-        CreateDir "./Dependencies/KSP"
-        Copy "./Dependencies/KSP" [kspDepDir.Force() + "/Assembly-CSharp.dll"; kspDepDir.Force() + "/UnityEngine.dll"]
+        CreateDir kspLocalDepDir
     )
+
+    kspAssemblies |> List.choose (fun a ->
+        match a with
+        | a when not (System.IO.File.Exists (kspLocalDepDir + "/" + a)) -> Some(kspDepDir.Force() + "/" + a)
+        | _ -> None
+    ) |> Copy kspLocalDepDir
 )
 
 Target "BuildMod" (fun _ ->
