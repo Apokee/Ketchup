@@ -1,8 +1,31 @@
 #r "packages/FAKE/tools/FakeLib.dll"
+#r "packages/FAKE/tools/Newtonsoft.Json.dll"
+open System.IO
+open System.Collections.Generic
 open Fake
+open Newtonsoft.Json
 
 // Properties
-let kspDir = lazy (ReadFileAsString "./KSPDIR")
+let config = (
+    let mutable configFile = null
+
+    if File.Exists("Ketchup.json") then
+        configFile <- "Ketchup.json"
+    else if File.Exists("../Ketchup.json") then
+        configFile <- "../Ketchup.json"
+
+    if configFile = null then
+        new Dictionary<string, string>()
+    else
+        JsonConvert.DeserializeObject<Dictionary<string, string>>(ReadFileAsString configFile)
+)
+
+let kspDir = lazy (
+    if config.ContainsKey("ksp_dir") then
+        config.["ksp_dir"]
+    else
+        raise (System.Exception("ksp_dir not specified in configuration"))
+)
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
 let kspDeployDir = lazy (kspDir.Force() + "/GameData/Ketchup")
 let kspLocalDepDir = "./Dependencies/KSP"
