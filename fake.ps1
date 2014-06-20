@@ -4,7 +4,7 @@ $Version    = "2.17.9"
 
 # Globals
 $ScriptPath			= "$PSScriptRoot"
-$PackagesPath       = "$ScriptPath\packages"
+$PackagesPath       = "$ScriptPath\Dependencies\NuGet"
 $FakePackagePath    = "$PackagesPath\$Package"
 $VersionFile        = "$FakePackagePath\VERSION"
 $FakeExe            = "$FakePackagePath\tools\FAKE.exe"
