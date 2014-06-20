@@ -13,7 +13,6 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=VIC/@EntryIndexedValue"></s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=VIC/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=D2EB18CDDCDE6A4286EDC2C46AC5D48A/@KeyIndexDefined">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=D2EB18CDDCDE6A4286EDC2C46AC5D48A/AbsolutePath/@EntryValue">D:\Users\Dwayne\Projects\Ketchup\Source\Ketchup.Tests\Ketchup.Tests.csproj.DotSettings</s:String>
-	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=D2EB18CDDCDE6A4286EDC2C46AC5D48A/RelativePath/@EntryValue">..\Source\Ketchup.Tests\Ketchup.Tests.csproj.DotSettings</s:String>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=D2EB18CDDCDE6A4286EDC2C46AC5D48A/RelativePath/@EntryValue">..\Tests\Ketchup.Tests\Ketchup.Tests.csproj.DotSettings</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileD2EB18CDDCDE6A4286EDC2C46AC5D48A/@KeyIndexDefined">True</s:Boolean>
 	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileD2EB18CDDCDE6A4286EDC2C46AC5D48A/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>
