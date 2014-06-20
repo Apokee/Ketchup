@@ -90,7 +90,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="..\..\Source\Properties\GlobalAssemblyInfo.cs">
+    <Compile Include="..\..\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Mathematics\VesselReferenceFrameTests.cs" />
