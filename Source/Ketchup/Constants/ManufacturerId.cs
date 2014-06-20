@@ -1,6 +1,6 @@
 ﻿namespace Ketchup.Constants
 {
-    public enum ManufacturerId : uint
+    internal enum ManufacturerId : uint
     {
         Unknown         = 0x00000000,
         Mackapar        = 0x1eb37e91,

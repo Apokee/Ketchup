@@ -2,7 +2,7 @@
 
 namespace Ketchup.Mathematics
 {
-    public class Range
+    internal class Range
     {
         #region Constants
 

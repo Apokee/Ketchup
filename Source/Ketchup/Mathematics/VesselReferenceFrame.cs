@@ -2,7 +2,7 @@
 
 namespace Ketchup.Mathematics
 {
-    public struct VesselReferenceFrame
+    internal struct VesselReferenceFrame
     {
         private readonly Vector3d _origin;
 

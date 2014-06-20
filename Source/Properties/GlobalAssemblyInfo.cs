@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyProduct("Ketchup Mod")]
@@ -14,3 +15,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("0.6.0 Alpha")]
 
 [assembly: ComVisible(false)]
+
+[assembly: InternalsVisibleTo("Ketchup.Tests")]

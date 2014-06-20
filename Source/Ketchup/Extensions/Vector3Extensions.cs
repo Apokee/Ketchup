@@ -2,7 +2,7 @@
 
 namespace Ketchup.Extensions
 {
-    public static class Vector3Extensions
+    internal static class Vector3Extensions
     {
         public static double PreciseAngle(this Vector3d from, Vector3d to)
         {

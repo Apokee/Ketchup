@@ -128,6 +128,10 @@
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
       <Name>Ketchup.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ketchup\Ketchup.csproj">
+      <Project>{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}</Project>
+      <Name>Ketchup</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Choose>
