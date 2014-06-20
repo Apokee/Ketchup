@@ -1,6 +1,6 @@
 # Configuration
 $Package    = "FAKE"
-$Version    = "2.17.9"
+$Version    = "2.18.2"
 
 # Globals
 $ScriptPath			= "$PSScriptRoot"
