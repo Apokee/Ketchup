@@ -5,7 +5,7 @@ namespace Ketchup.Mathematics
     /// <summary>
     /// North East Down (NED) reference frame.
     /// </summary>
-    public struct NedReferenceFrame
+    internal struct NedReferenceFrame
     {
         private readonly Vector3d _origin;
 

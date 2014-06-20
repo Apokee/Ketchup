@@ -1,10 +1,10 @@
 # Configuration
 $Package    = "FAKE"
-$Version    = "2.17.9"
+$Version    = "2.18.2"
 
 # Globals
 $ScriptPath			= "$PSScriptRoot"
-$PackagesPath       = "$ScriptPath\packages"
+$PackagesPath       = "$ScriptPath\Dependencies\NuGet"
 $FakePackagePath    = "$PackagesPath\$Package"
 $VersionFile        = "$FakePackagePath\VERSION"
 $FakeExe            = "$FakePackagePath\tools\FAKE.exe"

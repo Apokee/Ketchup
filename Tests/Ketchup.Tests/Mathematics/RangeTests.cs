@@ -9,7 +9,7 @@ namespace Ketchup.Mathematics
         #region Tests
 
         [Theory, PropertyData("Reduce_IsCorrect_TestCases")]
-        public void Reduce_IsCorrect(Range toRange, double value, double expectedResult)
+        internal void Reduce_IsCorrect(Range toRange, double value, double expectedResult)
         {
             // Arrange
             const double epsilon = 1e-12;

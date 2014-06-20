@@ -2,7 +2,7 @@
 
 namespace Ketchup.Extensions
 {
-    public static class DoubleExtensions
+    internal static class DoubleExtensions
     {
         public static double DegreesToRadians(this double value)
         {

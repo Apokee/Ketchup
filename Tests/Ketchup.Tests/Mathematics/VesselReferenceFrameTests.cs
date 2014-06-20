@@ -11,7 +11,7 @@ namespace Ketchup.Mathematics
         #region Tests
 
         [Theory, PropertyData("GetRoll_IsCorrect_TestCases")]
-        public void GetRoll_IsCorrect(VesselReferenceFrame vesselReferenceFrame, double expectedRoll)
+        internal void GetRoll_IsCorrect(VesselReferenceFrame vesselReferenceFrame, double expectedRoll)
         {
             // Arrange
             const double epsilon = 1e-12;

@@ -1,6 +1,6 @@
 ﻿namespace Ketchup.Constants
 {
-    public enum DeviceId : uint
+    internal enum DeviceId : uint
     {
         Firmware            = 0x37464B39, // TODO: the proposed specification doesn't specify this
         GenericClock        = 0x12d0b402,

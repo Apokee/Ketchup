@@ -1,5 +1,5 @@
-#r "packages/FAKE/tools/FakeLib.dll"
-#r "packages/FAKE/tools/Newtonsoft.Json.dll"
+#r "Dependencies/NuGet/FAKE/tools/FakeLib.dll"
+#r "Dependencies/NuGet/FAKE/tools/Newtonsoft.Json.dll"
 open System.IO
 open System.Collections.Generic
 open Fake
@@ -53,14 +53,18 @@ MSBuildDefaults <- MSBuildDefaults |> (fun p ->
     }
 )
 
-RestorePackages()
-
 // Targets
 Target "Default" (fun _ ->
     trace "Default Target"
 )
 
 Target "Init" (fun _ ->
+    // TODO: Needs to be executed with Mono on Unix-like systems
+    ExecProcess (fun psi ->
+        psi.FileName <- ".nuget/NuGet.exe"
+        psi.Arguments <- "restore Ketchup.sln"
+    ) (System.TimeSpan.FromMinutes 60.0) |> ignore
+
     if not (TestDir kspLocalDepDir) then (
         CreateDir kspLocalDepDir
     )
@@ -80,7 +84,7 @@ Target "BuildMod" (fun _ ->
 )
 
 Target "BuildTest" (fun _ ->
-    !! "Source/**/*.Tests.csproj"
+    !! "Tests/**/*.csproj"
         |> MSBuildDebug testDir "Build"
         |> ignore
 )
@@ -104,6 +108,7 @@ Target "Deploy" (fun _ ->
 )
 
 Target "Run" (fun _ ->
+    // TODO: Needs to be executed with Mono on Unix-like systems
     // TODO: this should be asynchronous but FAKE kills the process if you use StartProcess
     ExecProcess (fun psi ->
         psi.FileName <- kspDir.Force() + "/KSP.exe"

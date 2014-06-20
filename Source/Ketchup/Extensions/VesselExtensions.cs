@@ -1,9 +1,8 @@
 ﻿using Ketchup.Mathematics;
-using UnityEngine;
 
 namespace Ketchup.Extensions
 {
-    public static class VesselExtensions
+    internal static class VesselExtensions
     {
         public static NedReferenceFrame GetNedReferenceFrame(this Vessel vessel)
         {
