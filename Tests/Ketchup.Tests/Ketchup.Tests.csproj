@@ -90,7 +90,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="..\Properties\GlobalAssemblyInfo.cs">
+    <Compile Include="..\..\Source\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Mathematics\VesselReferenceFrameTests.cs" />
@@ -124,11 +124,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ketchup.Api\Ketchup.Api.csproj">
+    <ProjectReference Include="..\..\Source\Ketchup.Api\Ketchup.Api.csproj">
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
       <Name>Ketchup.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ketchup\Ketchup.csproj">
+    <ProjectReference Include="..\..\Source\Ketchup\Ketchup.csproj">
       <Project>{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}</Project>
       <Name>Ketchup</Name>
     </ProjectReference>

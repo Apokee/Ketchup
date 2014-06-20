@@ -80,7 +80,7 @@ Target "BuildMod" (fun _ ->
 )
 
 Target "BuildTest" (fun _ ->
-    !! "Source/**/*.Tests.csproj"
+    !! "Tests/**/*.csproj"
         |> MSBuildDebug testDir "Build"
         |> ignore
 )
