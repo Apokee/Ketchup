@@ -1,0 +1,4 @@
+# Path to your KSP installation.
+# Default: null
+# Example: "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program"
+ksp_dir: null
