@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Ksg.Ketchup.Extensions;
 using UnityEngine;
@@ -302,12 +303,16 @@ namespace Ksg.Ketchup
 
             if (_buffer.Any())
             {
-                node.AddValue(ConfigKeyBuffer, String.Join(",", _buffer.Select(i => i.ToString()).ToArray()));
+                node.AddValue(ConfigKeyBuffer,
+                    String.Join(",", _buffer.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToArray())
+                );
             }
 
             if (_pressedKeys.Any())
             {
-                node.AddValue(ConfigKeyPressedKeys, String.Join(",", _pressedKeys.Select(i => i.ToString()).ToArray()));
+                node.AddValue(ConfigKeyPressedKeys,
+                    String.Join(",", _pressedKeys.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToArray())
+                );
             }
 
             node.AddValue(ConfigKeyInterruptMessage, _interruptMessage);

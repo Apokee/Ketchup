@@ -314,6 +314,7 @@ namespace Ksg.Ketchup
         private enum ErrorCode : ushort
         {
             None    = 0,
+            // ReSharper disable once UnusedMember.Local
             Broken  = 1,
         }
 
