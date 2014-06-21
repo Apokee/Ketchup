@@ -1,7 +1,7 @@
 version: "{build}"
 
 environment:
-  KETCHUP_KSPDEPS: http://build.kerbalsystems.com/dependencies/ksp/0.23.5
+  KETCHUP_KSPDEPS: "http://build.kerbalsystems.com/dependencies/ksp/0.23.5"
 
 install:
     ps: |
