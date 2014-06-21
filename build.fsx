@@ -59,12 +59,6 @@ Target "Default" (fun _ ->
 )
 
 Target "Init" (fun _ ->
-    // TODO: Needs to be executed with Mono on Unix-like systems
-    ExecProcess (fun psi ->
-        psi.FileName <- ".nuget/NuGet.exe"
-        psi.Arguments <- "restore Ketchup.sln"
-    ) (System.TimeSpan.FromMinutes 60.0) |> ignore
-
     if not (TestDir kspLocalDepDir) then (
         CreateDir kspLocalDepDir
     )
