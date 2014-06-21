@@ -7,26 +7,9 @@ $DependenciesDir    = "$RootDir/Dependencies"
 $PackagesDir        = "$DependenciesDir/NuGet"
 $FakeExe            = "$PackagesDir/FAKE/tools/FAKE.exe"
 
-function Invoke-Fake {
-    param([string]$Arguments)
+# Install build packages
+iex "$NugetExe install `"$PackagesConfigFile`" -ExcludeVersion -OutputDirectory `"$PackagesDir`""
 
-    iex "$FakeExe $Arguments" | Out-Host
-    return $LASTEXITCODE
-}
-
-function Invoke-Nuget {
-    param([string]$Arguments)
-
-    iex "$NugetExe $Arguments" | Out-Host
-    return $LASTEXITCODE
-}
-
-function Install-PackagesIfNecessary {
-    $nugetExitCode = (Invoke-Nuget `
-        -Arguments "install `"$PackagesConfigFile`" -ExcludeVersion -OutputDirectory `"$PackagesDir`"")
-}
-
-Install-PackagesIfNecessary
-
-$fakeExitCode = (Invoke-Fake -Arguments $args)
-exit $fakeExitCode
+# Run FAKE
+iex "$FakeExe $arg"
+exit $LASTEXITCODE
