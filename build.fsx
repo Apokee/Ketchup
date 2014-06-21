@@ -14,8 +14,8 @@ let config = (
 
     if File.Exists("build.yml") then
         configFile <- "build.yml"
-    else if File.Exists("../build.yml") then
-        configFile <- "../build.yml"
+    else if File.Exists("../Ketchup.build.yml") then
+        configFile <- "../Ketchup.build.yml"
 
     if configFile = null then
         new YamlStream()
