@@ -1,30 +1,42 @@
 #r "Dependencies/NuGet/FAKE/tools/FakeLib.dll"
-#r "Dependencies/NuGet/FAKE/tools/Newtonsoft.Json.dll"
+#r "Dependencies/NuGet/YamlDotNet/lib/net35/YamlDotNet.dll"
 open System.IO
 open System.Collections.Generic
 open Fake
-open Newtonsoft.Json
+open YamlDotNet.RepresentationModel
 
 // Properties
 let config = (
+    // TODO: Clean this up
+    // * Cleaner checking of which file to use
+    // * Deserialize the file to an object
     let mutable configFile = null
 
-    if File.Exists("Ketchup.json") then
-        configFile <- "Ketchup.json"
-    else if File.Exists("../Ketchup.json") then
-        configFile <- "../Ketchup.json"
+    if File.Exists("build.yml") then
+        configFile <- "build.yml"
+    else if File.Exists("../build.yml") then
+        configFile <- "../build.yml"
 
     if configFile = null then
-        new Dictionary<string, string>()
-    else
-        JsonConvert.DeserializeObject<Dictionary<string, string>>(ReadFileAsString configFile)
+        new YamlStream()
+    else (
+        let yaml = new YamlStream()
+        yaml.Load(new StringReader(ReadFileAsString configFile))
+        yaml
+    )
 )
 
 let kspDir = lazy (
-    if config.ContainsKey("ksp_dir") then
-        config.["ksp_dir"]
-    else
+    if config.Documents.Count = 0 then
         raise (System.Exception("ksp_dir not specified in configuration"))
+    else (
+        let mapping = config.Documents.[0].RootNode :?> YamlMappingNode
+        let node = new YamlScalarNode("ksp_dir")
+        if mapping.Children.ContainsKey(node) then
+            mapping.Children.[node].ToString()
+        else
+            raise (System.Exception("ksp_dir not specified in configuration"))
+    )
 )
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
 let kspDeployDir = lazy (kspDir.Force() + "/GameData/Ketchup")
