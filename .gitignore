@@ -8,4 +8,4 @@ obj/
 *.suo
 *.user
 
-Ketchup.json
+/build.yml
