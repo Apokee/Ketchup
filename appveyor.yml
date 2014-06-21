@@ -1,8 +1,7 @@
 version: "{build}"
 
 environment:
-  KETCHUP_KSPDEPS:
-    secure: nYAYsrPeZmfrK217ONg9J3YobMTJfbOgFYuWlK1BtcX/a0rtwKhjovOBwFb80jO06qnlYqvvtivqP1V7sVoBdxrLlXkj72RZNVZ4KMB0D0CrvC3SWdEYi/e9VDry6cBv
+  KETCHUP_KSPDEPS: "http://build.kerbalsystems.com/dependencies/ksp/0.23.5"
 
 install:
     ps: |
