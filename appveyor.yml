@@ -1,0 +1,17 @@
+version: "{build}"
+
+environment:
+  KETCHUP_KSPDEPS:
+    secure: nYAYsrPeZmfrK217ONg9J3YobMTJfbOgFYuWlK1BtcX/a0rtwKhjovOBwFb80jO06qnlYqvvtivqP1V7sVoBdxrLlXkj72RZNVZ4KMB0D0CrvC3SWdEYi/e9VDry6cBv
+
+install:
+    ps: |
+        New-Item "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP" -Type Directory -Force | Out-Null
+        Start-FileDownload "$env:KETCHUP_KSPDEPS/Assembly-CSharp.dll" `
+            -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\Assembly-CSharp.dll"
+        Start-FileDownload "$env:KETCHUP_KSPDEPS/UnityEngine.dll" `
+            -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\UnityEngine.dll"
+
+build_script:
+    ps: |
+        ./fake BuildMode=Release
