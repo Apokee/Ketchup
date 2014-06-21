@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksg.Ketchup", "Source\Ksg.Ketchup\Ksg.Ketchup.csproj", "{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksg.Ketchup.Api", "Source\Ksg.Ketchup.Api\Ksg.Ketchup.Api.csproj", "{BF83C18A-AD39-4083-A819-5B42B3812664}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{321C0367-C334-4476-BB51-15EC365E65BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{00503FAD-71D0-418D-B91D-6FB2CEEC7153}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{3991ADE8-8DF4-42F5-BE04-2DAF1A101885}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{10E7B68B-615C-4FA2-BD54-A058DD5F0572}"
+	ProjectSection(SolutionItems) = preProject
+		build.fsx = build.fsx
+		build.ps1 = build.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{ED0C10B2-D63D-4A7C-BCBC-6DC93288EB68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksg.Ketchup.Tests", "Tests\Ksg.Ketchup.Tests\Ksg.Ketchup.Tests.csproj", "{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", "{10F2C765-A417-47C3-89E1-D48BAA32A39D}"
+	ProjectSection(SolutionItems) = preProject
+		Properties\GlobalAssemblyInfo.cs = Properties\GlobalAssemblyInfo.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF83C18A-AD39-4083-A819-5B42B3812664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6} = {321C0367-C334-4476-BB51-15EC365E65BF}
+		{BF83C18A-AD39-4083-A819-5B42B3812664} = {321C0367-C334-4476-BB51-15EC365E65BF}
+		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970} = {ED0C10B2-D63D-4A7C-BCBC-6DC93288EB68}
+	EndGlobalSection
+EndGlobal

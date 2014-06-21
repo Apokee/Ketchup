@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyProduct("Ketchup Mod")]
+[assembly: AssemblyProduct("KSG Ketchup Mod")]
 [assembly: AssemblyCompany("Dwayne Bent")]
 [assembly: AssemblyCopyright("Copyright © 2013-2014")]
 
@@ -16,4 +16,4 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: InternalsVisibleTo("Ketchup.Tests")]
+[assembly: InternalsVisibleTo("Ksg.Ketchup.Tests")]
