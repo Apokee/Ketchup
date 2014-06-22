@@ -13,4 +13,4 @@ install:
 
 build_script:
     ps: |
-        ./build BuildMode=Release
+        ./build Configuration=Release
