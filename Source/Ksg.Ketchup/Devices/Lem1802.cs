@@ -3,7 +3,7 @@ using System.Linq;
 using Ksg.Ketchup.Extensions;
 using UnityEngine;
 
-namespace Ksg.Ketchup
+namespace Ksg.Ketchup.Devices
 {
     internal sealed class Lem1802 : PartModule, IDevice
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ksg.Ketchup
+namespace Ksg.Ketchup.Devices
 {
     internal sealed class Sped3 : PartModule, IDevice
     {

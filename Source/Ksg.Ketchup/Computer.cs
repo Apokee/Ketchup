@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ksg.Ketchup.Devices;
 using Ksg.Ketchup.Extensions;
 using Ksg.Ketchup.Interop;
 using Ksg.Ketchup.IO;

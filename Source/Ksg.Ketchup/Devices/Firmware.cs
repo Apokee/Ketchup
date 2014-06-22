@@ -7,7 +7,7 @@ using Ksg.Ketchup.Extensions;
 using Ksg.Ketchup.IO;
 using UnityEngine;
 
-namespace Ksg.Ketchup
+namespace Ksg.Ketchup.Devices
 {
     internal sealed class Firmware : PartModule, IDevice
     {

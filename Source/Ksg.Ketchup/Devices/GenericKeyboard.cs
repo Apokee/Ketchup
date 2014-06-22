@@ -5,7 +5,7 @@ using System.Linq;
 using Ksg.Ketchup.Extensions;
 using UnityEngine;
 
-namespace Ksg.Ketchup
+namespace Ksg.Ketchup.Devices
 {
     public sealed class GenericKeyboard : PartModule, IDevice
     {
