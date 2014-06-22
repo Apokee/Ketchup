@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Ksg.Ketchup.Devices
 {
-    public sealed class GenericKeyboard : PartModule, IDevice
+    public sealed class KetchupGenericKeyboardModule : PartModule, IDevice
     {
         #region Constants
 

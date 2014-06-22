@@ -2,7 +2,7 @@
 
 namespace Ksg.Ketchup.Devices
 {
-    public sealed class GenericClock : PartModule, IDevice
+    public sealed class KetchupGenericClockModule : PartModule, IDevice
     {
         #region Constants
 

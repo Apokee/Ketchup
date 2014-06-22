@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Ksg.Ketchup.Devices
 {
-    internal sealed class Avionics : PartModule, IDevice
+    internal sealed class KetchupAvionicsModule : PartModule, IDevice
     {
         #region Constants
 
@@ -68,7 +68,7 @@ namespace Ksg.Ketchup.Devices
 
         #region Constructors
 
-        public Avionics()
+        public KetchupAvionicsModule()
         {
             _state = new State();
         }

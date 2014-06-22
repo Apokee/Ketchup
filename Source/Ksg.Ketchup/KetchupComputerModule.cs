@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Ksg.Ketchup
 {
-    internal class Computer : PartModule
+    internal class KetchupComputerModule : PartModule
     {
         #region Constants
 
@@ -345,14 +345,14 @@ namespace Ksg.Ketchup
             _dcpu16StateManager = dcpu16StateManager;
         }
 
-        private Firmware GetFirmware()
+        private KetchupFirmwareModule GetFirmware()
         {
-            return part.Modules.OfType<Firmware>().Single();
+            return part.Modules.OfType<KetchupFirmwareModule>().Single();
         }
 
         private IEnumerable<IDevice> DeviceScan()
         {
-            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is Firmware)).ToList();
+            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is KetchupFirmwareModule)).ToList();
         }
 
         private void Connect(IEnumerable<IDevice> devices)

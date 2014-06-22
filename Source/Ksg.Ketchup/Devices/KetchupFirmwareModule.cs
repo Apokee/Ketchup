@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Ksg.Ketchup.Devices
 {
-    internal sealed class Firmware : PartModule, IDevice
+    internal sealed class KetchupFirmwareModule : PartModule, IDevice
     {
         #region Constants
 
@@ -97,7 +97,7 @@ namespace Ksg.Ketchup.Devices
 
         #region Constructors
 
-        public Firmware()
+        public KetchupFirmwareModule()
         {
             _firmware = new FirmwareRom("<Default>", DefaultFirmware);
         }

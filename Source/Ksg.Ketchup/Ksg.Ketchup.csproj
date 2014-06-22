@@ -57,29 +57,29 @@
     </Compile>
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
-    <Compile Include="Devices\Avionics.cs" />
+    <Compile Include="Devices\KetchupAvionicsModule.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\VesselExtensions.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
-    <Compile Include="Computer.cs" />
-    <Compile Include="Devices\Firmware.cs" />
-    <Compile Include="Devices\GenericClock.cs" />
-    <Compile Include="Devices\GenericKeyboard.cs" />
+    <Compile Include="KetchupComputerModule.cs" />
+    <Compile Include="Devices\KetchupFirmwareModule.cs" />
+    <Compile Include="Devices\KetchupGenericClockModule.cs" />
+    <Compile Include="Devices\KetchupGenericKeyboardModule.cs" />
     <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
     <Compile Include="Interop\TomatoDeviceAdapter.cs" />
     <Compile Include="IO\BinaryStateReader.cs" />
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
     <Compile Include="IO\IoUtility.cs" />
-    <Compile Include="Devices\Lem1802.cs" />
-    <Compile Include="Devices\M35fd.cs" />
+    <Compile Include="Devices\KetchupLem1802Module.cs" />
+    <Compile Include="Devices\KetchupM35fdModule.cs" />
     <Compile Include="Mathematics\NedReferenceFrame.cs" />
     <Compile Include="Mathematics\Range.cs" />
     <Compile Include="Mathematics\VesselReferenceFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Devices\Sped3.cs" />
+    <Compile Include="Devices\KetchupSped3Module.cs" />
     <Compile Include="Utility\MachineWord.cs" />
   </ItemGroup>
   <ItemGroup>
