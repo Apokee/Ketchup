@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ksg.Ketchup
+namespace Ksg.Ketchup.Devices
 {
     public sealed class GenericClock : PartModule, IDevice
     {

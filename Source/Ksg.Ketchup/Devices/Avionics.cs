@@ -5,7 +5,7 @@ using Ksg.Ketchup.Mathematics;
 using Ksg.Ketchup.Utility;
 using UnityEngine;
 
-namespace Ksg.Ketchup
+namespace Ksg.Ketchup.Devices
 {
     internal sealed class Avionics : PartModule, IDevice
     {
