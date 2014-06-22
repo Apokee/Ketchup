@@ -52,11 +52,7 @@ let testDir = outputDir + "/Test"
 let stageDir = outputDir + "/Stage/Ketchup"
 let packageDir = outputDir + "/Package"
 
-let buildMode = getBuildParamOrDefault "BuildMode" "Debug"
-
-// TODO: figure out a more elegant solution
-//if buildMode <> "Debug" && buildMode <> "Release"
-//    then raise (System.ArgumentException("Unknown BuildMode " + buildMode))    
+let buildConfig = getBuildParamOrDefault "Configuration" "Debug"
 
 MSBuildDefaults <- MSBuildDefaults |> (fun p ->
     { p with
@@ -84,8 +80,7 @@ Target "Init" (fun _ ->
 
 Target "BuildMod" (fun _ ->
     !! "Source/**/*.csproj"
-        -- "**/*.Tests.csproj"
-        |> MSBuild (buildDir + "/" + buildMode) "Build" ["Configuration", buildMode]
+        |> MSBuild (buildDir + "/" + buildConfig) "Build" ["Configuration", buildConfig]
         |> ignore
 )
 
@@ -105,7 +100,7 @@ Target "Test" (fun _ ->
 Target "Stage" (fun _ ->
     CopyDir (stageDir + "/Contrib") contribDir (fun f -> true)
     CopyDir (stageDir + "/Parts") partsDir (fun f -> true)
-    CopyDir (stageDir + "/Plugins") (buildDir + "/" + buildMode) (fun f -> true)
+    CopyDir (stageDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
 )
 
 Target "Deploy" (fun _ ->
