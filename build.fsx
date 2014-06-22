@@ -38,8 +38,9 @@ let kspDir = lazy (
             raise (System.Exception("ksp_dir not specified in configuration"))
     )
 )
+let kspDepName = "KSG_Ketchup"
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
-let kspDeployDir = lazy (kspDir.Force() + "/GameData/Ketchup")
+let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDepName)
 let kspLocalDepDir = "./Dependencies/KSP"
 let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
 
@@ -49,7 +50,7 @@ let partsDir = "./Parts"
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
 let testDir = outputDir + "/Test"
-let stageDir = outputDir + "/Stage/Ketchup"
+let stageDir = outputDir + "/Stage/" + kspDepName
 let packageDir = outputDir + "/Package"
 
 let buildConfig = getBuildParamOrDefault "Configuration" "Debug"
