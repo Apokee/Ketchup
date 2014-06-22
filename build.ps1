@@ -11,5 +11,5 @@ $FakeExe            = "$PackagesDir/FAKE/tools/FAKE.exe"
 iex "$NugetExe install `"$PackagesConfigFile`" -ExcludeVersion -OutputDirectory `"$PackagesDir`""
 
 # Run FAKE
-iex "$FakeExe $arg"
+iex "$FakeExe $args"
 exit $LASTEXITCODE
