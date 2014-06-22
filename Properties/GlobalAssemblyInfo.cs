@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyProduct("KSG Ketchup Mod")]
-[assembly: AssemblyCompany("Dwayne Bent")]
+[assembly: AssemblyCompany("Kerbal Systems Group")]
 [assembly: AssemblyCopyright("Copyright © 2013-2014")]
 
 #if DEBUG
