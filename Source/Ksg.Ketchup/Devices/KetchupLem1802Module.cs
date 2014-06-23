@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Ksg.Ketchup.Devices
 {
-    internal sealed class Lem1802 : PartModule, IDevice
+    internal sealed class KetchupLem1802Module : PartModule, IDevice
     {
         #region Constants
 
@@ -117,7 +117,7 @@ namespace Ksg.Ketchup.Devices
 
         #region Constructors
 
-        public Lem1802()
+        public KetchupLem1802Module()
         {
             _screenTexture = new Texture2D(Width, Height) { filterMode = FilterMode.Point };
         }

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Ksg.Ketchup.Devices
 {
-    internal sealed class M35Fd : PartModule, IDevice
+    internal sealed class KetchupM35FdModule : PartModule, IDevice
     {
         #region Constants
 
