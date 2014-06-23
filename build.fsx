@@ -38,9 +38,10 @@ let kspDir = lazy (
             raise (System.Exception("ksp_dir not specified in configuration"))
     )
 )
-let kspDepName = "KSG_Ketchup"
+let kspDeployParentName = "KSG"
+let kspDeployChildName = "Ketchup"
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
-let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDepName)
+let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDeployParentName + "/" + kspDeployChildName)
 let kspLocalDepDir = "./Dependencies/KSP"
 let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
 
@@ -50,7 +51,8 @@ let partsDir = "./Parts"
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
 let testDir = outputDir + "/Test"
-let stageDir = outputDir + "/Stage/" + kspDepName
+let stageParentDir = outputDir + "/Stage/" + kspDeployParentName
+let stageChildDir = stageParentDir + "/" + kspDeployChildName
 let packageDir = outputDir + "/Package"
 
 let buildConfig = getBuildParamOrDefault "Configuration" "Debug"
@@ -99,14 +101,14 @@ Target "Test" (fun _ ->
 )
 
 Target "Stage" (fun _ ->
-    CopyDir (stageDir + "/Contrib") contribDir (fun f -> true)
-    CopyDir (stageDir + "/Parts") partsDir (fun f -> true)
-    CopyDir (stageDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
+    CopyDir (stageChildDir + "/Contrib") contribDir (fun f -> true)
+    CopyDir (stageChildDir + "/Parts") partsDir (fun f -> true)
+    CopyDir (stageChildDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
 )
 
 Target "Deploy" (fun _ ->
     CleanDir (kspDeployDir.Force())
-    CopyDir (kspDeployDir.Force()) stageDir (fun f -> true)
+    CopyDir (kspDeployDir.Force()) stageChildDir (fun f -> true)
 )
 
 Target "Run" (fun _ ->
@@ -123,8 +125,8 @@ Target "Package" (fun _ ->
     let version = getBuildParam "Version"
 
     CreateDir packageDir
-    !! (stageDir + "/**/*.*")
-        |> Zip (stageDir + "/..") (packageDir + "/Ketchup-" + version + ".zip")
+    !! (stageParentDir + "/**/*.*")
+        |> Zip (stageParentDir + "/..") (packageDir + "/Ketchup-" + version + ".zip")
 )
 
 Target "Clean" (fun _ ->
