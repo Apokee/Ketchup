@@ -24,9 +24,11 @@ namespace Ketchup.CrashDevice
 
         private enum Mode : ushort
         {
+            // ReSharper disable once UnusedMember.Local
             Passive     = 0x0000,
             Exclusive   = 0x0001,
-            Cooperative = 0x0002,
+            // ReSharper disable once UnusedMember.Local
+            Cooperative = 0x0002, // TODO: Implement cooperative mode
         }
 
         private static readonly Dictionary<ushort, KSPActionGroup> ActionGroupMapping =
@@ -103,7 +105,50 @@ namespace Ketchup.CrashDevice
         [KSPField(guiName = "KSG CRASH Throttle", guiActive = true, guiFormat = "F3", isPersistant = true)]
         private float _throttle;
 
+        [KSPField(isPersistant = true)]
+        private uint _stagesPendingActivation;
+
         #endregion
+
+        #region PartModule
+
+        public override void OnStart(StartState state)
+        {
+            if (state != StartState.Editor)
+            {
+                // TODO: Need to unregister this at some point
+                vessel.OnFlyByWire += OnFlyByWire;
+            }
+        }
+
+        private void OnFlyByWire(FlightCtrlState flightCtrlState)
+        {
+            if (_dcpu16 != null && _mode == Mode.Exclusive)
+            {
+                flightCtrlState.roll = _roll;
+                flightCtrlState.pitch = _pitch;
+                flightCtrlState.yaw = _yaw;
+
+                flightCtrlState.X = _translationX;
+                flightCtrlState.Y = _translationY;
+                flightCtrlState.Z = _translationZ;
+
+                flightCtrlState.mainThrottle = _throttle;
+
+                if (_stagesPendingActivation > 0 && vessel.currentStage > 0)
+                {
+                    var originalStage = vessel.currentStage;
+
+                    Staging.ActivateNextStage();
+
+                    if (vessel.currentStage != originalStage) { _stagesPendingActivation--; }
+                }
+            }
+        }
+
+        #endregion
+
+        #region IDevice
 
         private IDcpu16 _dcpu16;
 
@@ -152,13 +197,22 @@ namespace Ketchup.CrashDevice
                     KSPActionGroup actionGroup;
                     if (ActionGroupMapping.TryGetValue(_dcpu16.B, out actionGroup))
                     {
-                        // TODO: Determine what setting true/false does for "trigger" action groups like Abort
-                        vessel.ActionGroups[actionGroup] = MachineWord.ToBoolean(_dcpu16.C);
+                        if (actionGroup == KSPActionGroup.Stage)
+                        {
+                            _stagesPendingActivation++;
+                        }
+                        else
+                        {
+                            // TODO: Determine what setting true/false does for "trigger" action groups like Abort
+                            vessel.ActionGroups[actionGroup] = MachineWord.ToBoolean(_dcpu16.C);
+                        }
                     }
                     break;
             }
 
             return 0; // TODO: Set to a reasonable value
         }
+
+        #endregion
     }
 }
