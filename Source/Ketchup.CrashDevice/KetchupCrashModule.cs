@@ -9,13 +9,22 @@ namespace Ketchup.CrashDevice
     {
         #region Constants
 
-        private enum InterruptOperation
+        private enum InterruptOperation : ushort
         {
-            SetMode         = 0x0001,
-            SetRotation     = 0x0002,
-            SetTranslation  = 0x0003,
-            SetThrottle     = 0x0004,
-            SetActionGroup  = 0x0005,
+            GetStage        = 0x0001,
+
+            SetMode         = 0x4001,
+            SetRotation     = 0x4002,
+            SetTranslation  = 0x4003,
+            SetThrottle     = 0x4004,
+            SetActionGroup  = 0x4005,
+        }
+
+        private enum Mode : ushort
+        {
+            Passive     = 0x0000,
+            Exclusive   = 0x0001,
+            Cooperative = 0x0002,
         }
 
         #endregion
@@ -44,6 +53,13 @@ namespace Ketchup.CrashDevice
 
         #endregion
 
+        #region State
+
+        [KSPField(guiName="KSG CRASH Controller Mode", guiActive=true, isPersistant=true)]
+        private Mode _mode;
+
+        #endregion
+
         private IDcpu16 _dcpu16;
 
         public void OnConnect(IDcpu16 dcpu16)
@@ -62,7 +78,13 @@ namespace Ketchup.CrashDevice
 
             switch((InterruptOperation)_dcpu16.A)
             {
+                case InterruptOperation.GetStage:
+                    break;
                 case InterruptOperation.SetMode:
+                    if (Enum.IsDefined(typeof(Mode), _dcpu16.B))
+                    {
+                        _mode = (Mode)_dcpu16.B;
+                    }
                     break;
                 case InterruptOperation.SetRotation:
                     break;
