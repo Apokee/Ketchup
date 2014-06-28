@@ -38,6 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", 
 		Properties\GlobalAssemblyInfo.cs = Properties\GlobalAssemblyInfo.cs
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.CrashDevice", "Source\Ketchup.CrashDevice\Ketchup.CrashDevice.csproj", "{65D10FCB-1C5D-48ED-98F7-DBAA185689B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D10FCB-1C5D-48ED-98F7-DBAA185689B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D10FCB-1C5D-48ED-98F7-DBAA185689B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D10FCB-1C5D-48ED-98F7-DBAA185689B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D10FCB-1C5D-48ED-98F7-DBAA185689B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,5 +70,6 @@ Global
 		{05B224A9-D0CC-4EE8-8BE1-822593FC55E6} = {321C0367-C334-4476-BB51-15EC365E65BF}
 		{BF83C18A-AD39-4083-A819-5B42B3812664} = {321C0367-C334-4476-BB51-15EC365E65BF}
 		{FBCF8A2A-EE6E-4D59-892F-8F66D10F8970} = {ED0C10B2-D63D-4A7C-BCBC-6DC93288EB68}
+		{65D10FCB-1C5D-48ED-98F7-DBAA185689B5} = {321C0367-C334-4476-BB51-15EC365E65BF}
 	EndGlobalSection
 EndGlobal
