@@ -2,8 +2,24 @@
 
 namespace Ketchup.CrashDevice
 {
+    /// <summary>
+    /// Centrally Regulated Avionic Subsystem Haptics (CRASH) controller device.
+    /// </summary>
     internal sealed class KetchupCrashModule : PartModule, IDevice
     {
+        #region Constants
+
+        private enum InterruptOperation
+        {
+            SetMode         = 0x0001,
+            SetRotation     = 0x0002,
+            SetTranslation  = 0x0003,
+            SetThrottle     = 0x0004,
+            SetActionGroup  = 0x0005,
+        }
+
+        #endregion
+
         #region Device Identifiers
 
         public string FriendlyName
@@ -42,7 +58,25 @@ namespace Ketchup.CrashDevice
 
         public int OnInterrupt()
         {
-            throw new NotImplementedException();
+            if (_dcpu16 == null) { return 0; }
+
+            switch((InterruptOperation)_dcpu16.A)
+            {
+                case InterruptOperation.SetMode:
+                    break;
+                case InterruptOperation.SetRotation:
+                    break;
+                case InterruptOperation.SetTranslation:
+                    break;
+                case InterruptOperation.SetThrottle:
+                    break;
+                case InterruptOperation.SetActionGroup:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return 0; // TODO: Set to a reasonable value
         }
     }
 }
