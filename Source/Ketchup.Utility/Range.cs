@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Ketchup.Mathematics
+namespace Ketchup.Utility
 {
-    internal class Range
+    public class Range
     {
         #region Constants
 

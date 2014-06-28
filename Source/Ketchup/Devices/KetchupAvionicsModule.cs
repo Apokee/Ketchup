@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Ketchup.Extensions;
-using Ketchup.Mathematics;
 using Ketchup.Utility;
 using UnityEngine;
 
