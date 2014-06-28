@@ -56,8 +56,26 @@ namespace Ketchup.CrashDevice
 
         #region State
 
-        [KSPField(guiName="KSG CRASH Controller Mode", guiActive=true, isPersistant=true)]
+        [KSPField(guiName="KSG CRASH Mode", guiActive=true, isPersistant=true)]
         private Mode _mode;
+
+        [KSPField(guiName="KSG CRASH Roll", guiActive=true, guiFormat="F3", isPersistant=true)]
+        private float _roll;
+
+        [KSPField(guiName = "KSG CRASH Pitch", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        private float _pitch;
+
+        [KSPField(guiName = "KSG CRASH Yaw", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        private float _yaw;
+
+        [KSPField(guiName = "KSG CRASH Translation X", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        private float _translationX;
+
+        [KSPField(guiName = "KSG CRASH Translation Y", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        private float _translationY;
+
+        [KSPField(guiName = "KSG CRASH Translation Z", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        private float _translationZ;
 
         #endregion
 
@@ -92,8 +110,14 @@ namespace Ketchup.CrashDevice
                     }
                     break;
                 case InterruptOperation.SetRotation:
+                    _roll = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.X));
+                    _pitch = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.Y));
+                    _yaw = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.Z));
                     break;
                 case InterruptOperation.SetTranslation:
+                    _translationX = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.X));
+                    _translationY = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.Y));
+                    _translationZ = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.Z));
                     break;
                 case InterruptOperation.SetThrottle:
                     break;
