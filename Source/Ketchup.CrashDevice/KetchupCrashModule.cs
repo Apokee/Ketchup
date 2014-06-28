@@ -56,10 +56,10 @@ namespace Ketchup.CrashDevice
 
         #region State
 
-        [KSPField(guiName="KSG CRASH Mode", guiActive=true, isPersistant=true)]
+        [KSPField(guiName = "KSG CRASH Mode", guiActive = true, isPersistant = true)]
         private Mode _mode;
 
-        [KSPField(guiName="KSG CRASH Roll", guiActive=true, guiFormat="F3", isPersistant=true)]
+        [KSPField(guiName = "KSG CRASH Roll", guiActive = true, guiFormat = "F3", isPersistant = true)]
         private float _roll;
 
         [KSPField(guiName = "KSG CRASH Pitch", guiActive = true, guiFormat = "F3", isPersistant = true)]
@@ -76,6 +76,9 @@ namespace Ketchup.CrashDevice
 
         [KSPField(guiName = "KSG CRASH Translation Z", guiActive = true, guiFormat = "F3", isPersistant = true)]
         private float _translationZ;
+
+        [KSPField(guiName = "KSG CRASH Throttle", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        private float _throttle;
 
         #endregion
 
@@ -120,11 +123,10 @@ namespace Ketchup.CrashDevice
                     _translationZ = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.Z));
                     break;
                 case InterruptOperation.SetThrottle:
+                    _throttle = Range.ScaleUnsignedInt16ToUnsignedUnary(MachineWord.ToUInt16(_dcpu16.B));
                     break;
                 case InterruptOperation.SetActionGroup:
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
 
             return 0; // TODO: Set to a reasonable value
