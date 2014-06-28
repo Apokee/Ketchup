@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ketchup.Utility;
 
 namespace Ketchup.CrashDevice
@@ -27,6 +28,28 @@ namespace Ketchup.CrashDevice
             Exclusive   = 0x0001,
             Cooperative = 0x0002,
         }
+
+        private static readonly Dictionary<ushort, KSPActionGroup> ActionGroupMapping =
+            new Dictionary<ushort, KSPActionGroup>
+            {
+                {0x0001, KSPActionGroup.Custom01},
+                {0x0002, KSPActionGroup.Custom02},
+                {0x0003, KSPActionGroup.Custom03},
+                {0x0004, KSPActionGroup.Custom04},
+                {0x0005, KSPActionGroup.Custom05},
+                {0x0006, KSPActionGroup.Custom06},
+                {0x0007, KSPActionGroup.Custom07},
+                {0x0008, KSPActionGroup.Custom08},
+                {0x0009, KSPActionGroup.Custom09},
+                {0x000A, KSPActionGroup.Custom10},
+                {0x8001, KSPActionGroup.Stage},
+                {0x8002, KSPActionGroup.Gear},
+                {0x8003, KSPActionGroup.Light},
+                {0x8004, KSPActionGroup.RCS},
+                {0x8005, KSPActionGroup.SAS},
+                {0x8006, KSPActionGroup.Brakes},
+                {0x8007, KSPActionGroup.Abort}
+            };
 
         #endregion
 
@@ -126,6 +149,12 @@ namespace Ketchup.CrashDevice
                     _throttle = Range.ScaleUnsignedInt16ToUnsignedUnary(MachineWord.ToUInt16(_dcpu16.B));
                     break;
                 case InterruptOperation.SetActionGroup:
+                    KSPActionGroup actionGroup;
+                    if (ActionGroupMapping.TryGetValue(_dcpu16.B, out actionGroup))
+                    {
+                        // TODO: Determine what setting true/false does for "trigger" action groups like Abort
+                        vessel.ActionGroups[actionGroup] = MachineWord.ToBoolean(_dcpu16.C);
+                    }
                     break;
             }
 
