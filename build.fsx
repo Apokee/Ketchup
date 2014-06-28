@@ -38,10 +38,9 @@ let kspDir = lazy (
             raise (System.Exception("ksp_dir not specified in configuration"))
     )
 )
-let kspDeployParentName = "KSG"
-let kspDeployChildName = "Ketchup"
+let kspDeployName = "Ketchup"
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
-let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDeployParentName + "/" + kspDeployChildName)
+let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDeployName)
 let kspLocalDepDir = "./Dependencies/KSP"
 let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
 
@@ -51,8 +50,8 @@ let partsDir = "./Parts"
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
 let testDir = outputDir + "/Test"
-let stageParentDir = outputDir + "/Stage/" + kspDeployParentName
-let stageChildDir = stageParentDir + "/" + kspDeployChildName
+let stageDir = outputDir + "/Stage/GameData"
+let stageModDir = outputDir + "/Stage/GameData/" + kspDeployName
 let packageDir = outputDir + "/Package"
 
 let buildConfig = getBuildParamOrDefault "Configuration" "Debug"
@@ -101,14 +100,14 @@ Target "Test" (fun _ ->
 )
 
 Target "Stage" (fun _ ->
-    CopyDir (stageChildDir + "/Contrib") contribDir (fun f -> true)
-    CopyDir (stageChildDir + "/Parts") partsDir (fun f -> true)
-    CopyDir (stageChildDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
+    CopyDir (stageModDir + "/Contrib") contribDir (fun f -> true)
+    CopyDir (stageModDir + "/Parts") partsDir (fun f -> true)
+    CopyDir (stageModDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
 )
 
 Target "Deploy" (fun _ ->
     CleanDir (kspDeployDir.Force())
-    CopyDir (kspDeployDir.Force()) stageChildDir (fun f -> true)
+    CopyDir (kspDeployDir.Force()) stageModDir (fun f -> true)
 )
 
 Target "Run" (fun _ ->
@@ -125,8 +124,8 @@ Target "Package" (fun _ ->
     let version = getBuildParam "Version"
 
     CreateDir packageDir
-    !! (stageParentDir + "/**/*.*")
-        |> Zip (stageParentDir + "/..") (packageDir + "/Ketchup-" + version + ".zip")
+    !! (stageDir + "/**/*.*")
+        |> Zip (stageDir + "/..") (packageDir + "/Ketchup-" + version + ".zip")
 )
 
 Target "Clean" (fun _ ->
