@@ -1,4 +1,5 @@
 ﻿using System;
+using Ketchup.Utility;
 
 namespace Ketchup.CrashDevice
 {
@@ -79,6 +80,10 @@ namespace Ketchup.CrashDevice
             switch((InterruptOperation)_dcpu16.A)
             {
                 case InterruptOperation.GetStage:
+                    if (vessel.currentStage >= UInt16.MinValue && vessel.currentStage <= UInt16.MaxValue)
+                    {
+                        _dcpu16.B = MachineWord.FromUInt16((ushort)vessel.currentStage);
+                    }
                     break;
                 case InterruptOperation.SetMode:
                     if (Enum.IsDefined(typeof(Mode), _dcpu16.B))

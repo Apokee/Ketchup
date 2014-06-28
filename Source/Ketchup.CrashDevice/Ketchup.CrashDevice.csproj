@@ -56,6 +56,10 @@
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
       <Name>Ketchup.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ketchup.Utility\Ketchup.Utility.csproj">
+      <Project>{445D40BA-64E6-46F6-AF73-F8CC7208AB5F}</Project>
+      <Name>Ketchup.Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
