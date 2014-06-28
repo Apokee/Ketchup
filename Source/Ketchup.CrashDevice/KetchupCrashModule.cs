@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ketchup.Utility;
 
 namespace Ketchup.CrashDevice
@@ -20,6 +21,8 @@ namespace Ketchup.CrashDevice
             SetTranslation  = 0x4003,
             SetThrottle     = 0x4004,
             SetActionGroup  = 0x4005,
+
+            EventStageSpent = 0x8001,
         }
 
         private enum Mode : ushort
@@ -106,6 +109,12 @@ namespace Ketchup.CrashDevice
         private float _throttle;
 
         [KSPField(isPersistant = true)]
+        private ushort _stageSpentInterruptMessage;
+
+        [KSPField(isPersistant = true)]
+        private int _lastSpendStageInterrupted = -1;
+
+        [KSPField(isPersistant = true)]
         private uint _stagesPendingActivation;
 
         #endregion
@@ -118,6 +127,22 @@ namespace Ketchup.CrashDevice
             {
                 // TODO: Need to unregister this at some point
                 vessel.OnFlyByWire += OnFlyByWire;
+            }
+        }
+
+        public override void OnUpdate()
+        {
+            if (_dcpu16 != null)
+            {
+                if (_stageSpentInterruptMessage != 0)
+                {
+                    if (_lastSpendStageInterrupted != vessel.currentStage && IsStageSpent())
+                    {
+                        _dcpu16.Interrupt(_stageSpentInterruptMessage);
+
+                        _lastSpendStageInterrupted = vessel.currentStage;
+                    }
+                }
             }
         }
 
@@ -208,9 +233,38 @@ namespace Ketchup.CrashDevice
                         }
                     }
                     break;
+                case InterruptOperation.EventStageSpent:
+                    _stageSpentInterruptMessage = _dcpu16.B;
+                    break;
             }
 
             return 0; // TODO: Set to a reasonable value
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private bool IsStageSpent()
+        {
+            var engines = vessel.Parts.Where(IsInCurrentStage).SelectMany(GetEngines).ToArray();
+
+            return engines.Any() && engines.All(IsEngineSpent);
+        }
+
+        private bool IsInCurrentStage(Part p)
+        {
+            return p.inverseStage == vessel.currentStage;
+        }
+
+        private static IEnumerable<IEngineStatus> GetEngines(Part p)
+        {
+            return p.Modules.OfType<IEngineStatus>();
+        }
+
+        private static bool IsEngineSpent(IEngineStatus engine)
+        {
+            return !engine.isOperational;
         }
 
         #endregion
