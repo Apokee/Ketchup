@@ -92,6 +92,16 @@ Target "BuildTest" (fun _ ->
         |> ignore
 )
 
+Target "BuildContrib" (fun _ ->
+    !! "Contrib/**/*.dasm"
+        |> Seq.iter (fun f -> 
+            ExecProcess (fun psi ->
+                psi.FileName <- "Dependencies/Organic/Organic.exe"
+                psi.Arguments <- f + " " + outputDir + "/Contrib/" + (new FileInfo(f)).Name.Replace(".dasm", ".bin")
+            ) (System.TimeSpan.FromSeconds 30.0) |> ignore
+        )
+)
+
 Target "Test" (fun _ ->
     !! (testDir + "/*.Tests.dll")
         |> xUnit (fun p ->
