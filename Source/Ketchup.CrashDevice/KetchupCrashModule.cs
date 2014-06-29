@@ -134,14 +134,35 @@ namespace Ketchup.CrashDevice
         {
             if (_dcpu16 != null)
             {
-                if (_stageSpentInterruptMessage != 0)
-                {
-                    if (_lastSpentStageInterrupted != vessel.currentStage && IsStageSpent())
-                    {
-                        _dcpu16.Interrupt(_stageSpentInterruptMessage);
+                ActivateStageIfNecessary();
+                InterruptStageSpentIfNecessary();
+            }
+        }
 
-                        _lastSpentStageInterrupted = vessel.currentStage;
-                    }
+        private void InterruptStageSpentIfNecessary()
+        {
+            if (_stageSpentInterruptMessage != 0)
+            {
+                if (_lastSpentStageInterrupted != vessel.currentStage && IsStageSpent())
+                {
+                    _dcpu16.Interrupt(_stageSpentInterruptMessage);
+
+                    _lastSpentStageInterrupted = vessel.currentStage;
+                }
+            }
+        }
+
+        private void ActivateStageIfNecessary()
+        {
+            if (_stagesPendingActivation > 0 && vessel.currentStage > 0)
+            {
+                var originalStage = vessel.currentStage;
+
+                Staging.ActivateNextStage();
+
+                if (vessel.currentStage != originalStage)
+                {
+                    _stagesPendingActivation--;
                 }
             }
         }
@@ -159,15 +180,6 @@ namespace Ketchup.CrashDevice
                 flightCtrlState.Z = _translationZ;
 
                 flightCtrlState.mainThrottle = _throttle;
-
-                if (_stagesPendingActivation > 0 && vessel.currentStage > 0)
-                {
-                    var originalStage = vessel.currentStage;
-
-                    Staging.ActivateNextStage();
-
-                    if (vessel.currentStage != originalStage) { _stagesPendingActivation--; }
-                }
             }
         }
 

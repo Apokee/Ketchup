@@ -1,0 +1,59 @@
+jsr map_hardware
+jsr init_interrupt
+jsr init_crash
+
+set pc, halt
+
+; Globals
+:dev_crash          dat 0x0000
+:imsg_stagespent    dat 0x0001
+
+; Iterate through connected hardware devices
+:map_hardware    
+    hwn i
+    :map_hardware_loop
+        sub i, 1
+        hwq i
+
+        ife b, 0xcae1
+            ife a, 0x0001
+                set [dev_crash], i
+
+        ifn i, 0
+            set pc, map_hardware_loop
+        set pc, pop
+
+; Initialize interrupt handler
+:init_interrupt
+    ias handle_interrupt
+    set pc, pop
+
+; Initialize CRASH device
+:init_crash
+    ; Enable interrupt for spent stages
+    set a, 0x8001
+    set b, [imsg_stagespent]
+    hwi [dev_crash]
+
+    set pc, pop
+
+; Primary interrupt handler
+:handle_interrupt
+    ife a, [imsg_stagespent]
+        jsr handle_interrupt_stagespent
+
+    rfi 0
+
+; Handle StageSpent interrupt
+:handle_interrupt_stagespent
+    ; Engage staging
+    set a, 0x4005   ; SetActionGroup
+    set b, 0x8001   ; Stage
+    set c, 1        ; True
+    hwi [dev_crash]
+
+    set pc, pop
+
+; Suspend processor
+:halt
+    add pc, -1
