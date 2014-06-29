@@ -243,14 +243,14 @@ namespace Ketchup.CrashDevice
                     KSPActionGroup actionGroup;
                     if (ActionGroupMapping.TryGetValue(_dcpu16.B, out actionGroup))
                     {
-                        if (actionGroup == KSPActionGroup.Stage)
+                        switch(actionGroup)
                         {
-                            _stagesPendingActivation++;
-                        }
-                        else
-                        {
-                            // TODO: Determine what setting true/false does for "trigger" action groups like Abort
-                            vessel.ActionGroups[actionGroup] = MachineWord.ToBoolean(_dcpu16.C);
+                            case KSPActionGroup.Stage:
+                                _stagesPendingActivation++;
+                                break;
+                            default:
+                                vessel.ActionGroups.ToggleGroup(actionGroup);
+                                break;
                         }
                     }
                     break;

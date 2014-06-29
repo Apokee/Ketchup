@@ -10,7 +10,7 @@ set pc, halt
 :imsg_stagespent    dat 0x0001
 
 ; Iterate through connected hardware devices
-:map_hardware    
+:map_hardware
     hwn i
     :map_hardware_loop
         sub i, 1
@@ -56,6 +56,18 @@ set pc, halt
 
     set pc, pop
 
+; Deploy equipment
+:start_deploy
+    ; Engage ActionGroup 1
+    set push, 1
+    jsr dev_crash_set_actiongroup
+
+    ; Engage ActionGroup 2
+    set push, 2
+    jsr dev_crash_set_actiongroup
+
+    set pc, pop
+
 ; Set the mode of the CRASH device
 ; Parameters:
 ;   Mode
@@ -72,10 +84,8 @@ set pc, halt
 ; Engage ActionGroup with CRASH device
 ; Parameters
 ;   ActionGroup
-;   Value
 :dev_crash_set_actiongroup
     set z, pop
-    set c, pop  ; Value
     set b, pop  ; ActionGroup
     set push, z
 
@@ -87,7 +97,6 @@ set pc, halt
 ; Engage SAS
 :dev_crash_sas
     set push, 0x8005
-    set push, 1
     jsr dev_crash_set_actiongroup
 
     set pc, pop
@@ -95,8 +104,20 @@ set pc, halt
 ; Engage staging
 :dev_crash_staging
     set push, 0x8001
-    set push, 1
     jsr dev_crash_set_actiongroup
+
+    set pc, pop
+
+; Get Stage
+; Returns:
+;   Stage
+:dev_crash_get_stage
+    set a, 0x0001
+    hwi [dev_crash]
+
+    set z, pop
+    set push, b
+    set push, z
 
     set pc, pop
 
@@ -122,7 +143,17 @@ set pc, halt
 
 ; Handle StageSpent interrupt
 :handle_interrupt_stagespent
-    jsr dev_crash_staging
+    jsr dev_crash_get_stage
+    set a, pop
+
+    ; If current stage is 0
+    ife a, 0
+        jsr start_deploy
+
+    ; If current stage is not 0
+    ifn a, 0
+        jsr dev_crash_staging
+
     set pc, pop
 
 ; Suspend processor
