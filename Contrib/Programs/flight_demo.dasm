@@ -1,6 +1,7 @@
 jsr map_hardware
 jsr init_interrupt
-jsr init_crash
+jsr init_dev_crash
+jsr start_flight
 
 set pc, halt
 
@@ -29,10 +30,85 @@ set pc, halt
     set pc, pop
 
 ; Initialize CRASH device
-:init_crash
+:init_dev_crash
     ; Enable interrupt for spent stages
     set a, 0x8001
     set b, [imsg_stagespent]
+    hwi [dev_crash]
+
+    set pc, pop
+
+; Start flight sequence
+:start_flight
+    ; Set CRASH to Exclusive mode
+    set push, 0x0001
+    jsr dev_crash_set_mode
+
+    ; Engage SAS
+    jsr dev_crash_sas
+
+    ; Set throttle to 100%
+    set push, 0xFFFF
+    jsr dev_crash_throttle
+
+    ; Engage staging
+    jsr dev_crash_staging
+
+    set pc, pop
+
+; Set the mode of the CRASH device
+; Parameters:
+;   Mode
+:dev_crash_set_mode
+    set z, pop
+    set b, pop
+    set push, z
+
+    set a, 0x4001
+    hwi [dev_crash]
+
+    set pc, pop
+
+; Engage ActionGroup with CRASH device
+; Parameters
+;   ActionGroup
+;   Value
+:dev_crash_set_actiongroup
+    set z, pop
+    set c, pop  ; Value
+    set b, pop  ; ActionGroup
+    set push, z
+
+    set a, 0x4005   ; SetActionGroup
+    hwi [dev_crash]
+
+    set pc, pop
+
+; Engage SAS
+:dev_crash_sas
+    set push, 0x8005
+    set push, 1
+    jsr dev_crash_set_actiongroup
+
+    set pc, pop
+
+; Engage staging
+:dev_crash_staging
+    set push, 0x8001
+    set push, 1
+    jsr dev_crash_set_actiongroup
+
+    set pc, pop
+
+; Set Throttle
+; Parameters:
+;   Value
+:dev_crash_throttle
+    set z, pop
+    set b, pop
+    set push, z
+
+    set a, 0x4004
     hwi [dev_crash]
 
     set pc, pop
@@ -46,12 +122,7 @@ set pc, halt
 
 ; Handle StageSpent interrupt
 :handle_interrupt_stagespent
-    ; Engage staging
-    set a, 0x4005   ; SetActionGroup
-    set b, 0x8001   ; Stage
-    set c, 1        ; True
-    hwi [dev_crash]
-
+    jsr dev_crash_staging
     set pc, pop
 
 ; Suspend processor
