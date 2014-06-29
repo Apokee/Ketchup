@@ -125,8 +125,16 @@ namespace Ketchup.CrashDevice
         {
             if (state != StartState.Editor)
             {
-                // TODO: Need to unregister this at some point
                 vessel.OnFlyByWire += OnFlyByWire;
+            }
+        }
+
+        public void OnDestroy()
+        {
+            if (vessel != null)
+            {
+                // ReSharper disable once DelegateSubtraction
+                vessel.OnFlyByWire -= OnFlyByWire;
             }
         }
 
