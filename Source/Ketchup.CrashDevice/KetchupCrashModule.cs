@@ -112,7 +112,7 @@ namespace Ketchup.CrashDevice
         private ushort _stageSpentInterruptMessage;
 
         [KSPField(isPersistant = true)]
-        private int _lastSpendStageInterrupted = -1;
+        private int _lastSpentStageInterrupted = -1;
 
         [KSPField(isPersistant = true)]
         private uint _stagesPendingActivation;
@@ -136,11 +136,11 @@ namespace Ketchup.CrashDevice
             {
                 if (_stageSpentInterruptMessage != 0)
                 {
-                    if (_lastSpendStageInterrupted != vessel.currentStage && IsStageSpent())
+                    if (_lastSpentStageInterrupted != vessel.currentStage && IsStageSpent())
                     {
                         _dcpu16.Interrupt(_stageSpentInterruptMessage);
 
-                        _lastSpendStageInterrupted = vessel.currentStage;
+                        _lastSpentStageInterrupted = vessel.currentStage;
                     }
                 }
             }
