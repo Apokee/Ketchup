@@ -158,6 +158,7 @@ namespace Ketchup.CrashDevice
             {
                 var originalStage = vessel.currentStage;
 
+                // HACK: This is only good for the active vessel, which this vessel might not be
                 Staging.ActivateNextStage();
 
                 if (vessel.currentStage != originalStage)
