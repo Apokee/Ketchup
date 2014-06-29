@@ -56,8 +56,8 @@ set pc, halt
 
     set pc, pop
 
-; Deploy equipment
-:start_deploy
+; Handle last stage
+:handle_last_stage
     ; Engage ActionGroup 1
     set push, 1
     jsr dev_crash_set_actiongroup
@@ -65,6 +65,17 @@ set pc, halt
     ; Engage ActionGroup 2
     set push, 2
     jsr dev_crash_set_actiongroup
+
+    ; Reduce throttle to 0%
+    set push, 0x0000
+    jsr dev_crash_throttle
+
+    ; Disengage SAS
+    jsr dev_crash_sas
+
+    ; Set CRASH to Passive mode
+    set push, 0x0000
+    jsr dev_crash_set_mode
 
     set pc, pop
 
@@ -148,7 +159,7 @@ set pc, halt
 
     ; If current stage is 0
     ife a, 0
-        jsr start_deploy
+        jsr handle_last_stage
 
     ; If current stage is not 0
     ifn a, 0
