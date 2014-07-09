@@ -298,6 +298,19 @@ namespace Ketchup.CrashDevice
                 WriteBrakesToMemory();
                 WriteAbortToMemory();
                 WriteActionGroupsToMemory();
+
+                ReadRotationFromMemory();
+                ReadTranslationFromMemory();
+                ReadThrottleFromMemory();
+                ReadTrimFromMemory();
+                ReadStageFromMemory();
+                ReadGearFromMemory();
+                ReadLightFromMemory();
+                ReadRcsFromMemory();
+                ReadSasFromMemory();
+                ReadBrakesFromMemory();
+                ReadAbortFromMemory();
+                ReadActionGroupsFromMemory();
             }
         }
 
