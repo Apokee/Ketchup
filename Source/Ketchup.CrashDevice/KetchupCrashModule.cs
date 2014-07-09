@@ -248,11 +248,12 @@ namespace Ketchup.CrashDevice
         [KSPField(isPersistant = true)]
         private uint _memAddressReadAbort;
 
-        [KSPField(isPersistant = true)]
-        private uint _memAddressReadActionGroups;
-
         // TODO: This needs to be persisted
         private readonly Dictionary<KSPActionGroup, ushort> _memAddressesWriteActionGroups =
+            new Dictionary<KSPActionGroup, ushort>();
+
+        // TODO: This needs to be persisted
+        private readonly Dictionary<KSPActionGroup, ushort> _memAddressReadActionGroups =
             new Dictionary<KSPActionGroup, ushort>();
 
         // TODO: This needs to be persisted
@@ -658,8 +659,24 @@ namespace Ketchup.CrashDevice
                     ReadAbortFromMemory();
                     break;
                 case InterruptOperation.ControlSetMemActionGroup:
-                    _memAddressReadActionGroups = _dcpu16.B;
-                    ReadActionGroupsFromMemory();
+                    {
+                        KSPActionGroup actionGroup;
+                        if (ActionGroupMapping.TryGetValue(_dcpu16.C, out actionGroup))
+                        {
+                            if (_dcpu16.B == 0x0000)
+                            {
+                                if (_memAddressReadActionGroups.ContainsKey(actionGroup))
+                                {
+                                    _memAddressReadActionGroups.Remove(actionGroup);
+                                }
+                            }
+                            else
+                            {
+                                _memAddressReadActionGroups[actionGroup] = _dcpu16.B;
+                            }
+                        }
+                        ReadActionGroupsFromMemory();
+                    }
                     break;
                 case InterruptOperation.EventStageSpent:
                     _stageSpentInterruptMessage = _dcpu16.B;
@@ -931,17 +948,13 @@ namespace Ketchup.CrashDevice
 
         private void ReadActionGroupsFromMemory()
         {
-            if (_memAddressReadActionGroups != 0x0000)
+            foreach (var actionGroupAddress in _memAddressReadActionGroups)
             {
-                for (var i = 0; i < 10; i++)
-                {
-                    var address = _memAddressReadActionGroups + i;
-                    var actionGroup = ActionGroupMapping[(ushort)(i + 1)];
+                var actionGroup = actionGroupAddress.Key;
+                var address = actionGroupAddress.Value;
 
-                    HandleSetActionGroup(_dcpu16.Memory[address], actionGroup);
-                    _dcpu16.Memory[address] = (ushort)ActionGroupState.Ignore;
-                }
-
+                HandleSetActionGroup(_dcpu16.Memory[address], actionGroup);
+                _dcpu16.Memory[address] = (ushort)ActionGroupState.Ignore;
             }
         }
 
