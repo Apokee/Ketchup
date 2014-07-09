@@ -2,7 +2,7 @@
 
 namespace Ketchup.Utility
 {
-    internal static class MachineWord
+    public static class MachineWord
     {
         /// <summary>
         /// Converts boolean to canonical machine word representation.

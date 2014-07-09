@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
+using Ketchup.Utility;
 using Xunit.Extensions;
 
 namespace Ketchup.Mathematics

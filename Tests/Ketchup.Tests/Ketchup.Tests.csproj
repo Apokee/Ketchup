@@ -125,6 +125,10 @@
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
       <Name>Ketchup.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Source\Ketchup.Utility\Ketchup.Utility.csproj">
+      <Project>{445D40BA-64E6-46F6-AF73-F8CC7208AB5F}</Project>
+      <Name>Ketchup.Utility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Source\Ketchup\Ketchup.csproj">
       <Project>{05B224A9-D0CC-4EE8-8BE1-822593FC55E6}</Project>
       <Name>Ketchup</Name>

@@ -2,3 +2,8 @@
 # Default: null
 # Example: "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program"
 ksp_dir: null
+
+# Save profile to use.
+# Default: null
+# Example: "Dev"
+profile: null

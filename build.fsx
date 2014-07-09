@@ -38,9 +38,24 @@ let kspDir = lazy (
             raise (System.Exception("ksp_dir not specified in configuration"))
     )
 )
+
+let kspProfile = lazy (
+    if config.Documents.Count = 0 then
+        raise (System.Exception("profile not specified in configuration"))
+    else (
+        let mapping = config.Documents.[0].RootNode :?> YamlMappingNode
+        let node = new YamlScalarNode("profile")
+        if mapping.Children.ContainsKey(node) then
+            mapping.Children.[node].ToString()
+        else
+            raise (System.Exception("profile not specified in configuration"))
+    )
+)
+
 let kspDeployName = "Ketchup"
 let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
 let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDeployName)
+let kspFirmwareDir = lazy (kspDir.Force() + "/saves/" + kspProfile.Force() + "/Ketchup/Firmware")
 let kspLocalDepDir = "./Dependencies/KSP"
 let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
 
@@ -53,6 +68,7 @@ let testDir = outputDir + "/Test"
 let stageDir = outputDir + "/Stage/GameData"
 let stageModDir = outputDir + "/Stage/GameData/" + kspDeployName
 let packageDir = outputDir + "/Package"
+let contribBuildDir = outputDir + "/Contrib"
 
 let buildConfig = getBuildParamOrDefault "Configuration" "Debug"
 
@@ -92,6 +108,16 @@ Target "BuildTest" (fun _ ->
         |> ignore
 )
 
+Target "BuildContrib" (fun _ ->
+    !! "Contrib/**/*.dasm"
+        |> Seq.iter (fun f -> 
+            ExecProcess (fun psi ->
+                psi.FileName <- "Dependencies/Organic/Organic.exe"
+                psi.Arguments <- f + " " + contribBuildDir + "/" + (new FileInfo(f)).Name.Replace(".dasm", ".bin")
+            ) (System.TimeSpan.FromSeconds 30.0) |> ignore
+        )
+)
+
 Target "Test" (fun _ ->
     !! (testDir + "/*.Tests.dll")
         |> xUnit (fun p ->
@@ -107,7 +133,10 @@ Target "Stage" (fun _ ->
 
 Target "Deploy" (fun _ ->
     CleanDir (kspDeployDir.Force())
+    CleanDir (kspFirmwareDir.Force())
+
     CopyDir (kspDeployDir.Force()) stageModDir (fun f -> true)
+    CopyDir (kspFirmwareDir.Force()) contribBuildDir (fun f -> true)
 )
 
 Target "Run" (fun _ ->
@@ -144,6 +173,7 @@ Target "Clean" (fun _ ->
     ==> "Stage"
 
 "Stage"
+    ==> "BuildContrib"
     ==> "Deploy"
     ==> "Run"
 
