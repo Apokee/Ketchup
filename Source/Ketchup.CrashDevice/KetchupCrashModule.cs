@@ -483,20 +483,29 @@ namespace Ketchup.CrashDevice
                     }
                     break;
                 case InterruptOperation.ControlGetMemRotation:
-                    _memAddressWriteRotation = _dcpu16.B;
-                    WriteRotationToMemory();
+                    if (IsMemoryRangeValid(_dcpu16.B, 3))
+                    {
+                        _memAddressWriteRotation = _dcpu16.B;
+                        WriteRotationToMemory();
+                    }
                     break;
                 case InterruptOperation.ControlGetMemTranslation:
-                    _memAddressWriteTranslation = _dcpu16.B;
-                    WriteTranslationToMemory();
+                    if (IsMemoryRangeValid(_dcpu16.B, 3))
+                    {
+                        _memAddressWriteTranslation = _dcpu16.B;
+                        WriteTranslationToMemory();
+                    }
                     break;
                 case InterruptOperation.ControlGetMemThrottle:
                     _memAddressWriteThrottle = _dcpu16.B;
                     WriteThrottleToMemory();
                     break;
                 case InterruptOperation.ControlGetMemTrim:
-                    _memAddressWriteTrim = _dcpu16.B;
-                    WriteTrimToMemory();
+                    if (IsMemoryRangeValid(_dcpu16.B, 3))
+                    {
+                        _memAddressWriteTrim = _dcpu16.B;
+                        WriteTrimToMemory();
+                    }
                     break;
                 case InterruptOperation.ControlGetMemStage:
                     _memAddressWriteStage = _dcpu16.B;
@@ -596,20 +605,29 @@ namespace Ketchup.CrashDevice
                     }
                     break;
                 case InterruptOperation.ControlSetMemRotation:
-                    _memAddressReadRotation = _dcpu16.B;
-                    ReadRotationFromMemory();
+                    if (IsMemoryRangeValid(_dcpu16.B, 3))
+                    {
+                        _memAddressReadRotation = _dcpu16.B;
+                        ReadRotationFromMemory();
+                    }
                     break;
                 case InterruptOperation.ControlSetMemTranslation:
-                    _memAddressReadTranslation = _dcpu16.B;
-                    ReadTranslationFromMemory();
+                    if (IsMemoryRangeValid(_dcpu16.B, 3))
+                    {
+                        _memAddressReadTranslation = _dcpu16.B;
+                        ReadTranslationFromMemory();
+                    }
                     break;
                 case InterruptOperation.ControlSetMemThrottle:
                     _memAddressReadThrottle = _dcpu16.B;
                     ReadThrottleFromMemory();
                     break;
                 case InterruptOperation.ControlSetMemTrim:
-                    _memAddressReadTrim = _dcpu16.B;
-                    ReadTrimFromMemory();
+                    if (IsMemoryRangeValid(_dcpu16.B, 3))
+                    {
+                        _memAddressReadTrim = _dcpu16.B;
+                        ReadTrimFromMemory();
+                    }
                     break;
                 case InterruptOperation.ControlSetMemStage:
                     _memAddressReadStage = _dcpu16.B;
@@ -967,6 +985,11 @@ namespace Ketchup.CrashDevice
         private static bool IsEngineSpent(IEngineStatus engine)
         {
             return !engine.isOperational;
+        }
+
+        private bool IsMemoryRangeValid(ushort baseAddress, ushort length)
+        {
+            return (baseAddress + length - 1) <= UInt16.MaxValue;
         }
 
         #endregion
