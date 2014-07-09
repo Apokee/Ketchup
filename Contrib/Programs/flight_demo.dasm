@@ -128,8 +128,8 @@ set pc, halt
     set b, pop
     set push, z
 
-    set push, [dev_crash_op_control_set_reg_sas]
-    jsr dev_crash_set_actiongroup
+    set a, [dev_crash_op_control_set_reg_sas]
+    hwi [dev_crash]
 
     set pc, pop
 
