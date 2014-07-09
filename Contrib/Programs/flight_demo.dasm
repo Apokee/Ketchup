@@ -5,9 +5,20 @@ jsr start_flight
 
 set pc, halt
 
-; Globals
-:dev_crash          dat 0x0000
-:imsg_stagespent    dat 0x0001
+; Constants
+:dev_crash                                  dat 0x0000
+
+:dev_crash_op_control_get_reg_stage         dat 0x0005
+:dev_crash_op_control_set_reg_throttle      dat 0x0803
+:dev_crash_op_control_set_reg_stage         dat 0x0805
+:dev_crash_op_control_set_reg_sas           dat 0x0809
+:dev_crash_op_control_set_reg_actiongroup   dat 0x080C
+:dev_crash_op_event_stagespent              dat 0x2001
+:dev_crash_op_conf_set_controlmask          dat 0xE401
+
+:dev_crash_const_controlflag_throttle       dat 64
+
+:imsg_stagespent                            dat 0x0001
 
 ; Iterate through connected hardware devices
 :map_hardware
@@ -32,7 +43,7 @@ set pc, halt
 ; Initialize CRASH device
 :init_dev_crash
     ; Enable interrupt for spent stages
-    set a, 0x8001
+    set a, [dev_crash_op_event_stagespent]
     set b, [imsg_stagespent]
     hwi [dev_crash]
 
@@ -40,16 +51,18 @@ set pc, halt
 
 ; Start flight sequence
 :start_flight
-    ; Set CRASH to Exclusive mode
-    set push, 0x0001
-    jsr dev_crash_set_mode
+    ; Set CRASH control mask
+    set a, [dev_crash_const_controlflag_throttle]
+    set push, a
+    jsr dev_crash_set_controlmask
 
     ; Engage SAS
-    jsr dev_crash_sas
+    set push, 1
+    jsr dev_crash_set_sas
 
     ; Set throttle to 100%
     set push, 0xFFFF
-    jsr dev_crash_throttle
+    jsr dev_crash_set_throttle
 
     ; Engage staging
     jsr dev_crash_staging
@@ -68,26 +81,27 @@ set pc, halt
 
     ; Reduce throttle to 0%
     set push, 0x0000
-    jsr dev_crash_throttle
+    jsr dev_crash_set_throttle
 
     ; Disengage SAS
-    jsr dev_crash_sas
+    set push, 0
+    jsr dev_crash_set_sas
 
-    ; Set CRASH to Passive mode
+    ; Set CRASH control mask to entirely passive
     set push, 0x0000
-    jsr dev_crash_set_mode
+    jsr dev_crash_set_controlmask
 
     set pc, pop
 
-; Set the mode of the CRASH device
+; Set the control mask of the CRASH device
 ; Parameters:
-;   Mode
-:dev_crash_set_mode
+;   Control Mask
+:dev_crash_set_controlmask
     set z, pop
     set b, pop
     set push, z
 
-    set a, 0x4001
+    set a, [dev_crash_op_conf_set_controlmask]
     hwi [dev_crash]
 
     set pc, pop
@@ -97,25 +111,32 @@ set pc, halt
 ;   ActionGroup
 :dev_crash_set_actiongroup
     set z, pop
-    set b, pop  ; ActionGroup
+    set c, pop  ; ActionGroup
     set push, z
 
-    set a, 0x4005   ; SetActionGroup
+    set a, [dev_crash_op_control_set_reg_actiongroup]
+    set b, 1
     hwi [dev_crash]
 
     set pc, pop
 
-; Engage SAS
-:dev_crash_sas
-    set push, 0x8005
+; Set SAS
+; Parameters
+;   State
+:dev_crash_set_sas
+    set z, pop
+    set b, pop
+    set push, z
+
+    set push, [dev_crash_op_control_set_reg_sas]
     jsr dev_crash_set_actiongroup
 
     set pc, pop
 
 ; Engage staging
 :dev_crash_staging
-    set push, 0x8001
-    jsr dev_crash_set_actiongroup
+    set a, [dev_crash_op_control_set_reg_stage]
+    hwi [dev_crash]
 
     set pc, pop
 
@@ -123,11 +144,11 @@ set pc, halt
 ; Returns:
 ;   Stage
 :dev_crash_get_stage
-    set a, 0x0001
+    set a, [dev_crash_op_control_get_reg_stage]
     hwi [dev_crash]
 
     set z, pop
-    set push, b
+    set push, x
     set push, z
 
     set pc, pop
@@ -135,12 +156,12 @@ set pc, halt
 ; Set Throttle
 ; Parameters:
 ;   Value
-:dev_crash_throttle
+:dev_crash_set_throttle
     set z, pop
     set b, pop
     set push, z
 
-    set a, 0x4004
+    set a, [dev_crash_op_control_set_reg_throttle]
     hwi [dev_crash]
 
     set pc, pop
