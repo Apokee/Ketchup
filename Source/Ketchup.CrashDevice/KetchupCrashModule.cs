@@ -6,7 +6,7 @@ using Ketchup.Utility;
 namespace Ketchup.CrashDevice
 {
     /// <summary>
-    /// Centrally Regulated Avionic Subsystem Haptics (CRASH) device.
+    /// Centrally Regulated Avionic Subsystem Handler (CRASH) device.
     /// </summary>
     internal sealed class KetchupCrashModule : PartModule, IDevice
     {
