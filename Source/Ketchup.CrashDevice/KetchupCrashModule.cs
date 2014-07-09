@@ -567,7 +567,7 @@ namespace Ketchup.CrashDevice
                     _translationZ = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.Z));
                     break;
                 case InterruptOperation.ControlSetRegThrottle:
-                    _throttle = Range.ScaleUnsignedInt16ToUnsignedUnary(MachineWord.ToUInt16(_dcpu16.X));
+                    _throttle = Range.ScaleUnsignedInt16ToUnsignedUnary(MachineWord.ToUInt16(_dcpu16.B));
                     break;
                 case InterruptOperation.ControlSetRegTrim:
                     _rollTrim = Range.ScaleSignedInt16ToSignedUnary(MachineWord.ToInt16(_dcpu16.X));
