@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Ketchup.Extensions;
 using UnityEngine;
 
 namespace Ketchup.Devices
 {
+    [KSPModule("Device: Keyboard")]
     public sealed class KetchupGenericKeyboardModule : PartModule, IDevice
     {
         #region Constants
@@ -223,6 +225,14 @@ namespace Ketchup.Devices
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Equipped");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;
@@ -10,6 +11,7 @@ using UnityEngine;
 
 namespace Ketchup.Devices
 {
+    [KSPModule("Device: M35FD")]
     internal sealed class KetchupM35FdModule : PartModule, IDevice
     {
         #region Constants
@@ -142,6 +144,15 @@ namespace Ketchup.Devices
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Read/Write Speed: 61.4KB/s");
+            sb.AppendLine("Seek Time: 2.4ms");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {

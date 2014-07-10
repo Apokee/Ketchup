@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Ketchup.Utility;
 
 namespace Ketchup.CrashDevice
@@ -8,6 +9,7 @@ namespace Ketchup.CrashDevice
     /// <summary>
     /// Centrally Regulated Avionic Subsystem Handler (CRASH) device.
     /// </summary>
+    [KSPModule("Device: CRASH")]
     internal sealed class KetchupCrashModule : PartModule, IDevice
     {
         #region Constants
@@ -262,6 +264,14 @@ namespace Ketchup.CrashDevice
         #endregion
 
         #region PartModule
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Equipped");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {

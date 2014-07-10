@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Text;
 
 namespace Ketchup.Devices
 {
+    [KSPModule("Device: Clock")]
     public sealed class KetchupGenericClockModule : PartModule, IDevice
     {
         #region Constants
@@ -96,6 +98,14 @@ namespace Ketchup.Devices
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Equipped");
+
+            return sb.ToString();
+        }
 
         public override void OnLoad(ConfigNode node)
         {

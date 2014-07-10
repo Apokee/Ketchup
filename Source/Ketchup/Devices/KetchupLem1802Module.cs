@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Ketchup.Extensions;
 using UnityEngine;
 
 namespace Ketchup.Devices
 {
+    [KSPModule("Device: LEM-1802")]
     internal sealed class KetchupLem1802Module : PartModule, IDevice
     {
         #region Constants
@@ -176,6 +178,14 @@ namespace Ketchup.Devices
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Resolution: 128x96");
+
+            return sb.ToString();
+        }
 
         public override void OnLoad(ConfigNode node)
         {

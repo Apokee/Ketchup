@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;
@@ -9,6 +10,7 @@ using UnityEngine;
 
 namespace Ketchup.Devices
 {
+    [KSPModule("Device: Firmware")]
     internal sealed class KetchupFirmwareModule : PartModule, IDevice
     {
         #region Constants
@@ -129,6 +131,14 @@ namespace Ketchup.Devices
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("ROM: 8KB");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {

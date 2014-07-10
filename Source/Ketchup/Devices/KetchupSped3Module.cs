@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace Ketchup.Devices
 {
+    [KSPModule("Device: SPED-3")]
     internal sealed class KetchupSped3Module : PartModule, IDevice
     {
         #region Constants
@@ -123,6 +125,14 @@ namespace Ketchup.Devices
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Equipped");
+
+            return sb.ToString();
+        }
 
         public override void OnLoad(ConfigNode node)
         {
