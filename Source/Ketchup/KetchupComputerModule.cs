@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Ketchup.Devices;
 using Ketchup.Extensions;
 using Ketchup.Interop;
@@ -10,6 +11,7 @@ using UnityEngine;
 
 namespace Ketchup
 {
+    [KSPModule("Computer")]
     internal class KetchupComputerModule : PartModule
     {
         #region Constants
@@ -63,6 +65,16 @@ namespace Ketchup
         #endregion
 
         #region PartModule Methods
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Processor: DCPU-16");
+            sb.AppendLine(String.Format(@"Clock Speed: {0}", FormatClockSpeed(ClockFrequency)));
+            sb.AppendLine("RAM: 128KB");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {
@@ -223,9 +235,7 @@ namespace Ketchup
         
         private void OnWindow(int windowId)
         {
-            var actualClockSpeed = (_clockRates.Any() ? _clockRates.Average() / 1000 : 0);
-
-            var actualClockSpeedFormatted = actualClockSpeed.ToString("F3") + " KHz";
+            var actualClockSpeedFormatted = FormatClockSpeed(_clockRates.Any() ? _clockRates.Average() : 0);
 
             GUILayout.BeginHorizontal();
             var pwrButtonPressed = GUILayout.Button("PWR", _isPowerOn ? _styleButtonPressed : GUI.skin.button, GUILayout.ExpandWidth(false));
@@ -376,6 +386,60 @@ namespace Ketchup
         private bool HasPersistedState()
         {
             return !String.IsNullOrEmpty(_dcpu16State);
+        }
+
+        private static string FormatClockSpeed(double hertz)
+        {
+            double factor;
+            string suffix;
+
+            if (hertz < 1e3)
+            {
+                factor = 1e0;
+                suffix = "Hz";
+            }
+            else if (hertz < 1e6)
+            {
+                factor = 1e3;
+                suffix = "KHz";
+            }
+            else if (hertz < 1e9)
+            {
+                factor = 1e6;
+                suffix = "MHz";
+            }
+            else if (hertz < 1e12)
+            {
+                factor = 1e9;
+                suffix = "Ghz";
+            }
+            else if (hertz < 1e15)
+            {
+                factor = 1e12;
+                suffix = "THz";
+            }
+            else if (hertz < 1e18)
+            {
+                factor = 1e15;
+                suffix = "PHz";
+            }
+            else if (hertz < 1e21)
+            {
+                factor = 1e18;
+                suffix = "EHz";
+            }
+            else if (hertz < 1e24)
+            {
+                factor = 1e21;
+                suffix = "ZHz";
+            }
+            else
+            {
+                factor = 1e24;
+                suffix = "YHz";
+            }
+
+            return String.Format("{0:G6}{1}", hertz / factor, suffix);
         }
 
         #endregion
