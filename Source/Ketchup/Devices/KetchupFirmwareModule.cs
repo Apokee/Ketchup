@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Ketchup.Devices
 {
-    [KSPModule("Computer: Firmware")]
+    [KSPModule("Device: Firmware")]
     internal sealed class KetchupFirmwareModule : PartModule, IDevice
     {
         #region Constants

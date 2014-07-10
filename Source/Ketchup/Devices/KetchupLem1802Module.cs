@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Ketchup.Devices
 {
-    [KSPModule("Computer: LEM-1802")]
+    [KSPModule("Device: LEM-1802")]
     internal sealed class KetchupLem1802Module : PartModule, IDevice
     {
         #region Constants

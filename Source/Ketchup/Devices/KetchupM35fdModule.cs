@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Ketchup.Devices
 {
-    [KSPModule("Computer: M35FD")]
+    [KSPModule("Device: M35FD")]
     internal sealed class KetchupM35FdModule : PartModule, IDevice
     {
         #region Constants

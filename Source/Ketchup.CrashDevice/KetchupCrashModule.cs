@@ -9,7 +9,7 @@ namespace Ketchup.CrashDevice
     /// <summary>
     /// Centrally Regulated Avionic Subsystem Handler (CRASH) device.
     /// </summary>
-    [KSPModule("Computer: CRASH")]
+    [KSPModule("Device: CRASH")]
     internal sealed class KetchupCrashModule : PartModule, IDevice
     {
         #region Constants
