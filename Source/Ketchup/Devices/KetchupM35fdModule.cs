@@ -151,8 +151,8 @@ namespace Ketchup.Devices
             sb.AppendLine("Read/Write Speed: 61.4KB/s");
             sb.AppendLine("Seek Time: 2.4ms");
             sb.AppendLine();
-            sb.AppendLine(String.Format("Manufacturer ID: 0x{0:X4}", ManufacturerId));
-            sb.AppendLine(String.Format("Device ID: 0x{0:X4}", DeviceId));
+            sb.AppendLine(String.Format("Manufacturer ID: 0x{0:X8}", ManufacturerId));
+            sb.AppendLine(String.Format("Device ID: 0x{0:X8}", DeviceId));
             sb.AppendLine(String.Format("Version: 0x{0:X4}", Version));
 
             return sb.ToString();

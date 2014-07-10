@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Ketchup.Devices
 {
-    [KSPModule("Computer: Generic Clock")]
+    [KSPModule("Device: Generic Clock")]
     public sealed class KetchupGenericClockModule : PartModule, IDevice
     {
         #region Constants
@@ -102,8 +102,8 @@ namespace Ketchup.Devices
         public override string GetInfo()
         {
             var sb = new StringBuilder();
-            sb.AppendLine(String.Format("Manufacturer ID: 0x{0:X4}", ManufacturerId));
-            sb.AppendLine(String.Format("Device ID: 0x{0:X4}", DeviceId));
+            sb.AppendLine(String.Format("Manufacturer ID: 0x{0:X8}", ManufacturerId));
+            sb.AppendLine(String.Format("Device ID: 0x{0:X8}", DeviceId));
             sb.AppendLine(String.Format("Version: 0x{0:X4}", Version));
 
             return sb.ToString();
