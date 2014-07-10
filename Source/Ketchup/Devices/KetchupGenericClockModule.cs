@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Ketchup.Devices
 {
-    [KSPModule("Device: Generic Clock")]
+    [KSPModule("Device: Clock")]
     public sealed class KetchupGenericClockModule : PartModule, IDevice
     {
         #region Constants
