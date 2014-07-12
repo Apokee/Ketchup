@@ -7,3 +7,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("0f92c7ba-97ae-4446-b9ce-f946326286c7")]
 
 [assembly: AssemblyVersion("0.6.0.*")]
+[assembly: KSPAssembly("Ketchup", 0, 6)]
