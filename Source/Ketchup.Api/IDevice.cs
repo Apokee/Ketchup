@@ -26,7 +26,7 @@
         ushort Version { get; }
 
         /// <summary>
-        /// Called when the device is connected to the CPU. CPU should be notified of connection seperately. Behavior
+        /// Called when the device is connected to the CPU. CPU should be notified of connection separately. Behavior
         /// is undefined if performed during execution.
         /// </summary>
         /// <param name="dcpu16">The CPU the device is connected to.</param>
@@ -34,7 +34,7 @@
 
         /// <summary>
         /// Called when the device is disconnected from the CPU. The device should no longer modify the state of the
-        /// CPU or fire interrupts. CPU should be notified of disconnection seperately. Behavior is undefined if
+        /// CPU or fire interrupts. CPU should be notified of disconnection separately. Behavior is undefined if
         /// performed during execution.
         /// </summary>
         void OnDisconnect();
