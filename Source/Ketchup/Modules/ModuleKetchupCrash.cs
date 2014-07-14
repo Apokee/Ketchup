@@ -5,7 +5,7 @@ using System.Text;
 using Ketchup.Api.v0;
 using Ketchup.Utility;
 
-namespace Ketchup.CrashDevice
+namespace Ketchup.Modules
 {
     /// <summary>
     /// Centrally Regulated Avionic Subsystem Handler (CRASH) device.
