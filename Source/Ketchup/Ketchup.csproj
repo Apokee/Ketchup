@@ -64,6 +64,7 @@
     <Compile Include="Extensions\VesselExtensions.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
     <Compile Include="Modules\ModuleKetchupComputer.cs" />
+    <Compile Include="Modules\ModuleKetchupCrash.cs" />
     <Compile Include="Modules\ModuleKetchupFirmware.cs" />
     <Compile Include="Modules\ModuleKetchupGenericClock.cs" />
     <Compile Include="Modules\ModuleKetchupGenericKeyboard.cs" />
