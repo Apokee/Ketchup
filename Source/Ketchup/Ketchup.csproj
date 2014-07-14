@@ -57,7 +57,6 @@
     </Compile>
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
-    <Compile Include="Modules\ModuleKetchupAvionics.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
@@ -76,6 +75,7 @@
     <Compile Include="IO\IoUtility.cs" />
     <Compile Include="Modules\ModuleKetchupLem1802.cs" />
     <Compile Include="Modules\ModuleKetchupM35fd.cs" />
+    <Compile Include="Modules\ModuleKetchupStop.cs" />
     <Compile Include="Utility\NedReferenceFrame.cs" />
     <Compile Include="Utility\VesselReferenceFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
