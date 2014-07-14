@@ -89,8 +89,8 @@ namespace Ketchup
         Queue<ushort> InterruptQueue { get; } 
         
         /// <summary>
-        /// Called when a device is connected to the CPU. Device should be notified of connection separately. Behavior is
-        /// undefined if performed during execution.
+        /// Called when a device is connected to the CPU. Device should be notified of connection separately. Behavior
+        /// is undefined if performed during execution.
         /// </summary>
         /// <param name="device">The device to connect to the CPU.</param>
         /// <returns>The new device index.</returns>
