@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Ketchup.Modules
 {
     [KSPModule("Computer")]
-    internal class KetchupComputerModule : PartModule
+    internal class ModuleKetchupComputer : PartModule
     {
         #region Constants
 
