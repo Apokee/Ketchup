@@ -38,6 +38,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Properties", "Properties", 
 		Properties\GlobalAssemblyInfo.cs = Properties\GlobalAssemblyInfo.cs
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Parts", "Parts", "{3DA5B511-970A-4E11-96D8-025D2E0779FC}"
+	ProjectSection(SolutionItems) = preProject
+		Parts\KetchupSped3Radial.cfg = Parts\KetchupSped3Radial.cfg
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Patches", "Patches", "{160F2C94-0B03-43BE-93B8-042AABFBF8D0}"
+	ProjectSection(SolutionItems) = preProject
+		Patches\ModuleCommand.cfg = Patches\ModuleCommand.cfg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
