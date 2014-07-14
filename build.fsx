@@ -61,6 +61,7 @@ let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
 
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
+let patchesDir = "./Patches"
 
 let outputDir = "./Output"
 let buildDir = outputDir + "/Build"
@@ -128,6 +129,7 @@ Target "Test" (fun _ ->
 Target "Stage" (fun _ ->
     CopyDir (stageModDir + "/Contrib") contribDir (fun f -> true)
     CopyDir (stageModDir + "/Parts") partsDir (fun f -> true)
+    CopyDir (stageModDir + "/Patches") patchesDir (fun f -> true)
     CopyDir (stageModDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
 )
 
