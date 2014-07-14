@@ -1,4 +1,4 @@
-﻿namespace Ketchup
+﻿namespace Ketchup.Api.v0
 {
     /// <summary>
     /// Hardware device that may be connected to an IDcpu16.
