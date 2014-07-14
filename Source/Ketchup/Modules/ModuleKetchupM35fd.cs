@@ -10,7 +10,7 @@ using Ketchup.Extensions;
 using Ketchup.IO;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
     [KSPModule("Device: M35FD")]
     internal sealed class KetchupM35FdModule : PartModule, IDevice

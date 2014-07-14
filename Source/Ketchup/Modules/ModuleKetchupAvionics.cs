@@ -3,9 +3,9 @@ using Ketchup.Extensions;
 using Ketchup.Utility;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
-    internal sealed class KetchupAvionicsModule : PartModule, IDevice
+    internal sealed class ModuleKetchupAvionics : PartModule, IDevice
     {
         #region Constants
 

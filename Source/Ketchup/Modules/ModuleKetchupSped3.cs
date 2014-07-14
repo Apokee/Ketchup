@@ -5,10 +5,10 @@ using System.Text;
 using Ketchup.Api.v0;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
     [KSPModule("Device: SPED-3")]
-    internal sealed class KetchupSped3Module : PartModule, IDevice
+    internal sealed class ModuleKetchupSped3 : PartModule, IDevice
     {
         #region Constants
 

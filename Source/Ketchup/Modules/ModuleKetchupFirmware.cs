@@ -9,10 +9,10 @@ using Ketchup.Extensions;
 using Ketchup.IO;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
     [KSPModule("Device: Firmware")]
-    internal sealed class KetchupFirmwareModule : PartModule, IDevice
+    internal sealed class ModuleKetchupFirmware : PartModule, IDevice
     {
         #region Constants
 
@@ -100,7 +100,7 @@ namespace Ketchup.Devices
 
         #region Constructors
 
-        public KetchupFirmwareModule()
+        public ModuleKetchupFirmware()
         {
             _firmware = new FirmwareRom("<Default>", DefaultFirmware);
         }

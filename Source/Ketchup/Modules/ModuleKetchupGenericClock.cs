@@ -2,10 +2,10 @@
 using System.Text;
 using Ketchup.Api.v0;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
     [KSPModule("Device: Clock")]
-    public sealed class KetchupGenericClockModule : PartModule, IDevice
+    public sealed class ModuleKetchupGenericClock : PartModule, IDevice
     {
         #region Constants
 

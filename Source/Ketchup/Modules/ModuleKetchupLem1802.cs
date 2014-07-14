@@ -5,10 +5,10 @@ using Ketchup.Api.v0;
 using Ketchup.Extensions;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
     [KSPModule("Device: LEM-1802")]
-    internal sealed class KetchupLem1802Module : PartModule, IDevice
+    internal sealed class ModuleKetchupLem1802 : PartModule, IDevice
     {
         #region Constants
 
@@ -120,7 +120,7 @@ namespace Ketchup.Devices
 
         #region Constructors
 
-        public KetchupLem1802Module()
+        public ModuleKetchupLem1802()
         {
             _screenTexture = new Texture2D(Width, Height) { filterMode = FilterMode.Point };
         }
