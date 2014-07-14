@@ -1,4 +1,4 @@
-﻿using Ketchup.Mathematics;
+﻿using Ketchup.Utility;
 
 namespace Ketchup.Extensions
 {

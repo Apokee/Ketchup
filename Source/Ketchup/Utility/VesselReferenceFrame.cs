@@ -1,6 +1,6 @@
 ﻿using Ketchup.Extensions;
 
-namespace Ketchup.Mathematics
+namespace Ketchup.Utility
 {
     internal struct VesselReferenceFrame
     {

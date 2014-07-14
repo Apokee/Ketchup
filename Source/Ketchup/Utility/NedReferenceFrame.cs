@@ -1,6 +1,6 @@
 ﻿using Ketchup.Extensions;
 
-namespace Ketchup.Mathematics
+namespace Ketchup.Utility
 {
     /// <summary>
     /// North East Down (NED) reference frame.
