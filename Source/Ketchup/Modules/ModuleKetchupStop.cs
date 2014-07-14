@@ -1,4 +1,5 @@
-﻿using Ketchup.Api.v0;
+﻿using System.Text;
+using Ketchup.Api.v0;
 using Ketchup.Extensions;
 using Ketchup.Utility;
 using UnityEngine;
@@ -47,6 +48,14 @@ namespace Ketchup.Modules
         #endregion
 
         #region PartModule
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Equipped");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {
