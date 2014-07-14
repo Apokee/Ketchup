@@ -7,7 +7,7 @@
     <ProjectGuid>{BF83C18A-AD39-4083-A819-5B42B3812664}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ketchup</RootNamespace>
+    <RootNamespace>Ketchup.Api</RootNamespace>
     <AssemblyName>Ketchup.Api</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -46,8 +46,8 @@
     <Compile Include="..\..\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="IDcpu16.cs" />
-    <Compile Include="IDevice.cs" />
+    <Compile Include="v0\IDcpu16.cs" />
+    <Compile Include="v0\IDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

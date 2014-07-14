@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Ketchup.Api.v0;
 
 namespace Ketchup.Devices
 {

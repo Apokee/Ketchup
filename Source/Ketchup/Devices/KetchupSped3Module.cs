@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Ketchup.Api.v0;
 using UnityEngine;
 
 namespace Ketchup.Devices

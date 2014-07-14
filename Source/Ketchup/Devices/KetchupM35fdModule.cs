@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Ketchup.Api.v0;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;

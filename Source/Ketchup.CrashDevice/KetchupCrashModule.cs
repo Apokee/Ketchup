@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Ketchup.Api.v0;
 using Ketchup.Utility;
 
 namespace Ketchup.CrashDevice
