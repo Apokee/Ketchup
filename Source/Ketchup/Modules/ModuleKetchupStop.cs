@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Ketchup.Modules
 {
+    [KSPModule("Device: STOP")]
     internal sealed class ModuleKetchupStop : PartModule, IDevice
     {
         #region Constants
