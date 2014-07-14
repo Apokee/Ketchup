@@ -7,10 +7,10 @@ using Ketchup.Api.v0;
 using Ketchup.Extensions;
 using UnityEngine;
 
-namespace Ketchup.Devices
+namespace Ketchup.Modules
 {
     [KSPModule("Device: Keyboard")]
-    public sealed class KetchupGenericKeyboardModule : PartModule, IDevice
+    public sealed class ModuleKetchupGenericKeyboard : PartModule, IDevice
     {
         #region Constants
 

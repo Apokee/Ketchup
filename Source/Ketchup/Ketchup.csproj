@@ -57,37 +57,36 @@
     </Compile>
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
-    <Compile Include="Devices\KetchupAvionicsModule.cs" />
+    <Compile Include="Modules\ModuleKetchupAvionics.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\VesselExtensions.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
-    <Compile Include="KetchupComputerModule.cs" />
-    <Compile Include="Devices\KetchupFirmwareModule.cs" />
-    <Compile Include="Devices\KetchupGenericClockModule.cs" />
-    <Compile Include="Devices\KetchupGenericKeyboardModule.cs" />
+    <Compile Include="Modules\ModuleKetchupComputer.cs" />
+    <Compile Include="Modules\ModuleKetchupCrash.cs" />
+    <Compile Include="Modules\ModuleKetchupFirmware.cs" />
+    <Compile Include="Modules\ModuleKetchupGenericClock.cs" />
+    <Compile Include="Modules\ModuleKetchupGenericKeyboard.cs" />
     <Compile Include="Interop\TomatoDcpu16Adapter.cs" />
     <Compile Include="Interop\TomatoDeviceAdapter.cs" />
     <Compile Include="IO\BinaryStateReader.cs" />
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
     <Compile Include="IO\IoUtility.cs" />
-    <Compile Include="Devices\KetchupLem1802Module.cs" />
-    <Compile Include="Devices\KetchupM35fdModule.cs" />
-    <Compile Include="Mathematics\NedReferenceFrame.cs" />
-    <Compile Include="Mathematics\VesselReferenceFrame.cs" />
+    <Compile Include="Modules\ModuleKetchupLem1802.cs" />
+    <Compile Include="Modules\ModuleKetchupM35fd.cs" />
+    <Compile Include="Utility\NedReferenceFrame.cs" />
+    <Compile Include="Utility\VesselReferenceFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Devices\KetchupSped3Module.cs" />
+    <Compile Include="Modules\ModuleKetchupSped3.cs" />
+    <Compile Include="Utility\MachineWord.cs" />
+    <Compile Include="Utility\Range.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ketchup.Api\Ketchup.Api.csproj">
       <Project>{BF83C18A-AD39-4083-A819-5B42B3812664}</Project>
       <Name>Ketchup.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ketchup.Utility\Ketchup.Utility.csproj">
-      <Project>{445d40ba-64e6-46f6-af73-f8cc7208ab5f}</Project>
-      <Name>Ketchup.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

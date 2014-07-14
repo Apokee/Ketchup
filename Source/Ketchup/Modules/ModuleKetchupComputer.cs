@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
-using Ketchup.Devices;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
 using Tomato;
 using UnityEngine;
 
-namespace Ketchup
+namespace Ketchup.Modules
 {
     [KSPModule("Computer")]
-    internal class KetchupComputerModule : PartModule
+    internal class ModuleKetchupComputer : PartModule
     {
         #region Constants
 
@@ -356,14 +355,14 @@ namespace Ketchup
             _dcpu16StateManager = dcpu16StateManager;
         }
 
-        private KetchupFirmwareModule GetFirmware()
+        private ModuleKetchupFirmware GetFirmware()
         {
-            return part.Modules.OfType<KetchupFirmwareModule>().Single();
+            return part.Modules.OfType<ModuleKetchupFirmware>().Single();
         }
 
         private IEnumerable<IDevice> DeviceScan()
         {
-            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is KetchupFirmwareModule)).ToList();
+            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is ModuleKetchupFirmware)).ToList();
         }
 
         private void Connect(IEnumerable<IDevice> devices)

@@ -5,13 +5,13 @@ using System.Text;
 using Ketchup.Api.v0;
 using Ketchup.Utility;
 
-namespace Ketchup.CrashDevice
+namespace Ketchup.Modules
 {
     /// <summary>
     /// Centrally Regulated Avionic Subsystem Handler (CRASH) device.
     /// </summary>
     [KSPModule("Device: CRASH")]
-    internal sealed class KetchupCrashModule : PartModule, IDevice
+    internal sealed class ModuleKetchupCrash : PartModule, IDevice
     {
         #region Constants
 
@@ -146,34 +146,34 @@ namespace Ketchup.CrashDevice
         [KSPField(isPersistant = true)]
         private ushort _controlMask;
 
-        [KSPField(guiName = "CRASH Roll", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _roll;
 
-        [KSPField(guiName = "CRASH Pitch", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _pitch;
 
-        [KSPField(guiName = "CRASH Yaw", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _yaw;
 
-        [KSPField(guiName = "CRASH Translation X", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _translationX;
 
-        [KSPField(guiName = "CRASH Translation Y", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _translationY;
 
-        [KSPField(guiName = "CRASH Translation Z", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _translationZ;
 
-        [KSPField(guiName = "CRASH Throttle", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _throttle;
 
-        [KSPField(guiName = "CRASH Roll Trim", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _rollTrim;
 
-        [KSPField(guiName = "CRASH Pitch Trim", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _pitchTrim;
 
-        [KSPField(guiName = "CRASH Yaw Trim", guiActive = true, guiFormat = "F3", isPersistant = true)]
+        [KSPField(isPersistant = true)]
         private float _yawTrim;
 
         [KSPField(isPersistant = true)]

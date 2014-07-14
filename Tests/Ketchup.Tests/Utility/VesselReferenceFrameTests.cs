@@ -4,7 +4,7 @@ using FluentAssertions;
 using Ketchup.Extensions;
 using Xunit.Extensions;
 
-namespace Ketchup.Mathematics
+namespace Ketchup.Utility
 {
     public sealed class VesselReferenceFrameTests
     {
