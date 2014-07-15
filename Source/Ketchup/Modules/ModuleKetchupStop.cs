@@ -13,7 +13,7 @@ namespace Ketchup.Modules
 
         private enum InterruptOperation
         {
-            GetOrientation = 0x0001,
+            ActionGetRegisterTaitBryanOrientation = 0x0024,
         }
 
         #endregion
@@ -97,7 +97,7 @@ namespace Ketchup.Modules
 
                 switch (operation)
                 {
-                    case InterruptOperation.GetOrientation:
+                    case InterruptOperation.ActionGetRegisterTaitBryanOrientation:
                         var orientation = GetOrientation();
 
                         _dcpu16.X = MachineWord.FromUInt16((ushort)
