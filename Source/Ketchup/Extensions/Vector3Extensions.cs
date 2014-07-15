@@ -10,8 +10,6 @@ namespace Ketchup.Extensions
                 .RadiansToDegrees();
         }
 
-        // FIXME: does this do what I intend it to do??
-
         public static Vector3d Negative(this Vector3d vector)
         {
             return -vector;
