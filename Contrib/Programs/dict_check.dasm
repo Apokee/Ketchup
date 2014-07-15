@@ -1,0 +1,79 @@
+jsr map_hardware
+jsr test_persistence
+
+set pc, halt
+
+; Constants
+:dev_crash  dat 0x0000
+
+; Iterate through connected hardware devices
+:map_hardware
+    hwn i
+    :map_hardware_loop
+        sub i, 1
+        hwq i
+
+        ife b, 0xcae1
+            ife a, 0x0001
+                set [dev_crash], i
+
+        ifn i, 0
+            set pc, map_hardware_loop
+        set pc, pop
+
+:test_persistence
+    set a, 0x020C
+
+    set b, action_group_1
+    set c, 1
+    hwi [dev_crash]
+
+    set b, action_group_2
+    set c, 2
+    hwi [dev_crash]
+
+    set b, action_group_3
+    set c, 3
+    hwi [dev_crash]
+
+    set b, action_group_4
+    set c, 4
+    hwi [dev_crash]
+
+    set b, action_group_5
+    set c, 5
+    hwi [dev_crash]
+
+    set b, action_group_6
+    set c, 6
+    hwi [dev_crash]
+
+    set b, action_group_7
+    set c, 7
+    hwi [dev_crash]
+
+    set b, action_group_8
+    set c, 8
+    hwi [dev_crash]
+
+    set b, action_group_9
+    set c, 9
+    hwi [dev_crash]
+
+    set b, action_group_10
+    set c, 10
+    hwi [dev_crash]
+
+:halt
+    add pc, -1
+
+:action_group_1     .dat 0x0000
+:action_group_2     .dat 0x0000
+:action_group_3     .dat 0x0000
+:action_group_4     .dat 0x0000
+:action_group_5     .dat 0x0000
+:action_group_6     .dat 0x0000
+:action_group_7     .dat 0x0000
+:action_group_8     .dat 0x0000
+:action_group_9     .dat 0x0000
+:action_group_10    .dat 0x0000

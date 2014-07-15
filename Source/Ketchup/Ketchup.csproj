@@ -76,6 +76,7 @@
     <Compile Include="Modules\ModuleKetchupLem1802.cs" />
     <Compile Include="Modules\ModuleKetchupM35fd.cs" />
     <Compile Include="Modules\ModuleKetchupStop.cs" />
+    <Compile Include="Utility\ConfigDictionary.cs" />
     <Compile Include="Utility\NedReferenceFrame.cs" />
     <Compile Include="Utility\VesselReferenceFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
