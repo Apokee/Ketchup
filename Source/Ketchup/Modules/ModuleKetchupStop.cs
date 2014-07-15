@@ -1,21 +1,19 @@
-﻿using Ketchup.Api.v0;
+﻿using System.Text;
+using Ketchup.Api.v0;
 using Ketchup.Extensions;
 using Ketchup.Utility;
 using UnityEngine;
 
 namespace Ketchup.Modules
 {
-    internal sealed class ModuleKetchupAvionics : PartModule, IDevice
+    [KSPModule("Device: STOP")]
+    internal sealed class ModuleKetchupStop : PartModule, IDevice
     {
         #region Constants
 
         private enum InterruptOperation
         {
-            GetRotation         = 0x0001,
-            GetTranslation      = 0x0002,
-            GetThrottle         = 0x0003,
-
-            GetOrientation      = 0x000C,
+            ActionGetRegisterTaitBryanOrientation = 0x0024,
         }
 
         #endregion
@@ -24,9 +22,7 @@ namespace Ketchup.Modules
 
         public string FriendlyName
         {
-            // TODO: All friendly names should be 12-characters long, emulating x86 CPUID
-            // http://en.wikipedia.org/wiki/CPUID
-            get { return "KSG Avionics"; }
+            get { return "KSG STOP Device"; }
         }
 
         public uint ManufacturerId
@@ -36,12 +32,12 @@ namespace Ketchup.Modules
 
         public uint DeviceId
         {
-            get { return (uint)Constants.DeviceId.Avionics; }
+            get { return (uint)Constants.DeviceId.Stop; }
         }
 
         public ushort Version
         {
-            get { return 0x0000; }
+            get { return 0x0001; }
         }
 
         #endregion
@@ -52,7 +48,15 @@ namespace Ketchup.Modules
 
         #endregion
 
-        #region PartModule Members
+        #region PartModule
+
+        public override string GetInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Equipped");
+
+            return sb.ToString();
+        }
 
         public override void OnStart(StartState state)
         {
@@ -93,22 +97,7 @@ namespace Ketchup.Modules
 
                 switch (operation)
                 {
-                    case InterruptOperation.GetRotation:
-                        _dcpu16.X = MachineWord.FromInt16(Range.ScaleSignedUnaryToSignedInt16(vessel.ctrlState.roll));
-                        _dcpu16.Y = MachineWord.FromInt16(Range.ScaleSignedUnaryToSignedInt16(vessel.ctrlState.pitch));
-                        _dcpu16.Z = MachineWord.FromInt16(Range.ScaleSignedUnaryToSignedInt16(vessel.ctrlState.yaw));
-                        break;
-                    case InterruptOperation.GetTranslation:
-                        _dcpu16.X = MachineWord.FromInt16(Range.ScaleSignedUnaryToSignedInt16(vessel.ctrlState.X));
-                        _dcpu16.Y = MachineWord.FromInt16(Range.ScaleSignedUnaryToSignedInt16(vessel.ctrlState.Y));
-                        _dcpu16.Z = MachineWord.FromInt16(Range.ScaleSignedUnaryToSignedInt16(vessel.ctrlState.Z));
-                        break;
-                    case InterruptOperation.GetThrottle:
-                        _dcpu16.X = MachineWord.FromUInt16(Range.ScaleUnsignedUnaryToUnsignedInt16(
-                           vessel.ctrlState.mainThrottle
-                        ));
-                        break;
-                    case InterruptOperation.GetOrientation:
+                    case InterruptOperation.ActionGetRegisterTaitBryanOrientation:
                         var orientation = GetOrientation();
 
                         _dcpu16.X = MachineWord.FromUInt16((ushort)
@@ -125,7 +114,7 @@ namespace Ketchup.Modules
                 }
             }
 
-            return 0;
+            return 0; // TODO: Return sensible value
         }
 
         #endregion
@@ -138,11 +127,22 @@ namespace Ketchup.Modules
             var nedReferenceFrame = vessel.GetNedReferenceFrame();
 
             return new Vector3d(
-                vesselReferenceFrame.GetHeading(nedReferenceFrame),
+                vesselReferenceFrame.GetRoll(nedReferenceFrame),
                 vesselReferenceFrame.GetPitch(nedReferenceFrame),
-                vesselReferenceFrame.GetRoll(nedReferenceFrame)
+                vesselReferenceFrame.GetHeading(nedReferenceFrame)
             );
         }
+
+        #region Debug
+
+#if DEBUG
+        private LineRenderer _northAxisLine;
+        private LineRenderer _eastAxisLine;
+        private LineRenderer _downAxisLine;
+
+        private LineRenderer _vesselFrontLine;
+        private LineRenderer _vesselRightLine;
+        private LineRenderer _vesselBottomLine;
 
         private LineRenderer SetupAxisLineRender(Color color, float lengthMeters, float widthMeters)
         {
@@ -162,15 +162,6 @@ namespace Ketchup.Modules
 
             return lineRenderer;
         }
-
-#if DEBUG
-        private LineRenderer _northAxisLine;
-        private LineRenderer _eastAxisLine;
-        private LineRenderer _downAxisLine;
-
-        private LineRenderer _vesselFrontLine;
-        private LineRenderer _vesselRightLine;
-        private LineRenderer _vesselBottomLine;
 
         private void DebugSetupAxes()
         {
@@ -206,6 +197,8 @@ namespace Ketchup.Modules
             _vesselBottomLine.transform.rotation = Quaternion.LookRotation(vessel.transform.forward.normalized);
         }
 #endif
+
+        #endregion
 
         #endregion
     }

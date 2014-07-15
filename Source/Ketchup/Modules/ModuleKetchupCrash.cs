@@ -126,12 +126,12 @@ namespace Ketchup.Modules
 
         public uint ManufacturerId
         {
-            get { return 0xcae02013; } // TODO: Replace with constant
+            get { return (uint)Constants.ManufacturerId.KerbalSystems; }
         }
 
         public uint DeviceId
         {
-            get { return 0xcae10001; }
+            get { return (uint)Constants.DeviceId.Crash; }
         }
 
         public ushort Version
