@@ -127,9 +127,9 @@ namespace Ketchup.Modules
             var nedReferenceFrame = vessel.GetNedReferenceFrame();
 
             return new Vector3d(
-                vesselReferenceFrame.GetHeading(nedReferenceFrame),
+                vesselReferenceFrame.GetRoll(nedReferenceFrame),
                 vesselReferenceFrame.GetPitch(nedReferenceFrame),
-                vesselReferenceFrame.GetRoll(nedReferenceFrame)
+                vesselReferenceFrame.GetHeading(nedReferenceFrame)
             );
         }
 
