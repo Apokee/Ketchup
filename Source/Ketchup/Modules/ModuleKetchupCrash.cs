@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
@@ -251,16 +252,20 @@ namespace Ketchup.Modules
         [KSPField(isPersistant = true)]
         private uint _memAddressReadAbort;
 
-        // TODO: This needs to be persisted
-        private readonly Dictionary<KSPActionGroup, ushort> _memAddressesWriteActionGroups =
-            new Dictionary<KSPActionGroup, ushort>();
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
+        [KSPField(isPersistant = true)]
+        private ConfigDictionary _memAddressesWriteActionGroups = new ConfigDictionary();
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
 
-        // TODO: This needs to be persisted
-        private readonly Dictionary<KSPActionGroup, ushort> _memAddressReadActionGroups =
-            new Dictionary<KSPActionGroup, ushort>();
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
+        [KSPField(isPersistant = true)]
+        private readonly ConfigDictionary _memAddressReadActionGroups = new ConfigDictionary();
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
 
-        // TODO: This needs to be persisted
-        private readonly FlightCtrlState _lastFlightCtrlState = new FlightCtrlState();
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
+        [KSPField(isPersistant = true)]
+        private FlightCtrlState _lastFlightCtrlState = new FlightCtrlState();
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
 
         #endregion
 
@@ -554,14 +559,15 @@ namespace Ketchup.Modules
                         {
                             if (_dcpu16.B == 0x0000)
                             {
-                                if (_memAddressesWriteActionGroups.ContainsKey(actionGroup))
+                                if (_memAddressesWriteActionGroups.ContainsKey(actionGroup.ToString()))
                                 {
-                                    _memAddressesWriteActionGroups.Remove(actionGroup);
+                                    _memAddressesWriteActionGroups.Remove(actionGroup.ToString());
                                 }
                             }
                             else
                             {
-                                _memAddressesWriteActionGroups[actionGroup] = _dcpu16.B;
+                                _memAddressesWriteActionGroups[actionGroup.ToString()] =
+                                    _dcpu16.B.ToString(CultureInfo.InvariantCulture);
                             }
                         }
                         WriteActionGroupsToMemory();
@@ -676,14 +682,15 @@ namespace Ketchup.Modules
                         {
                             if (_dcpu16.B == 0x0000)
                             {
-                                if (_memAddressReadActionGroups.ContainsKey(actionGroup))
+                                if (_memAddressReadActionGroups.ContainsKey(actionGroup.ToString()))
                                 {
-                                    _memAddressReadActionGroups.Remove(actionGroup);
+                                    _memAddressReadActionGroups.Remove(actionGroup.ToString());
                                 }
                             }
                             else
                             {
-                                _memAddressReadActionGroups[actionGroup] = _dcpu16.B;
+                                _memAddressReadActionGroups[actionGroup.ToString()] =
+                                    _dcpu16.B.ToString(CultureInfo.InvariantCulture);
                             }
                         }
                         ReadActionGroupsFromMemory();
@@ -820,10 +827,16 @@ namespace Ketchup.Modules
         {
             foreach(var actionGroupAddress in _memAddressesWriteActionGroups)
             {
-                var actionGroup = actionGroupAddress.Key;
-                var address = actionGroupAddress.Value;
+                if (Enum.IsDefined(typeof(KSPActionGroup), actionGroupAddress.Key))
+                {
+                    var actionGroup = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), actionGroupAddress.Key);
+                    ushort address;
 
-                _dcpu16.Memory[address] = MachineWord.FromBoolean(vessel.ActionGroups[actionGroup]);
+                    if (UInt16.TryParse(actionGroupAddress.Value, out address))
+                    {
+                        _dcpu16.Memory[address] = MachineWord.FromBoolean(vessel.ActionGroups[actionGroup]);
+                    }
+                }
             }
         }
 
@@ -961,11 +974,17 @@ namespace Ketchup.Modules
         {
             foreach (var actionGroupAddress in _memAddressReadActionGroups)
             {
-                var actionGroup = actionGroupAddress.Key;
-                var address = actionGroupAddress.Value;
+                if (Enum.IsDefined(typeof(KSPActionGroup), actionGroupAddress.Key))
+                {
+                    var actionGroup = (KSPActionGroup)Enum.Parse(typeof(KSPActionGroup), actionGroupAddress.Key);
+                    ushort address;
 
-                HandleSetActionGroup(_dcpu16.Memory[address], actionGroup);
-                _dcpu16.Memory[address] = (ushort)ActionGroupState.Ignore;
+                    if (UInt16.TryParse(actionGroupAddress.Value, out address))
+                    {
+                        HandleSetActionGroup(_dcpu16.Memory[address], actionGroup);
+                        _dcpu16.Memory[address] = (ushort)ActionGroupState.Ignore;
+                    }
+                }
             }
         }
 
