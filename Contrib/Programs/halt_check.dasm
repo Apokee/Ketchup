@@ -1,0 +1,57 @@
+jsr map_hardware
+jsr init_interrupt
+jsr init_clock
+
+set pc, halt
+
+; Globals
+:dev_clock      dat 0x0000
+:dev_monitor    dat 0x0000
+
+:map_hardware
+    hwn i
+    :map_hardware_loop
+        sub i, 1
+        hwq i
+
+        ife b, 0x12D0
+            ife a, 0xB402
+                set [dev_clock], i
+
+        ifn i, 0
+            set pc, map_hardware_loop
+        set pc, pop
+
+:init_interrupt
+    ias handle_interrupt
+    set pc, pop
+
+:init_clock
+    ; Tick every 1 minute
+    set a, 0
+    set b, 3600
+    hwi [dev_clock]
+
+    ; Turn on interrupts
+    set a, 2
+    set b, 1
+    hwi [dev_clock]
+
+    set pc, pop
+
+:handle_interrupt
+    jsr busy
+
+    rfi 0
+
+:busy
+    set a, 0
+    :busy_loop
+        add a, 1
+        ifn a, 0xFFFF
+            set pc, busy_loop
+
+    set pc, pop
+
+:halt
+    add pc, -1
