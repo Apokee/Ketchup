@@ -439,6 +439,7 @@ namespace Ketchup.Modules
             {
                 GUI.skin = HighLogic.Skin;
 
+                _windowPosition = new Rect(_windowPosition) { width = 300 };
                 _windowPosition = GUILayout.Window(4, _windowPosition, OnM35FdWindow, "M35FD");
             }
         }
