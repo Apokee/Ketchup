@@ -102,12 +102,13 @@ namespace Ketchup.Api.v0
         /// </summary>
         /// <param name="deviceIndex">The index of the device to disconnect from the CPU.</param>
         void OnDisconnect(ushort deviceIndex);
-
+        
         /// <summary>
-        /// Execute the next instruction.
+        /// Execute instructions.
         /// </summary>
-        /// <returns>The number of cycles the instruction took to complete.</returns>
-        int Execute();
+        /// <param name="cyclesToExecute">The number of cycles to execute.</param>
+        /// <returns>The number of cycles executed.</returns>
+        int Execute(int cyclesToExecute);
         
         /// <summary>
         /// Fire an interrupt to the CPU.

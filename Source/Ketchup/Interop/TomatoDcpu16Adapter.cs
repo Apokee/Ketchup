@@ -128,12 +128,14 @@ namespace Ketchup.Interop
             _dcpu16.Devices[deviceIndex] = null;
         }
 
-        public int Execute()
+        public int Execute(int cyclesToExecute)
         {
             _interruptWakeFlag = false;
 
+            // TODO: What happens in case of an overflow?
+
             var cyclesBefore = _dcpu16.TotalCycles;
-            _dcpu16.Execute(1);
+            _dcpu16.Execute(cyclesToExecute);
             var cyclesAfter = _dcpu16.TotalCycles;
 
             return cyclesAfter - cyclesBefore;

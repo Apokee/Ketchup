@@ -43,15 +43,10 @@ namespace Ketchup.Modules
         private Dcpu16StateManager _dcpu16StateManager;
 
         private bool _isPowerOn;
-        private bool _isHalted;
-
-        private int? _warpIndexBeforeWake;
 
         private readonly List<double> _clockRates = new List<double>(60);
         private int _cyclesExecuted;
         private int _clockRateIndex;
-
-        private TimeWarp _timeWarp;
 
         private Rect _windowRect;
         private bool _showWindow;
@@ -80,8 +75,6 @@ namespace Ketchup.Modules
         {
             if (state != StartState.Editor)
             {
-                _timeWarp = TimeWarp.fetch;
-
                 InitStylesIfNecessary();
                 InitWindowSizeIfNecessary();
                 InitWindowPositionIfNecessary();
@@ -152,59 +145,36 @@ namespace Ketchup.Modules
             // Do we really need to keep track of a halt condition in two places?
             if (_isPowerOn && _dcpu16 != null)
             {
-                if (_isHalted)
-                {
-                    if (_dcpu16.IsPendingWakeUp())
-                    {
-                        _warpIndexBeforeWake = TimeWarp.CurrentRateIndex;
+                var cyclesToExecute = 0;
 
-                        _isHalted = false;
-                    }
+                if (_dcpu16.IsPendingWakeUp())
+                {
+                    cyclesToExecute = (int)Math.Round((TimeWarp.deltaTime / 2.0) * ClockFrequency);
                 }
-                else
+                else if (!_dcpu16.IsHalted())
                 {
-                    if (_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted())
+                    cyclesToExecute = (int)Math.Round(TimeWarp.deltaTime * ClockFrequency);
+                }
+
+                if (cyclesToExecute > 0)
+                {
+                    TimeWarpThrottleIfNecessary();
+
+                    var cyclesExecuted = _dcpu16.Execute(cyclesToExecute);
+
+                    // We use this calculation to get the real-world clock rate, not the in-simulation clock rate
+                    var clockRate = _cyclesExecuted / TimeWarp.deltaTime * TimeWarp.CurrentRate;
+                    if (_clockRates.Count < 60)
                     {
-                        var maxPhysicsWarpIndex = _timeWarp.physicsWarpRates.Length - 1;
-
-                        if (_timeWarp.physicsWarpRates[maxPhysicsWarpIndex] < TimeWarp.CurrentRate)
-                        {
-                            TimeWarp.SetRate(TimeWarp.WarpMode == TimeWarp.Modes.LOW ? maxPhysicsWarpIndex : 0, true);
-                        }
-
-                        var cyclesToExecute = (int)Math.Round(Time.deltaTime * ClockFrequency * TimeWarp.CurrentRate);
-
-
-                        var cyclesExecuted = 0;
-                        while (cyclesExecuted < cyclesToExecute)
-                        {
-                            cyclesExecuted += _dcpu16.Execute();
-                        }
-
-                        var clockRate = _cyclesExecuted / Time.deltaTime;
-                        if (_clockRates.Count < 60)
-                        {
-                            _clockRates.Add(clockRate);
-                        }
-                        else
-                        {
-                            _clockRates[_clockRateIndex] = clockRate;
-                            _clockRateIndex = ((_clockRateIndex + 1) % 60);
-                        }
-
-                        _cyclesExecuted = cyclesExecuted;
+                        _clockRates.Add(clockRate);
                     }
                     else
                     {
-                        _isHalted = true;
-
-                        if (_warpIndexBeforeWake != null)
-                        {
-                            var index = _warpIndexBeforeWake.Value;
-                            _warpIndexBeforeWake = null;
-                            TimeWarp.SetRate(index, true);
-                        }
+                        _clockRates[_clockRateIndex] = clockRate;
+                        _clockRateIndex = ((_clockRateIndex + 1) % 60);
                     }
+
+                    _cyclesExecuted = cyclesExecuted;
                 }
             }
         }
@@ -222,6 +192,30 @@ namespace Ketchup.Modules
         #endregion
 
         #region Helper Methods
+
+        private void TimeWarpThrottleIfNecessary()
+        {
+            if ((_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted()) && TimeWarp.WarpMode == TimeWarp.Modes.HIGH)
+            {
+                var condition = String.Empty;
+
+                if (_dcpu16.IsPendingWakeUp())
+                {
+                    condition = "DCPU-16 is pending wake up from halt, ";
+                }
+                else if (_dcpu16.IsHalted())
+                {
+                    condition = "DCPU-16 is executing, ";
+                }
+
+                Debug.Log(String.Format("[Ketchup:Computer] {0} throttling TimeWarp from {1}",
+                    condition,
+                    TimeWarp.CurrentRate
+                ));
+
+                TimeWarp.SetRate(0, false);
+            }
+        }
 
         private void OnDraw()
         {
@@ -241,7 +235,7 @@ namespace Ketchup.Modules
             var pwrButtonPressed = GUILayout.Button("PWR", _isPowerOn ? _styleButtonPressed : GUI.skin.button, GUILayout.ExpandWidth(false));
             if (_isPowerOn)
             {
-                if (_isHalted)
+                if (_dcpu16.IsHalted())
                 {
                     GUILayout.Label("Halted", new GUIStyle(GUI.skin.label) { normal = { textColor = Color.yellow }, padding = new RectOffset(0, 0, 8, 0) });
                 }
@@ -329,8 +323,6 @@ namespace Ketchup.Modules
         private void TurnOff()
         {
             _isPowerOn = false;
-
-            _isHalted = false;
 
             _dcpu16 = null;
             _dcpu16StateManager = null;
