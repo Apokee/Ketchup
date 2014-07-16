@@ -295,10 +295,11 @@ namespace Ketchup.Modules
             lineRenderer.transform.localEulerAngles = new Vector3(-90f, 0f, 0f);
 
             lineRenderer.transform.localScale = _scaleVector;
+
+            lineRenderer.transform.Translate(_translateVector);
             lineRenderer.transform.Translate(new Vector3(0.5f, 0.5f, 0f));
             lineRenderer.transform.Rotate(Vector3.forward, _currentRotation);
             lineRenderer.transform.Translate(new Vector3(-0.5f, -0.5f, 0f));
-            lineRenderer.transform.Translate(_translateVector);
 
             lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
             lineRenderer.SetColors(color, color);
