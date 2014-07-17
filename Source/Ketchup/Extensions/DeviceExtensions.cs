@@ -12,15 +12,15 @@ namespace Ketchup.Extensions
             var connectionId = node.GetValue(ConfigKeyGlobalDeviceId);
             if (!String.IsNullOrEmpty(connectionId))
             {
-                device.GlobalDeviceId = new Guid(connectionId);
+                device.GlobalDeviceId = new Kuid(connectionId);
             }
         }
 
         public static void SaveGlobalDeviceId(this IDevice device, ConfigNode node)
         {
-            if (device.GlobalDeviceId != Guid.Empty)
+            if (device.GlobalDeviceId != null)
             {
-                node.AddValue(ConfigKeyGlobalDeviceId, device.GlobalDeviceId.ToString("N"));
+                node.AddValue(ConfigKeyGlobalDeviceId, device.GlobalDeviceId.ToString());
             }
         }
     }

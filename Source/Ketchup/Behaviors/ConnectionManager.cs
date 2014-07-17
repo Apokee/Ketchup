@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ketchup.Api.v0;
 using Ketchup.Data;
 using Ketchup.Modules;
@@ -82,6 +83,7 @@ namespace Ketchup.Behaviors
 
                 GameEvents.onPartAttach.Add(OnPartAttach);
                 GameEvents.onPartRemove.Add(OnPartRemove);
+                GameEvents.onVesselCreate.Add(OnVesselCreate);
             }
         }
 
@@ -121,6 +123,39 @@ namespace Ketchup.Behaviors
             Log(LogLevel.Debug, "OnPartRemove()");
 
             PrepareConnectionRecalculation();
+        }
+
+        private void OnVesselCreate(Vessel vessel)
+        {
+            Log(LogLevel.Debug, "OnVesselCreate()");
+
+            if (_mode == Mode.Flight)
+            {
+                var kuidUpdates = new Dictionary<Kuid, Kuid>();
+
+                var computers = vessel.Parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
+                var devices = vessel.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
+
+                foreach (var device in devices.Where(device => device.GlobalDeviceId.Scope == KuidScope.Editor))
+                {
+                    var oldKuid = device.GlobalDeviceId;
+                    var newKuid = new Kuid(KuidScope.Flight, Guid.NewGuid());
+
+                    Log(LogLevel.Debug, "{0} has a GlobalDeviceId with Editor scope, rewriting from {1} to {2}",
+                        device.FriendlyName,
+                        oldKuid,
+                        newKuid
+                    );
+
+                    kuidUpdates.Add(oldKuid, newKuid);
+                    device.GlobalDeviceId = newKuid;
+                }
+
+                foreach (var computer in computers)
+                {
+                    computer.UpdateConnections(kuidUpdates);
+                }
+            }
         }
 
         private void EditorCheckForFirstPart()
@@ -176,34 +211,44 @@ namespace Ketchup.Behaviors
         {
             Log(LogLevel.Debug, "RecalculateConnections(): Vessel contains {0} parts", parts.Count);
 
-            foreach (var part in parts)
+            switch (_mode)
             {
-                Log(LogLevel.Debug, "RecalculateConnections(): {0} {1} the root",
-                    part.partInfo.title, part.parent == null ? "is" : "is not"
-                );
-
-                var computers = part.FindModulesImplementing<ModuleKetchupComputer>();
-                var devices = part.FindModulesImplementing<IDevice>();
-
-                if (computers.Count == 1)
-                {
-                    var computer = computers[0];
-
-                    computer.ResetConnections();
-                    foreach (var device in devices)
+                case Mode.Editor:
+                    Log(LogLevel.Debug, "RecalculateConnections(): In Editor, proceeding");
+                    foreach (var part in parts)
                     {
-                        if (device.GlobalDeviceId == Guid.Empty)
+                        Log(LogLevel.Debug, "RecalculateConnections(): {0} {1} the root",
+                            part.partInfo.title, part.parent == null ? "is" : "is not"
+                            );
+
+                        var computers = part.FindModulesImplementing<ModuleKetchupComputer>();
+                        var devices = part.FindModulesImplementing<IDevice>();
+
+                        if (computers.Count == 1)
                         {
-                            device.GlobalDeviceId = Guid.NewGuid();
+                            var computer = computers[0];
+
+                            computer.ResetConnections();
+                            foreach (var device in devices)
+                            {
+                                if (device.GlobalDeviceId == null)
+                                {
+                                    device.GlobalDeviceId = new Kuid(KuidScope.Editor, Guid.NewGuid());
+                                }
+
+                                computer
+                                    .AddConnection(new Connection(ConnectionType.Automatic, device.GlobalDeviceId));
+                            }
                         }
+                        else
+                        {
 
-                        computer.AddConnection(new Connection(ConnectionType.Automatic, device.GlobalDeviceId));
+                        }
                     }
-                }
-                else
-                {
-
-                }
+                    break;
+                case Mode.Flight:
+                    Log(LogLevel.Debug, "RecalculateConnections(): In Flight, doing nothing");
+                    break;
             }
 
             _recalculateConnections = false;

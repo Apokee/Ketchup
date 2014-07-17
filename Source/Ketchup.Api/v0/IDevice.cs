@@ -33,7 +33,7 @@ namespace Ketchup.Api.v0
         /// <remarks>
         /// Implementors should save and restore this identifier unless its value is <see cref="Guid.Empty"/>.
         /// </remarks>
-        Guid GlobalDeviceId { get; set; }
+        Kuid GlobalDeviceId { get; set; }
 
         /// <summary>
         /// Called when the device is connected to the CPU. CPU should be notified of connection separately. Behavior

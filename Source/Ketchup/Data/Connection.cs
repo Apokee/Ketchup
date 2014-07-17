@@ -1,43 +1,33 @@
 ﻿using System;
+using Ketchup.Api.v0;
 
 namespace Ketchup.Data
 {
     internal sealed class Connection
     {
-        private string _string;
-
         public ConnectionType ConnectionType { get; private set; }
-        public Guid GlobalDeviceId { get; private set; }
+        public Kuid Kuid { get; private set; }
 
-        public Connection(ConnectionType connectionType, Guid globalDeviceId)
+        public Connection(ConnectionType connectionType, Kuid id)
         {
             ConnectionType = connectionType;
-            GlobalDeviceId = globalDeviceId;
-
-            SetString();
+            Kuid = id;
         }
 
-        public Connection(string serialized)
+        public Connection(string str)
         {
-            var colonIndex = serialized.IndexOf(':');
+            var colonIndex = str.IndexOf(':');
 
-            var connectionType = serialized.Substring(0, colonIndex);
-            var globalDeviceId = serialized.Substring(colonIndex + 1);
+            var connectionType = str.Substring(0, colonIndex);
+            var id = str.Substring(colonIndex + 1);
 
             ConnectionType = (ConnectionType)Byte.Parse(connectionType);
-            GlobalDeviceId = new Guid(globalDeviceId);
-
-            SetString();
-        }
-
-        private void SetString()
-        {
-            _string = String.Format("{0}:{1}", (byte)ConnectionType, GlobalDeviceId.ToString("N"));
+            Kuid = new Kuid(id);
         }
 
         public override string ToString()
         {
-            return _string;
+            return String.Format("{0}:{1}", (byte)ConnectionType, Kuid);
         }
     }
 }

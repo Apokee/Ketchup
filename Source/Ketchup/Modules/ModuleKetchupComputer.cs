@@ -59,7 +59,7 @@ namespace Ketchup.Modules
 
         private string _dcpu16State;
 
-        private readonly List<Connection> _connections = new List<Connection>();
+        private List<Connection> _connections = new List<Connection>();
 
         #endregion
 
@@ -228,6 +228,13 @@ namespace Ketchup.Modules
             _connections.Clear();
         }
 
+        public void UpdateConnections(Dictionary<Kuid, Kuid> updates)
+        {
+            _connections = _connections
+                .Select(i => updates.ContainsKey(i.Kuid) ? new Connection(i.ConnectionType, updates[i.Kuid]) : i)
+                .ToList();
+        }
+
         #region Helper Methods
 
         private void TimeWarpThrottleIfNecessary()
@@ -394,7 +401,7 @@ namespace Ketchup.Modules
 
         private IEnumerable<IDevice> DeviceScan()
         {
-            var connectedGlobalDeviceIds = new HashSet<Guid>(_connections.Select(i => i.GlobalDeviceId));
+            var connectedGlobalDeviceIds = new HashSet<Kuid>(_connections.Select(i => i.Kuid));
             return vessel
                 .Parts
                 .SelectMany(i => i.FindModulesImplementing<IDevice>())

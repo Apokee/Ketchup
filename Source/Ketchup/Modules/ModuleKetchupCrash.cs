@@ -141,7 +141,7 @@ namespace Ketchup.Modules
             get { return 0x0001; }
         }
 
-        public Guid GlobalDeviceId { get; set; }
+        public Kuid GlobalDeviceId { get; set; }
 
         #endregion
 
