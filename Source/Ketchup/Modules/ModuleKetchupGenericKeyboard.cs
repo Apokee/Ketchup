@@ -179,6 +179,8 @@ namespace Ketchup.Modules
             get { return 0x0001; }
         }
 
+        public Guid GlobalDeviceId { get; set; }
+
         #endregion
         
         #region IDevice Methods
@@ -302,6 +304,8 @@ namespace Ketchup.Modules
                 {
                     _isAttached = isAttached;
                 }
+
+                this.LoadGlobalDeviceId(node);
             }
         }
 
@@ -328,6 +332,8 @@ namespace Ketchup.Modules
 
             node.AddValue(ConfigKeyInterruptMessage, _interruptMessage);
             node.AddValue(ConfigKeyIsAttached, _isAttached);
+
+            this.SaveGlobalDeviceId(node);
         }
 
         #endregion

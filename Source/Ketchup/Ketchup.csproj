@@ -58,6 +58,9 @@
     <Compile Include="Behaviors\ConnectionManager.cs" />
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
+    <Compile Include="Data\Connection.cs" />
+    <Compile Include="Data\ConnectionType.cs" />
+    <Compile Include="Extensions\DeviceExtensions.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="Exceptions\LoadStateException.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />

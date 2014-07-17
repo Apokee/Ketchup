@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
+using Ketchup.Data;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
+using Ketchup.Services;
 using Tomato;
 using UnityEngine;
 
@@ -23,6 +25,7 @@ namespace Ketchup.Modules
         private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyDcpu16State = "Dcpu16State";
         private const string ConfigKeyIsPowerOn = "IsPowerOn";
+        private const string ConfigKeyConnection = "Connection";
 
         private const uint ConfigVersion = 1;
 
@@ -34,7 +37,7 @@ namespace Ketchup.Modules
         private static bool _isStyleInit;
 
         #endregion
-
+        
         #region Instance Fields
 
         private TomatoDcpu16Adapter _dcpu16;
@@ -53,9 +56,10 @@ namespace Ketchup.Modules
 
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
-        
 
         private string _dcpu16State;
+
+        private readonly List<Connection> _connections = new List<Connection>();
 
         #endregion
 
@@ -119,6 +123,24 @@ namespace Ketchup.Modules
                 }
 
                 _dcpu16State = node.GetValue(ConfigKeyDcpu16State);
+
+                foreach (var rawConnection in node.GetValues(ConfigKeyConnection))
+                {
+                    try
+                    {
+                        _connections.Add(new Connection(rawConnection));
+                    }
+                    catch (Exception e)
+                    {
+                        Service.Debug.Log(
+                            "ModuleKetchupComputer",
+                            LogLevel.Error,
+                            "Could not parse Connection: '{0}' due to exception:\n{1}",
+                            rawConnection,
+                            e.ToString()
+                        );
+                    }
+                }
             }
         }
 
@@ -136,6 +158,11 @@ namespace Ketchup.Modules
                 var state = _dcpu16StateManager.Save();
 
                 node.AddValue(ConfigKeyDcpu16State, state);
+            }
+
+            foreach (var connection in _connections)
+            {
+                node.AddValue(ConfigKeyConnection, connection.ToString());
             }
         }
 
@@ -190,6 +217,16 @@ namespace Ketchup.Modules
         }
 
         #endregion
+
+        public void AddConnection(Connection connection)
+        {
+            _connections.Add(connection);
+        }
+
+        public void ResetConnections()
+        {
+            _connections.Clear();
+        }
 
         #region Helper Methods
 

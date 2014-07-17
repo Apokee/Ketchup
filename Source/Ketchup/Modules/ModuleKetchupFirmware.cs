@@ -96,6 +96,8 @@ namespace Ketchup.Modules
             get { return 0x0001; }
         }
 
+        public Guid GlobalDeviceId { get; set; }
+
         #endregion
 
         #region Constructors
@@ -182,6 +184,8 @@ namespace Ketchup.Modules
 
                     _firmware = new FirmwareRom(firmwareName, firmwareData);
                 }
+
+                this.LoadGlobalDeviceId(node);
             }
         }
 
@@ -193,6 +197,8 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyShowWindow, _showWindow);
             node.AddValue(ConfigKeyFirmwareName, _firmware.Name);
             node.AddValue(ConfigKeyFirmwareData, _firmware.Serialize());
+
+            this.SaveGlobalDeviceId(node);
         }
 
         #endregion

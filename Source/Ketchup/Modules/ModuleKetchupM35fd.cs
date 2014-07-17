@@ -98,6 +98,8 @@ namespace Ketchup.Modules
             get { return 0x000b; }
         }
 
+        public Guid GlobalDeviceId { get; set; }
+
         #endregion
 
         #region IDevice Methods
@@ -230,6 +232,8 @@ namespace Ketchup.Modules
                         _disk = _allLoadedDisks[diskIndex];
                     }
                 }
+
+                this.LoadGlobalDeviceId(node);
             }
         }
 
@@ -250,6 +254,8 @@ namespace Ketchup.Modules
                 diskNode.AddValue(ConfigKeyIsWriteProtected, _allLoadedDisks[i].IsWriteProtected);
                 diskNode.AddValue(ConfigKeyData, _allLoadedDisks[i].Serialize());
             }
+
+            this.SaveGlobalDeviceId(node);
         }
 
         #endregion

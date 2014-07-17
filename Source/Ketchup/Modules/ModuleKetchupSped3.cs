@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
+using Ketchup.Extensions;
 using UnityEngine;
 
 namespace Ketchup.Modules
@@ -68,6 +69,8 @@ namespace Ketchup.Modules
         {
             get { return 0x0003; }
         }
+
+        public Guid GlobalDeviceId { get; set; }
 
         #endregion
 
@@ -169,6 +172,8 @@ namespace Ketchup.Modules
                 {
                     _currentRotation = currentRotation;
                 }
+
+                this.LoadGlobalDeviceId(node);
             }
         }
 
@@ -180,6 +185,8 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyVertexCount, _vertexCount);
             node.AddValue(ConfigKeyTargetRotation, _targetRotation);
             node.AddValue(ConfigKeyCurrentRotation, _currentRotation);
+
+            this.SaveGlobalDeviceId(node);
         }
 
         public override void OnUpdate()
