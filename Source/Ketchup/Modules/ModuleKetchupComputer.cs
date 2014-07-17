@@ -232,7 +232,11 @@ namespace Ketchup.Modules
 
         private void TimeWarpThrottleIfNecessary()
         {
-            if ((_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted()) && TimeWarp.WarpMode == TimeWarp.Modes.HIGH)
+            if (
+                (_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted())
+                && TimeWarp.WarpMode == TimeWarp.Modes.HIGH
+                && TimeWarp.CurrentRate > 1
+            )
             {
                 var condition = String.Empty;
 
@@ -340,10 +344,11 @@ namespace Ketchup.Modules
         {
             InitializeDcpu16();
 
-            var firmware = GetFirmware();
+            var connectedDevices = DeviceScan().ToList();
+            var firmware = connectedDevices.FirstOrDefault(i => i is ModuleKetchupFirmware);
 
             Connect(firmware);
-            Connect(DeviceScan());
+            Connect(connectedDevices.Where(i => i != firmware));
 
             if (useState && HasPersistedState())
             {
@@ -351,7 +356,10 @@ namespace Ketchup.Modules
             }
             else
             {
-                firmware.OnInterrupt();
+                if (firmware != null)
+                {
+                    firmware.OnInterrupt();
+                }
             }
 
             _isPowerOn = true;
@@ -384,14 +392,13 @@ namespace Ketchup.Modules
             _dcpu16StateManager = dcpu16StateManager;
         }
 
-        private ModuleKetchupFirmware GetFirmware()
-        {
-            return part.Modules.OfType<ModuleKetchupFirmware>().Single();
-        }
-
         private IEnumerable<IDevice> DeviceScan()
         {
-            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is ModuleKetchupFirmware)).ToList();
+            var connectedGlobalDeviceIds = new HashSet<Guid>(_connections.Select(i => i.GlobalDeviceId));
+            return vessel
+                .Parts
+                .SelectMany(i => i.FindModulesImplementing<IDevice>())
+                .Where(i => connectedGlobalDeviceIds.Contains(i.GlobalDeviceId));
         }
 
         private void Connect(IEnumerable<IDevice> devices)
@@ -404,12 +411,16 @@ namespace Ketchup.Modules
 
         private void Connect(IDevice device)
         {
-            _connectedDevices.Add(device);
+            if (device != null)
+            {
 
-            _dcpu16.OnConnect(device);
-            device.OnConnect(_dcpu16);
+                _connectedDevices.Add(device);
 
-            Debug.Log(String.Format("[Ketchup:Computer] Connected DCPU-16 to {0}", device.FriendlyName));
+                _dcpu16.OnConnect(device);
+                device.OnConnect(_dcpu16);
+
+                Debug.Log(String.Format("[Ketchup:Computer] Connected DCPU-16 to {0}", device.FriendlyName));
+            }
         }
 
         private bool HasPersistedState()

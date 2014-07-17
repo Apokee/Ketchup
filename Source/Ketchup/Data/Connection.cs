@@ -4,17 +4,17 @@ namespace Ketchup.Data
 {
     internal sealed class Connection
     {
-        private readonly string _string;
+        private string _string;
 
         public ConnectionType ConnectionType { get; private set; }
-        public Guid KetchupId { get; private set; }
+        public Guid GlobalDeviceId { get; private set; }
 
-        public Connection(ConnectionType connectionType, Guid ketchupId)
+        public Connection(ConnectionType connectionType, Guid globalDeviceId)
         {
             ConnectionType = connectionType;
-            KetchupId = ketchupId;
+            GlobalDeviceId = globalDeviceId;
 
-            _string = String.Format("{0}:{1}", (byte)connectionType, ketchupId.ToString("N"));
+            SetString();
         }
 
         public Connection(string serialized)
@@ -22,10 +22,17 @@ namespace Ketchup.Data
             var colonIndex = serialized.IndexOf(':');
 
             var connectionType = serialized.Substring(0, colonIndex);
-            var ketchupId = serialized.Substring(colonIndex + 1);
+            var globalDeviceId = serialized.Substring(colonIndex + 1);
 
             ConnectionType = (ConnectionType)Byte.Parse(connectionType);
-            KetchupId = new Guid(ketchupId);
+            GlobalDeviceId = new Guid(globalDeviceId);
+
+            SetString();
+        }
+
+        private void SetString()
+        {
+            _string = String.Format("{0}:{1}", (byte)ConnectionType, GlobalDeviceId.ToString("N"));
         }
 
         public override string ToString()
