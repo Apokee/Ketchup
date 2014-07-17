@@ -55,6 +55,7 @@
     <Compile Include="..\..\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Behaviors\ConnectionManager.cs" />
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />
     <Compile Include="Extensions\DoubleExtensions.cs" />
@@ -76,7 +77,11 @@
     <Compile Include="Modules\ModuleKetchupLem1802.cs" />
     <Compile Include="Modules\ModuleKetchupM35fd.cs" />
     <Compile Include="Modules\ModuleKetchupStop.cs" />
+    <Compile Include="Services\IDebugService.cs" />
+    <Compile Include="Services\LogLevel.cs" />
+    <Compile Include="Services\Service.cs" />
     <Compile Include="Utility\ConfigDictionary.cs" />
+    <Compile Include="Services\DebugService.cs" />
     <Compile Include="Utility\NedReferenceFrame.cs" />
     <Compile Include="Utility\VesselReferenceFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
