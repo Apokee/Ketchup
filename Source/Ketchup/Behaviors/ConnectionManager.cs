@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Ketchup.Api.v0;
+using Ketchup.Modules;
 using UnityEngine;
 using Ketchup.Services;
 
@@ -177,6 +179,19 @@ namespace Ketchup.Behaviors
                 Log(LogLevel.Debug, "RecalculateConnections(): {0} {1} the root",
                     part.partInfo.title, part.parent == null ? "is" : "is not"
                 );
+
+                var computers = part.FindModulesImplementing<ModuleKetchupComputer>();
+                var devices = part.FindModulesImplementing<IDevice>();
+
+                if (computers.Count > 0)
+                {
+                    Log(LogLevel.Debug, "RecalculateConnections(): {0} computer(s) found", computers.Count);
+                }
+
+                if (devices.Count > 0)
+                {
+                    Log(LogLevel.Debug, "RecalculateConnections(): {0} device(s) found", devices.Count);
+                }
             }
 
             _recalculateConnections = false;
