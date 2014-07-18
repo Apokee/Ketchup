@@ -3,6 +3,11 @@
 # Example: "C:/Program Files (x86)/Steam/SteamApps/common/Kerbal Space Program"
 ksp_dir: null
 
+# Executable file to run.
+# Default: KSP.exe
+# Example: "KSP_x64.exe"
+ksp_exe: "KSP.exe"
+
 # Save profile to use.
 # Default: null
 # Example: "Dev"
