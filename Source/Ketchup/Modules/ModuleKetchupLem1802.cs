@@ -116,7 +116,7 @@ namespace Ketchup.Modules
             get { return 0x1802; }
         }
 
-        public Kuid GlobalDeviceId { get; set; }
+        public Port Port { get; set; }
 
         #endregion
 
@@ -245,7 +245,7 @@ namespace Ketchup.Modules
                     _imageScale = imageScale;
                 }
 
-                this.LoadGlobalDeviceId(node);
+                this.LoadDevicePort(node);
             }
         }
 
@@ -261,7 +261,7 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyBorderColorValue, _borderColorValue);
             node.AddValue(ConfigKeyImageScale, _imageScale);
 
-            this.SaveGlobalDeviceId(node);
+            this.SaveDevicePort(node);
         }
 
         public override void OnStart(StartState state)

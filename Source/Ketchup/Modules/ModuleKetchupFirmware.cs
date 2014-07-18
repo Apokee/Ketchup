@@ -96,7 +96,7 @@ namespace Ketchup.Modules
             get { return 0x0001; }
         }
 
-        public Kuid GlobalDeviceId { get; set; }
+        public Port Port { get; set; }
 
         #endregion
 
@@ -185,7 +185,7 @@ namespace Ketchup.Modules
                     _firmware = new FirmwareRom(firmwareName, firmwareData);
                 }
 
-                this.LoadGlobalDeviceId(node);
+                this.LoadDevicePort(node);
             }
         }
 
@@ -198,7 +198,7 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyFirmwareName, _firmware.Name);
             node.AddValue(ConfigKeyFirmwareData, _firmware.Serialize());
 
-            this.SaveGlobalDeviceId(node);
+            this.SaveDevicePort(node);
         }
 
         #endregion

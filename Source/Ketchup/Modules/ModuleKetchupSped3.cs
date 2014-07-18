@@ -70,7 +70,7 @@ namespace Ketchup.Modules
             get { return 0x0003; }
         }
 
-        public Kuid GlobalDeviceId { get; set; }
+        public Port Port { get; set; }
 
         #endregion
 
@@ -173,7 +173,7 @@ namespace Ketchup.Modules
                     _currentRotation = currentRotation;
                 }
 
-                this.LoadGlobalDeviceId(node);
+                this.LoadDevicePort(node);
             }
         }
 
@@ -186,7 +186,7 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyTargetRotation, _targetRotation);
             node.AddValue(ConfigKeyCurrentRotation, _currentRotation);
 
-            this.SaveGlobalDeviceId(node);
+            this.SaveDevicePort(node);
         }
 
         public override void OnUpdate()

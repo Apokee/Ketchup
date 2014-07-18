@@ -1,26 +1,28 @@
-﻿using System;
-using Ketchup.Api.v0;
+﻿using Ketchup.Api.v0;
 
 namespace Ketchup.Extensions
 {
     public static class DeviceExtensions
     {
-        private const string ConfigKeyGlobalDeviceId = "GlobalDeviceId";
+        private const string ConfigNodeDevicePort = "DEVICE_PORT";
 
-        public static void LoadGlobalDeviceId(this IDevice device, ConfigNode node)
+        public static void LoadDevicePort(this IDevice device, ConfigNode node)
         {
-            var connectionId = node.GetValue(ConfigKeyGlobalDeviceId);
-            if (!String.IsNullOrEmpty(connectionId))
+            var devicePortNode = node.GetNode(ConfigNodeDevicePort);
+            if (devicePortNode != null)
             {
-                device.GlobalDeviceId = new Kuid(connectionId);
+                device.Port = new Port(devicePortNode);
             }
         }
 
-        public static void SaveGlobalDeviceId(this IDevice device, ConfigNode node)
+        public static void SaveDevicePort(this IDevice device, ConfigNode node)
         {
-            if (device.GlobalDeviceId != null)
+            if (device.Port != null)
             {
-                node.AddValue(ConfigKeyGlobalDeviceId, device.GlobalDeviceId.ToString());
+                var devicePortNode = new ConfigNode(ConfigNodeDevicePort);
+                device.Port.Save(devicePortNode);
+
+                node.AddNode(devicePortNode);
             }
         }
     }

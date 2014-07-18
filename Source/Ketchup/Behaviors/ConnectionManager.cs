@@ -131,29 +131,29 @@ namespace Ketchup.Behaviors
 
             if (_mode == Mode.Flight)
             {
-                var kuidUpdates = new Dictionary<Kuid, Kuid>();
+                var portUpdates = new Dictionary<Port, Port>();
 
                 var computers = vessel.Parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
                 var devices = vessel.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
 
-                foreach (var device in devices.Where(device => device.GlobalDeviceId.Scope == KuidScope.Editor))
+                foreach (var device in devices.Where(device => device.Port.Scope == PortScope.Craft))
                 {
-                    var oldKuid = device.GlobalDeviceId;
-                    var newKuid = new Kuid(KuidScope.Flight, Guid.NewGuid());
+                    var oldPort = device.Port;
+                    var newPort = new Port(PortScope.Persistence, Guid.NewGuid());
 
-                    Log(LogLevel.Debug, "{0} has a GlobalDeviceId with Editor scope, rewriting from {1} to {2}",
+                    Log(LogLevel.Debug, "{0} has a Port with Craft scope, rewriting from {1} to {2}",
                         device.FriendlyName,
-                        oldKuid,
-                        newKuid
+                        oldPort,
+                        newPort
                     );
 
-                    kuidUpdates.Add(oldKuid, newKuid);
-                    device.GlobalDeviceId = newKuid;
+                    portUpdates.Add(oldPort, newPort);
+                    device.Port = newPort;
                 }
 
                 foreach (var computer in computers)
                 {
-                    computer.UpdateConnections(kuidUpdates);
+                    computer.UpdateDeviceConnections(portUpdates);
                 }
             }
         }
@@ -228,16 +228,17 @@ namespace Ketchup.Behaviors
                         {
                             var computer = computers[0];
 
-                            computer.ResetConnections();
+                            computer.ResetDeviceConnections();
                             foreach (var device in devices)
                             {
-                                if (device.GlobalDeviceId == null)
+                                if (device.Port == null)
                                 {
-                                    device.GlobalDeviceId = new Kuid(KuidScope.Editor, Guid.NewGuid());
+                                    device.Port = new Port(PortScope.Craft, Guid.NewGuid());
                                 }
 
-                                computer
-                                    .AddConnection(new Connection(ConnectionType.Automatic, device.GlobalDeviceId));
+                                computer.AddDeviceConnection(
+                                    new DeviceConnection(DeviceConnectionType.Automatic, device.Port)
+                                );
                             }
                         }
                         else

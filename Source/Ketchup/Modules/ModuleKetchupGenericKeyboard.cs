@@ -179,7 +179,7 @@ namespace Ketchup.Modules
             get { return 0x0001; }
         }
 
-        public Kuid GlobalDeviceId { get; set; }
+        public Port Port { get; set; }
 
         #endregion
         
@@ -305,7 +305,7 @@ namespace Ketchup.Modules
                     _isAttached = isAttached;
                 }
 
-                this.LoadGlobalDeviceId(node);
+                this.LoadDevicePort(node);
             }
         }
 
@@ -333,7 +333,7 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyInterruptMessage, _interruptMessage);
             node.AddValue(ConfigKeyIsAttached, _isAttached);
 
-            this.SaveGlobalDeviceId(node);
+            this.SaveDevicePort(node);
         }
 
         #endregion

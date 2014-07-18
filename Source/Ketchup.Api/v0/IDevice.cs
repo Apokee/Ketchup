@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Ketchup.Api.v0
+﻿namespace Ketchup.Api.v0
 {
     /// <summary>
     /// Hardware device that may be connected to an IDcpu16.
@@ -27,13 +25,7 @@ namespace Ketchup.Api.v0
         /// </summary>
         ushort Version { get; }
 
-        /// <summary>
-        /// Identifier for a particular inatance of this device.
-        /// </summary>
-        /// <remarks>
-        /// Implementors should save and restore this identifier unless its value is <see cref="Guid.Empty"/>.
-        /// </remarks>
-        Kuid GlobalDeviceId { get; set; }
+        Port Port { get; set; }
 
         /// <summary>
         /// Called when the device is connected to the CPU. CPU should be notified of connection separately. Behavior

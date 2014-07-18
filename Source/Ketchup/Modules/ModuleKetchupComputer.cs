@@ -7,7 +7,6 @@ using Ketchup.Data;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
-using Ketchup.Services;
 using Tomato;
 using UnityEngine;
 
@@ -25,7 +24,7 @@ namespace Ketchup.Modules
         private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyDcpu16State = "Dcpu16State";
         private const string ConfigKeyIsPowerOn = "IsPowerOn";
-        private const string ConfigKeyConnection = "Connection";
+        private const string ConfigNodeConnection = "DEVICE_CONNECTION";
 
         private const uint ConfigVersion = 1;
 
@@ -59,7 +58,7 @@ namespace Ketchup.Modules
 
         private string _dcpu16State;
 
-        private List<Connection> _connections = new List<Connection>();
+        private List<DeviceConnection> _deviceConnections = new List<DeviceConnection>();
 
         #endregion
 
@@ -124,22 +123,9 @@ namespace Ketchup.Modules
 
                 _dcpu16State = node.GetValue(ConfigKeyDcpu16State);
 
-                foreach (var rawConnection in node.GetValues(ConfigKeyConnection))
+                foreach (var deviceConnectionNode in node.GetNodes(ConfigNodeConnection))
                 {
-                    try
-                    {
-                        _connections.Add(new Connection(rawConnection));
-                    }
-                    catch (Exception e)
-                    {
-                        Service.Debug.Log(
-                            "ModuleKetchupComputer",
-                            LogLevel.Error,
-                            "Could not parse Connection: '{0}' due to exception:\n{1}",
-                            rawConnection,
-                            e.ToString()
-                        );
-                    }
+                    _deviceConnections.Add(new DeviceConnection(deviceConnectionNode));
                 }
             }
         }
@@ -160,9 +146,13 @@ namespace Ketchup.Modules
                 node.AddValue(ConfigKeyDcpu16State, state);
             }
 
-            foreach (var connection in _connections)
+            foreach (var deviceConnection in _deviceConnections)
             {
-                node.AddValue(ConfigKeyConnection, connection.ToString());
+                var deviceConnectionNode = new ConfigNode(ConfigNodeConnection);
+
+                deviceConnection.Save(deviceConnectionNode);
+
+                node.AddNode(deviceConnectionNode);
             }
         }
 
@@ -218,20 +208,20 @@ namespace Ketchup.Modules
 
         #endregion
 
-        public void AddConnection(Connection connection)
+        public void AddDeviceConnection(DeviceConnection deviceConnection)
         {
-            _connections.Add(connection);
+            _deviceConnections.Add(deviceConnection);
         }
 
-        public void ResetConnections()
+        public void ResetDeviceConnections()
         {
-            _connections.Clear();
+            _deviceConnections.Clear();
         }
 
-        public void UpdateConnections(Dictionary<Kuid, Kuid> updates)
+        public void UpdateDeviceConnections(Dictionary<Port, Port> updates)
         {
-            _connections = _connections
-                .Select(i => updates.ContainsKey(i.Kuid) ? new Connection(i.ConnectionType, updates[i.Kuid]) : i)
+            _deviceConnections = _deviceConnections
+                .Select(i => updates.ContainsKey(i.Port) ? new DeviceConnection(i.Type, updates[i.Port]) : i)
                 .ToList();
         }
 
@@ -401,11 +391,11 @@ namespace Ketchup.Modules
 
         private IEnumerable<IDevice> DeviceScan()
         {
-            var connectedGlobalDeviceIds = new HashSet<Kuid>(_connections.Select(i => i.Kuid));
+            var connectedGlobalDeviceIds = new HashSet<Port>(_deviceConnections.Select(i => i.Port));
             return vessel
                 .Parts
                 .SelectMany(i => i.FindModulesImplementing<IDevice>())
-                .Where(i => connectedGlobalDeviceIds.Contains(i.GlobalDeviceId));
+                .Where(i => connectedGlobalDeviceIds.Contains(i.Port));
         }
 
         private void Connect(IEnumerable<IDevice> devices)

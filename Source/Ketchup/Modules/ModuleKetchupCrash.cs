@@ -141,7 +141,7 @@ namespace Ketchup.Modules
             get { return 0x0001; }
         }
 
-        public Kuid GlobalDeviceId { get; set; }
+        public Port Port { get; set; }
 
         #endregion
 
@@ -284,12 +284,12 @@ namespace Ketchup.Modules
 
         public override void OnLoad(ConfigNode node)
         {
-            this.LoadGlobalDeviceId(node);
+            this.LoadDevicePort(node);
         }
 
         public override void OnSave(ConfigNode node)
         {
-            this.SaveGlobalDeviceId(node);
+            this.SaveDevicePort(node);
         }
 
         public override void OnStart(StartState state)

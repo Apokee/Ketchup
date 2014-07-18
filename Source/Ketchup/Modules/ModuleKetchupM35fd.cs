@@ -98,7 +98,7 @@ namespace Ketchup.Modules
             get { return 0x000b; }
         }
 
-        public Kuid GlobalDeviceId { get; set; }
+        public Port Port { get; set; }
 
         #endregion
 
@@ -233,7 +233,7 @@ namespace Ketchup.Modules
                     }
                 }
 
-                this.LoadGlobalDeviceId(node);
+                this.LoadDevicePort(node);
             }
         }
 
@@ -255,7 +255,7 @@ namespace Ketchup.Modules
                 diskNode.AddValue(ConfigKeyData, _allLoadedDisks[i].Serialize());
             }
 
-            this.SaveGlobalDeviceId(node);
+            this.SaveDevicePort(node);
         }
 
         #endregion
