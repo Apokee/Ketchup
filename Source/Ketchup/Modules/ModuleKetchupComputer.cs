@@ -334,7 +334,7 @@ namespace Ketchup.Modules
         private void TurnOn(bool coldStart)
         {
             InitializeDcpu16();
-            DeviceScan(coldStart);
+            InitializeDevices(coldStart);
 
             if (coldStart || !HasPersistedState())
             {
@@ -379,7 +379,7 @@ namespace Ketchup.Modules
             _dcpu16StateManager = dcpu16StateManager;
         }
 
-        private void DeviceScan(bool coldStart)
+        private void InitializeDevices(bool coldStart)
         {
             var connectedGlobalDeviceIds = new HashSet<Port>(_deviceConnections.Select(i => i.Port));
             var connectedDevices = vessel

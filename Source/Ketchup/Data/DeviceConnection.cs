@@ -50,7 +50,7 @@ namespace Ketchup.Data
             node.AddValue(ConfigKeyType, Type.ToString());
             if (HardwareId != null)
             {
-                node.AddValue(ConfigKeyType, HardwareId.Value.ToString(CultureInfo.InvariantCulture));
+                node.AddValue(ConfigKeyHardwareId, HardwareId.Value.ToString(CultureInfo.InvariantCulture));
             }
             node.AddNode(devicePortNode);
         }
