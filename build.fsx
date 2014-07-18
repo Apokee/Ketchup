@@ -39,6 +39,19 @@ let kspDir = lazy (
     )
 )
 
+let kspExe = lazy (
+    if config.Documents.Count = 0 then
+        "KSP.exe"
+    else (
+        let mapping = config.Documents.[0].RootNode :?> YamlMappingNode
+        let node = new YamlScalarNode("ksp_exe")
+        if mapping.Children.ContainsKey(node) then
+            mapping.Children.[node].ToString()
+        else
+            "KSP.exe"
+    )
+)
+
 let kspProfile = lazy (
     if config.Documents.Count = 0 then
         raise (System.Exception("profile not specified in configuration"))
@@ -145,7 +158,7 @@ Target "Run" (fun _ ->
     // TODO: Needs to be executed with Mono on Unix-like systems
     // TODO: this should be asynchronous but FAKE kills the process if you use StartProcess
     ExecProcess (fun psi ->
-        psi.FileName <- kspDir.Force() + "/KSP.exe"
+        psi.FileName <- kspDir.Force() + "/" + kspExe.Force()
         psi.WorkingDirectory <- kspDir.Force()
     ) (System.TimeSpan.FromMinutes 60.0) |> ignore
 )
