@@ -58,6 +58,7 @@ namespace Ketchup.Modules
 
         private string _dcpu16State;
 
+        // TODO: We maintain both a list of devices and device connections, this should be simplified
         private List<DeviceConnection> _deviceConnections = new List<DeviceConnection>();
 
         #endregion
@@ -218,13 +219,6 @@ namespace Ketchup.Modules
             _deviceConnections.Clear();
         }
 
-        public void UpdateDeviceConnections(Dictionary<Port, Port> updates)
-        {
-            _deviceConnections = _deviceConnections
-                .Select(i => updates.ContainsKey(i.Port) ? new DeviceConnection(i.Type, updates[i.Port]) : i)
-                .ToList();
-        }
-
         #region Helper Methods
 
         private void TimeWarpThrottleIfNecessary()
@@ -340,23 +334,19 @@ namespace Ketchup.Modules
         private void TurnOn(bool coldStart)
         {
             InitializeDcpu16();
+            DeviceScan(coldStart);
 
-            var connectedDevices = DeviceScan().ToList();
-            var firmware = connectedDevices.FirstOrDefault(i => i is ModuleKetchupFirmware);
-
-            Connect(firmware);
-            Connect(connectedDevices.Where(i => i != firmware));
-
-            if (!coldStart && HasPersistedState())
+            if (coldStart || !HasPersistedState())
             {
-                _dcpu16StateManager.Load(_dcpu16State);
+                if (_connectedDevices.Count > 0)
+                {
+                    // The first device *should* be the firmware device unless the user does something screwy
+                    _connectedDevices[0].OnInterrupt();
+                }
             }
             else
             {
-                if (firmware != null)
-                {
-                    firmware.OnInterrupt();
-                }
+                _dcpu16StateManager.Load(_dcpu16State);
             }
 
             _isPowerOn = true;
@@ -389,35 +379,77 @@ namespace Ketchup.Modules
             _dcpu16StateManager = dcpu16StateManager;
         }
 
-        private IEnumerable<IDevice> DeviceScan()
+        private void DeviceScan(bool coldStart)
         {
             var connectedGlobalDeviceIds = new HashSet<Port>(_deviceConnections.Select(i => i.Port));
-            return vessel
+            var connectedDevices = vessel
                 .Parts
                 .SelectMany(i => i.FindModulesImplementing<IDevice>())
-                .Where(i => connectedGlobalDeviceIds.Contains(i.Port));
-        }
+                .Where(i => connectedGlobalDeviceIds.Contains(i.Port))
+                .ToList();
 
-        private void Connect(IEnumerable<IDevice> devices)
-        {
-            foreach (var device in devices)
+            var orderedDevices = new List<IDevice>();
+
+            if (coldStart)
             {
-                Connect(device);
+                var firmware = connectedDevices.FirstOrDefault(i => i is ModuleKetchupFirmware);
+                var others = connectedDevices.Where(i => i != firmware);
+
+
+                if (firmware != null)
+                {
+                    orderedDevices.Add(firmware);
+                }
+
+                orderedDevices.AddRange(others);
+
+                var newConnections = new List<DeviceConnection>();
+                for (ushort i = 0; i < orderedDevices.Count; i++)
+                {
+                    var device = orderedDevices[i];
+                    var connection = _deviceConnections.Single(c => c.Port == device.Port);
+
+                    var port = connection.Port;
+                    if (port.Scope == PortScope.Craft)
+                    {
+                        port = new Port(PortScope.Persistence, Guid.NewGuid());
+                        device.Port = port;
+                    }
+
+                    newConnections.Add(new DeviceConnection(connection.Type, port, i));
+                }
+                _deviceConnections = newConnections;
+            }
+            else
+            {
+                orderedDevices.AddRange(
+                    _deviceConnections
+                        .Where(i => i.HardwareId != null)
+                        .Select(i => new { 
+                            HardwareId = i.HardwareId.Value,
+                            Device = connectedDevices.Single(d => d.Port == i.Port)
+                        })
+                        .OrderBy(i => i.HardwareId)
+                        .Select(i => i.Device)
+                );
+            }
+
+            foreach (var device in orderedDevices)
+            {
+                if (device != null)
+                {
+                    _connectedDevices.Add(device);
+                    TriggerConnection(device);
+                }
             }
         }
 
-        private void Connect(IDevice device)
+        private void TriggerConnection(IDevice device)
         {
-            if (device != null)
-            {
+            _dcpu16.OnConnect(device);
+            device.OnConnect(_dcpu16);
 
-                _connectedDevices.Add(device);
-
-                _dcpu16.OnConnect(device);
-                device.OnConnect(_dcpu16);
-
-                Debug.Log(String.Format("[Ketchup:Computer] Connected DCPU-16 to {0}", device.FriendlyName));
-            }
+            Debug.Log(String.Format("[Ketchup:Computer] Connected DCPU-16 to {0}", device.FriendlyName));
         }
 
         private bool HasPersistedState()

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Ketchup.Api.v0;
 using Ketchup.Data;
 using Ketchup.Modules;
@@ -83,7 +82,6 @@ namespace Ketchup.Behaviors
 
                 GameEvents.onPartAttach.Add(OnPartAttach);
                 GameEvents.onPartRemove.Add(OnPartRemove);
-                GameEvents.onVesselCreate.Add(OnVesselCreate);
             }
         }
 
@@ -123,39 +121,6 @@ namespace Ketchup.Behaviors
             Log(LogLevel.Debug, "OnPartRemove()");
 
             PrepareConnectionRecalculation();
-        }
-
-        private void OnVesselCreate(Vessel vessel)
-        {
-            Log(LogLevel.Debug, "OnVesselCreate()");
-
-            if (_mode == Mode.Flight)
-            {
-                var portUpdates = new Dictionary<Port, Port>();
-
-                var computers = vessel.Parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
-                var devices = vessel.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
-
-                foreach (var device in devices.Where(device => device.Port.Scope == PortScope.Craft))
-                {
-                    var oldPort = device.Port;
-                    var newPort = new Port(PortScope.Persistence, Guid.NewGuid());
-
-                    Log(LogLevel.Debug, "{0} has a Port with Craft scope, rewriting from {1} to {2}",
-                        device.FriendlyName,
-                        oldPort,
-                        newPort
-                    );
-
-                    portUpdates.Add(oldPort, newPort);
-                    device.Port = newPort;
-                }
-
-                foreach (var computer in computers)
-                {
-                    computer.UpdateDeviceConnections(portUpdates);
-                }
-            }
         }
 
         private void EditorCheckForFirstPart()
@@ -232,12 +197,12 @@ namespace Ketchup.Behaviors
                             foreach (var device in devices)
                             {
                                 if (device.Port == null)
-                                {
+                                {   // TODO: When there is a common DeviceModule base class, this should be moved
                                     device.Port = new Port(PortScope.Craft, Guid.NewGuid());
                                 }
 
                                 computer.AddDeviceConnection(
-                                    new DeviceConnection(DeviceConnectionType.Automatic, device.Port)
+                                    new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
                                 );
                             }
                         }
