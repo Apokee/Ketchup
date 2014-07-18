@@ -84,7 +84,7 @@ namespace Ketchup.Modules
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
 
                 if (_isPowerOn)
-                    TurnOn(useState: true);
+                    TurnOn(coldStart: false);
                 else
                     TurnOff();
             }
@@ -334,10 +334,10 @@ namespace Ketchup.Modules
             if (_isPowerOn)
                 TurnOff();
             else
-                TurnOn(useState: false);
+                TurnOn(coldStart: true);
         }
 
-        private void TurnOn(bool useState)
+        private void TurnOn(bool coldStart)
         {
             InitializeDcpu16();
 
@@ -347,7 +347,7 @@ namespace Ketchup.Modules
             Connect(firmware);
             Connect(connectedDevices.Where(i => i != firmware));
 
-            if (useState && HasPersistedState())
+            if (!coldStart && HasPersistedState())
             {
                 _dcpu16StateManager.Load(_dcpu16State);
             }
