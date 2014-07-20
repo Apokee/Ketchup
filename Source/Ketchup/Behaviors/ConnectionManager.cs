@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ketchup.Api.v0;
 using Ketchup.Data;
 using Ketchup.Modules;
@@ -82,6 +83,7 @@ namespace Ketchup.Behaviors
 
                 GameEvents.onPartAttach.Add(OnPartAttach);
                 GameEvents.onPartRemove.Add(OnPartRemove);
+                GameEvents.OnVesselRollout.Add(OnVesselRollout);
             }
         }
 
@@ -100,6 +102,7 @@ namespace Ketchup.Behaviors
             {
                 Log(LogLevel.Debug, "OnDestroy()");
 
+                GameEvents.OnVesselRollout.Remove(OnVesselRollout);
                 GameEvents.onPartRemove.Remove(OnPartRemove);
                 GameEvents.onPartAttach.Remove(OnPartAttach);
             }
@@ -121,6 +124,30 @@ namespace Ketchup.Behaviors
             Log(LogLevel.Debug, "OnPartRemove()");
 
             PrepareConnectionRecalculation();
+        }
+
+        private void OnVesselRollout(ShipConstruct data)
+        {
+            Log(LogLevel.Debug, "OnVesselRollout()");
+
+            var computers = data.Parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
+            var devices = data.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
+
+            var updates = new Dictionary<Port, Port>();
+
+            foreach(var device in devices.Where(i => i.Port.Scope == PortScope.Craft))
+            {
+                var oldPort = device.Port;
+                var newPort = new Port(PortScope.Persistence, Guid.NewGuid());
+
+                device.Port = newPort;
+                updates[oldPort] = newPort;
+            }
+
+            foreach (var computer in computers)
+            {
+                computer.UpdateDeviceConnections(updates);
+            }
         }
 
         private void EditorCheckForFirstPart()

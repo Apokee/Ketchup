@@ -59,6 +59,7 @@ namespace Ketchup.Modules
         private string _dcpu16State;
 
         // TODO: We maintain both a list of devices and device connections, this should be simplified
+        // TODO: DeviceConnections do too much, they represent both connections that have and do not have a HWID
         private List<DeviceConnection> _deviceConnections = new List<DeviceConnection>();
 
         #endregion
@@ -217,6 +218,13 @@ namespace Ketchup.Modules
         public void ResetDeviceConnections()
         {
             _deviceConnections.Clear();
+        }
+
+        public void UpdateDeviceConnections(Dictionary<Port, Port> updates)
+        {
+            _deviceConnections = _deviceConnections
+                .Select(i => updates.ContainsKey(i.Port) ? new DeviceConnection(i.Type, updates[i.Port], null) : i)
+                .ToList();
         }
 
         #region Helper Methods
@@ -412,14 +420,7 @@ namespace Ketchup.Modules
                     var device = orderedDevices[i];
                     var connection = _deviceConnections.Single(c => c.Port == device.Port);
 
-                    var port = connection.Port;
-                    if (port.Scope == PortScope.Craft)
-                    {
-                        port = new Port(PortScope.Persistence, Guid.NewGuid());
-                        device.Port = port;
-                    }
-
-                    newConnections.Add(new DeviceConnection(connection.Type, port, i));
+                    newConnections.Add(new DeviceConnection(connection.Type, connection.Port, i));
                 }
                 _deviceConnections = newConnections;
             }
