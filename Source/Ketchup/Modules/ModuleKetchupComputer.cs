@@ -223,6 +223,9 @@ namespace Ketchup.Modules
 
         private void TimeWarpThrottleIfNecessary()
         {
+            // TODO: Possibly use this to control time warp
+            //HighLogic.CurrentGame.Parameters.Flight.CanTimeWarpHigh = false;
+
             if (
                 (_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted())
                 && TimeWarp.WarpMode == TimeWarp.Modes.HIGH
