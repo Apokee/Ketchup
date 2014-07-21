@@ -227,36 +227,23 @@ namespace Ketchup.Behaviors
             {
                 case Mode.Editor:
                     Log(LogLevel.Debug, "RecalculateConnections(): In Editor, proceeding");
-                    foreach (var part in parts)
+
+                    var computers = GetComputers(parts).ToList();
+                    var devices = GetDevices(parts);
+
+                    var computer = computers[0];
+
+                    computer.ResetDeviceConnections();
+                    foreach (var device in devices)
                     {
-                        Log(LogLevel.Debug, "RecalculateConnections(): {0} {1} the root",
-                            part.partInfo.title, part.parent == null ? "is" : "is not"
-                            );
-
-                        var computers = part.FindModulesImplementing<ModuleKetchupComputer>();
-                        var devices = part.FindModulesImplementing<IDevice>();
-
-                        if (computers.Count == 1)
-                        {
-                            var computer = computers[0];
-
-                            computer.ResetDeviceConnections();
-                            foreach (var device in devices)
-                            {
-                                if (device.Port == null)
-                                {   // TODO: When there is a common DeviceModule base class, this should be moved
-                                    device.Port = new Port(PortScope.Craft, Guid.NewGuid());
-                                }
-
-                                computer.AddDeviceConnection(
-                                    new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
-                                );
-                            }
+                        if (device.Port == null)
+                        {   // TODO: When there is a common DeviceModule base class, this should be moved
+                            device.Port = new Port(PortScope.Craft, Guid.NewGuid());
                         }
-                        else
-                        {
 
-                        }
+                        computer.AddDeviceConnection(
+                            new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
+                        );
                     }
                     break;
                 case Mode.Flight:
