@@ -235,7 +235,7 @@ namespace Ketchup.Modules
 
             var missingDevices = _connectedDevices.Except(vesselDevices).ToList();
             var missingPorts = new HashSet<Port>(missingDevices.Select(i => i.Port));
-            var missingConnections = _deviceConnections.Where(i => missingPorts.Contains(i.Port));
+            var missingConnections = _deviceConnections.Where(i => missingPorts.Contains(i.Port)).ToList();
 
 
             foreach(var missingConnection in missingConnections)
