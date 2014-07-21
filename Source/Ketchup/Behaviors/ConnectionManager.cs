@@ -87,6 +87,7 @@ namespace Ketchup.Behaviors
                 GameEvents.onStageSeparation.Add(OnStageSeperation);
                 GameEvents.onJointBreak.Add(OnJointBreak);
                 GameEvents.onPartDestroyed.Add(OnPartDestroyed);
+                GameEvents.onVesselWasModified.Add(OnVesselWasModified);
             }
         }
 
@@ -105,6 +106,7 @@ namespace Ketchup.Behaviors
             {
                 Log(LogLevel.Debug, "OnDestroy()");
 
+                GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
                 GameEvents.onPartDestroyed.Remove(OnPartDestroyed);
                 GameEvents.onJointBreak.Remove(OnJointBreak);
                 GameEvents.onStageSeparation.Remove(OnStageSeperation);
@@ -176,6 +178,13 @@ namespace Ketchup.Behaviors
         private void OnPartDestroyed(Part data)
         {
             Log(LogLevel.Debug, "OnPartDestroyed()");
+
+            EnsureConnectivityOfUnpackedVessels();
+        }
+
+        private void OnVesselWasModified(Vessel data)
+        {
+            Log(LogLevel.Debug, "OnVesselWasModified()");
 
             EnsureConnectivityOfUnpackedVessels();
         }
