@@ -7,6 +7,7 @@ using Ketchup.Data;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
+using Ketchup.Services;
 using Tomato;
 using UnityEngine;
 
@@ -60,6 +61,7 @@ namespace Ketchup.Modules
 
         // TODO: We maintain both a list of devices and device connections, this should be simplified
         // TODO: DeviceConnections do too much, they represent both connections that have and do not have a HWID
+        // TODO: Tomato also maintains its own list of devices...
         private List<DeviceConnection> _deviceConnections = new List<DeviceConnection>();
 
         #endregion
@@ -225,6 +227,45 @@ namespace Ketchup.Modules
             _deviceConnections = _deviceConnections
                 .Select(i => updates.ContainsKey(i.Port) ? new DeviceConnection(i.Type, updates[i.Port], null) : i)
                 .ToList();
+        }
+
+        public void EnsureDeviceConnections()
+        {
+            var vesselDevices = vessel.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
+
+            var missingDevices = _connectedDevices.Except(vesselDevices).ToList();
+            var missingPorts = new HashSet<Port>(missingDevices.Select(i => i.Port));
+            var missingConnections = _deviceConnections.Where(i => missingPorts.Contains(i.Port));
+
+
+            foreach(var missingConnection in missingConnections)
+            {
+                Service.Debug.Log(
+                    "ModuleKetchupComputer", LogLevel.Debug, "Removing missing connection: {0}", missingConnection
+                );
+                _deviceConnections.Remove(missingConnection);
+            }
+
+            if (_isPowerOn)
+            {
+                foreach (var missingDevice in missingDevices)
+                {
+                    var index = _connectedDevices.IndexOf(missingDevice);
+
+                    if (index >= 0)
+                    {
+                        Service.Debug.Log("ModuleKetchupComputer", LogLevel.Debug,
+                            "{0} with HWID {1} was disconnected",
+                            missingDevice.FriendlyName,
+                            index
+                        );
+
+                        _dcpu16.OnDisconnect((ushort)index);
+                        missingDevice.OnDisconnect();
+                        _connectedDevices[index] = new DisconnectedDevice();
+                    }
+                }
+            }
         }
 
         #region Helper Methods

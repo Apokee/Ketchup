@@ -28,7 +28,7 @@ namespace Ketchup.Data
 
         public override string ToString()
         {
-            return String.Format("{0}:{1}", (byte)Type, Port);
+            return String.Format("{0},{1}", (byte)Type, Port);
         }
 
         public void Load(ConfigNode node)

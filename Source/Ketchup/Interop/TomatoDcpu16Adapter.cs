@@ -125,7 +125,7 @@ namespace Ketchup.Interop
 
         public void OnDisconnect(ushort deviceIndex)
         {
-            _dcpu16.Devices[deviceIndex] = null;
+            _dcpu16.Devices[deviceIndex] = new TomatoDeviceAdapter(new DisconnectedDevice());
         }
 
         public int Execute(int cyclesToExecute)

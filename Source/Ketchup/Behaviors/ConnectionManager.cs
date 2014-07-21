@@ -84,6 +84,7 @@ namespace Ketchup.Behaviors
                 GameEvents.onPartAttach.Add(OnPartAttach);
                 GameEvents.onPartRemove.Add(OnPartRemove);
                 GameEvents.OnVesselRollout.Add(OnVesselRollout);
+                GameEvents.onStageSeparation.Add(OnStageSeperation);
             }
         }
 
@@ -102,6 +103,7 @@ namespace Ketchup.Behaviors
             {
                 Log(LogLevel.Debug, "OnDestroy()");
 
+                GameEvents.onStageSeparation.Remove(OnStageSeperation);
                 GameEvents.OnVesselRollout.Remove(OnVesselRollout);
                 GameEvents.onPartRemove.Remove(OnPartRemove);
                 GameEvents.onPartAttach.Remove(OnPartAttach);
@@ -149,6 +151,21 @@ namespace Ketchup.Behaviors
                 foreach (var computer in computers)
                 {
                     computer.UpdateDeviceConnections(updates);
+                }
+            }
+        }
+
+        private void OnStageSeperation(EventReport data)
+        {
+            Log(LogLevel.Debug, "OnStageSeperation(): {0}", data.origin.partInfo.title);
+
+            if (_mode == Mode.Flight)
+            {
+                foreach (var vessel in FlightGlobals.Vessels.Where(i => !i.packed))
+                {
+                    Log(LogLevel.Debug, "Found unpacked vessel: {0}", vessel.RevealName());
+
+                    EnsureConnectivity(vessel.Parts);
                 }
             }
         }
@@ -250,6 +267,16 @@ namespace Ketchup.Behaviors
             _recalculateConnections = false;
         }
 
+        private static void EnsureConnectivity(IEnumerable<Part> parts)
+        {
+            var computers = GetComputers(parts);
+
+            foreach (var computer in computers)
+            {
+                computer.EnsureDeviceConnections();
+            }
+        }
+
         #endregion
 
         #region Helper Methods
@@ -257,6 +284,16 @@ namespace Ketchup.Behaviors
         private static void Log(LogLevel level, string message, params object[] args)
         {
             Service.Debug.Log("ConnectionManager", level, message, args);
+        }
+
+        private static IEnumerable<ModuleKetchupComputer> GetComputers(IEnumerable<Part> parts)
+        {
+            return parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
+        }
+
+        private static IEnumerable<IDevice> GetDevices(IEnumerable<Part> parts)
+        {
+            return parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
         }
 
         #endregion

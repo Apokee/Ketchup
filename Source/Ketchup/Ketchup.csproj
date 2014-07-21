@@ -66,6 +66,7 @@
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\VesselExtensions.cs" />
     <Compile Include="Extensions\MiscExtensions.cs" />
+    <Compile Include="Interop\DisconnectedDevice.cs" />
     <Compile Include="Modules\ModuleKetchupComputer.cs" />
     <Compile Include="Modules\ModuleKetchupCrash.cs" />
     <Compile Include="Modules\ModuleKetchupFirmware.cs" />
