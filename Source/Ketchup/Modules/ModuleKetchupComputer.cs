@@ -233,7 +233,10 @@ namespace Ketchup.Modules
         {
             var vesselDevices = vessel.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
 
-            var missingDevices = _connectedDevices.Except(vesselDevices).ToList();
+            var missingDevices = _connectedDevices
+                .Where(i => !(i is DisconnectedDevice))
+                .Except(vesselDevices)
+                .ToList();
             var missingPorts = new HashSet<Port>(missingDevices.Select(i => i.Port));
             var missingConnections = _deviceConnections.Where(i => missingPorts.Contains(i.Port)).ToList();
 

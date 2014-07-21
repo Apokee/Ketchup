@@ -85,6 +85,8 @@ namespace Ketchup.Behaviors
                 GameEvents.onPartRemove.Add(OnPartRemove);
                 GameEvents.OnVesselRollout.Add(OnVesselRollout);
                 GameEvents.onStageSeparation.Add(OnStageSeperation);
+                GameEvents.onJointBreak.Add(OnJointBreak);
+                GameEvents.onPartDestroyed.Add(OnPartDestroyed);
             }
         }
 
@@ -103,6 +105,8 @@ namespace Ketchup.Behaviors
             {
                 Log(LogLevel.Debug, "OnDestroy()");
 
+                GameEvents.onPartDestroyed.Remove(OnPartDestroyed);
+                GameEvents.onJointBreak.Remove(OnJointBreak);
                 GameEvents.onStageSeparation.Remove(OnStageSeperation);
                 GameEvents.OnVesselRollout.Remove(OnVesselRollout);
                 GameEvents.onPartRemove.Remove(OnPartRemove);
@@ -159,6 +163,25 @@ namespace Ketchup.Behaviors
         {
             Log(LogLevel.Debug, "OnStageSeperation(): {0}", data.origin.partInfo.title);
 
+            EnsureConnectivityOfUnpackedVessels();
+        }
+
+        private void OnJointBreak(EventReport data)
+        {
+            Log(LogLevel.Debug, "OnJointBreak(): {0}", data.origin.partInfo.title);
+
+            EnsureConnectivityOfUnpackedVessels();
+        }
+
+        private void OnPartDestroyed(Part data)
+        {
+            Log(LogLevel.Debug, "OnPartDestroyed()");
+
+            EnsureConnectivityOfUnpackedVessels();
+        }
+
+        private void EnsureConnectivityOfUnpackedVessels()
+        {
             if (_mode == Mode.Flight)
             {
                 foreach (var vessel in FlightGlobals.Vessels.Where(i => !i.packed))
