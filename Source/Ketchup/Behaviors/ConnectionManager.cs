@@ -130,23 +130,26 @@ namespace Ketchup.Behaviors
         {
             Log(LogLevel.Debug, "OnVesselRollout()");
 
-            var computers = data.Parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
-            var devices = data.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
-
-            var updates = new Dictionary<Port, Port>();
-
-            foreach(var device in devices.Where(i => i.Port.Scope == PortScope.Craft))
+            if (_mode == Mode.Flight)
             {
-                var oldPort = device.Port;
-                var newPort = new Port(PortScope.Persistence, Guid.NewGuid());
+                var computers = data.Parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
+                var devices = data.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
 
-                device.Port = newPort;
-                updates[oldPort] = newPort;
-            }
+                var updates = new Dictionary<Port, Port>();
 
-            foreach (var computer in computers)
-            {
-                computer.UpdateDeviceConnections(updates);
+                foreach (var device in devices.Where(i => i.Port.Scope == PortScope.Craft))
+                {
+                    var oldPort = device.Port;
+                    var newPort = new Port(PortScope.Persistence, Guid.NewGuid());
+
+                    device.Port = newPort;
+                    updates[oldPort] = newPort;
+                }
+
+                foreach (var computer in computers)
+                {
+                    computer.UpdateDeviceConnections(updates);
+                }
             }
         }
 
