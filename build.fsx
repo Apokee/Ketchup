@@ -1,5 +1,5 @@
-#r "Dependencies/NuGet/FAKE/tools/FakeLib.dll"
-#r "Dependencies/NuGet/YamlDotNet/lib/net35/YamlDotNet.dll"
+#r "Dependencies/NuGet/FAKE.2.18.2/tools/FakeLib.dll"
+#r "Dependencies/NuGet/YamlDotNet.3.2.0/lib/net35/YamlDotNet.dll"
 open System.IO
 open System.Collections.Generic
 open Fake
