@@ -263,19 +263,22 @@ namespace Ketchup.Behaviors
                     var computers = GetComputers(parts).ToList();
                     var devices = GetDevices(parts);
 
-                    var computer = computers[0];
-
-                    computer.ResetDeviceConnections();
-                    foreach (var device in devices)
+                    if (computers.Count > 0)
                     {
-                        if (device.Port == null)
-                        {   // TODO: When there is a common DeviceModule base class, this should be moved
-                            device.Port = new Port(PortScope.Craft, Guid.NewGuid());
-                        }
+                        var computer = computers[0];
 
-                        computer.AddDeviceConnection(
-                            new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
-                        );
+                        computer.ResetDeviceConnections();
+                        foreach (var device in devices)
+                        {
+                            if (device.Port == null)
+                            {   // TODO: When there is a common DeviceModule base class, this should be moved
+                                device.Port = new Port(PortScope.Craft, Guid.NewGuid());
+                            }
+
+                            computer.AddDeviceConnection(
+                                new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
+                            );
+                        }
                     }
                     break;
                 case Mode.Flight:

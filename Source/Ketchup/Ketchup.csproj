@@ -38,6 +38,10 @@
       <HintPath>..\..\Dependencies\KSP\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\Dependencies\KSP\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="SharpCompress.Portable">
       <HintPath>..\..\Dependencies\SharpCompress\SharpCompress.Portable.dll</HintPath>
     </Reference>
@@ -55,6 +59,7 @@
     <Compile Include="..\..\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Behaviors\ButtonManager.cs" />
     <Compile Include="Behaviors\ConnectionManager.cs" />
     <Compile Include="Constants\DeviceId.cs" />
     <Compile Include="Constants\ManufacturerId.cs" />

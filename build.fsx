@@ -70,7 +70,7 @@ let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
 let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDeployName)
 let kspFirmwareDir = lazy (kspDir.Force() + "/saves/" + kspProfile.Force() + "/Ketchup/Firmware")
 let kspLocalDepDir = "./Dependencies/KSP"
-let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
+let kspAssemblies = ["Assembly-CSharp.dll"; "Assembly-CSharp-firstpass.dll"; "UnityEngine.dll"]
 
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
