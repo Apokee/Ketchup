@@ -11,9 +11,11 @@ install:
     ps: |
         New-Item "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP" -Type Directory -Force | Out-Null
         Start-FileDownload "$env:KETCHUP_KSPDEPS/Assembly-CSharp.dll" `
-            -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\Assembly-CSharp.dll"
+          -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\Assembly-CSharp.dll"
+        Start-FileDownload "$env:KETCHUP_KSPDEPS/Assembly-CSharp-firstpass.dll" `
+          -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\Assembly-CSharp-firstpass.dll"
         Start-FileDownload "$env:KETCHUP_KSPDEPS/UnityEngine.dll" `
-            -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\UnityEngine.dll"
+          -FileName "$env:APPVEYOR_BUILD_FOLDER\Dependencies\KSP\UnityEngine.dll"
 
 build_script:
     ps: |
