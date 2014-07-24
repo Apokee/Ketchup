@@ -6,5 +6,5 @@ Ketchup [![Build status][build-badge]][build]
 [dcpu]: https://web.archive.org/web/20140101092129/http://dcpu.com/
 [ksp]: https://kerbalspaceprogram.com/
 [wiki]: https://github.com/Apokee/Ketchup/wiki
-[build]: https://ci.appveyor.com/project/Apokee/ketchup
-[build-badge]: https://ci.appveyor.com/api/projects/status/vraij252isc1ttfh
+[build]: https://ci.appveyor.com/project/Apokee/ketchup/branch/development
+[build-badge]: https://ci.appveyor.com/api/projects/status/ri9vdw423wamthja/branch/development
