@@ -1,7 +1,7 @@
 version: "{build}"
 
 environment:
-  KETCHUP_KSPDEPS: "http://build.kerbalsystems.org/dependencies/ksp/0.24"
+  KETCHUP_KSPDEPS: "http://build.apokee.com/dependencies/ksp/0.24"
 
   matrix:
   - KETCHUP_CONFIGURATION: Debug
