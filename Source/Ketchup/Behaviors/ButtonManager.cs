@@ -12,7 +12,9 @@ namespace Ketchup.Behaviors
     internal sealed class ButtonManager : MonoBehaviour
     {
         private const ApplicationLauncher.AppScenes ButtonScenes =
-            ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH;
+            ApplicationLauncher.AppScenes.VAB |
+            ApplicationLauncher.AppScenes.SPH |
+            ApplicationLauncher.AppScenes.FLIGHT;
 
         private static Texture2D _texture;
         private ApplicationLauncherButton _button;
@@ -49,6 +51,12 @@ namespace Ketchup.Behaviors
             GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
             GameEvents.onPartAttach.Add(OnPartAttach);
             GameEvents.onPartRemove.Add(OnPartRemove);
+            GameEvents.onVesselChange.Add(OnVesselChange);
+            GameEvents.onStageSeparation.Add(OnStageSeperation);
+            GameEvents.onJointBreak.Add(OnJointBreak);
+            GameEvents.onPartDestroyed.Add(OnPartDestroyed);
+            GameEvents.onVesselWasModified.Add(OnVesselWasModified);
+            GameEvents.onFlightReady.Add(OnFlightReady);
         }
 
         public void Update()
@@ -58,6 +66,12 @@ namespace Ketchup.Behaviors
 
         public void OnDestroy()
         {
+            GameEvents.onFlightReady.Remove(OnFlightReady);
+            GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
+            GameEvents.onPartDestroyed.Remove(OnPartDestroyed);
+            GameEvents.onJointBreak.Remove(OnJointBreak);
+            GameEvents.onStageSeparation.Remove(OnStageSeperation);
+            GameEvents.onVesselChange.Remove(OnVesselChange);
             GameEvents.onPartRemove.Remove(OnPartRemove);
             GameEvents.onPartAttach.Remove(OnPartAttach);
             GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
@@ -66,7 +80,7 @@ namespace Ketchup.Behaviors
 
         private void OnGuiApplicationLauncherReady()
         {
-            if (HighLogic.LoadedSceneIsEditor)
+            if (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight)
             {
                 Log(LogLevel.Debug, "Adding AppLauncher button");
 
@@ -96,6 +110,48 @@ namespace Ketchup.Behaviors
         private void OnPartRemove(GameEvents.HostTargetAction<Part, Part> data)
         {
             Log(LogLevel.Debug, "OnPartRemove()");
+
+            UpdateButtonState(checkParts: true);
+        }
+
+        private void OnVesselChange(Vessel data)
+        {
+            Log(LogLevel.Debug, "OnVesselChange()");
+
+            UpdateButtonState(checkParts: true);
+        }
+
+        private void OnStageSeperation(EventReport data)
+        {
+            Log(LogLevel.Debug, "OnStageSeperation(): {0}", data.origin.partInfo.title);
+
+            UpdateButtonState(checkParts: true);
+        }
+
+        private void OnJointBreak(EventReport data)
+        {
+            Log(LogLevel.Debug, "OnJointBreak(): {0}", data.origin.partInfo.title);
+
+            UpdateButtonState(checkParts: true);
+        }
+
+        private void OnPartDestroyed(Part data)
+        {
+            Log(LogLevel.Debug, "OnPartDestroyed()");
+
+            UpdateButtonState(checkParts: true);
+        }
+
+        private void OnVesselWasModified(Vessel data)
+        {
+            Log(LogLevel.Debug, "OnVesselWasModified()");
+
+            UpdateButtonState(checkParts: true);
+        }
+
+        private void OnFlightReady()
+        {
+            Log(LogLevel.Debug, "OnFlightReady()");
 
             UpdateButtonState(checkParts: true);
         }
@@ -164,9 +220,13 @@ namespace Ketchup.Behaviors
             {
                 IEnumerable<Part> parts = null;
 
-                if (_editorLogic != null)
+                if (HighLogic.LoadedSceneIsEditor && _editorLogic != null)
                 {
                     parts = _editorLogic.ship.Parts;
+                }
+                else if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null)
+                {
+                    parts = FlightGlobals.ActiveVessel.Parts;
                 }
 
                 if (parts != null)
