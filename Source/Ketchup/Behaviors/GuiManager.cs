@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Ketchup.Behaviors
 {
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
-    internal sealed class ButtonManager : MonoBehaviour
+    internal sealed class GuiManager : MonoBehaviour
     {
         private const ApplicationLauncher.AppScenes ButtonScenes =
             ApplicationLauncher.AppScenes.VAB |
