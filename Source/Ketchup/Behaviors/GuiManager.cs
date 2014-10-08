@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,27 +17,31 @@ namespace Ketchup.Behaviors
             ApplicationLauncher.AppScenes.SPH |
             ApplicationLauncher.AppScenes.FLIGHT;
 
-        private static Texture2D _texture;
+        private static Texture2D _appLauncherTexture;
+
         private ApplicationLauncherButton _button;
         private bool _canShowButton;
 
         private EditorLogic _editorLogic;
         private int _editorPartCount;
 
+        private bool _showWindow;
+        private Rect _windowRect;
+
         public void Awake()
         {
             Log(LogLevel.Debug, "Awake()");
 
-            if (_texture == null)
+            if (_appLauncherTexture == null)
             {
-                Log(LogLevel.Debug, "Loading button texture");
+                Log(LogLevel.Debug, "Loading AppLauncher texture");
 
                 var texture = new Texture2D(38, 38, TextureFormat.RGBA32, false);
                 texture.LoadImage(File.ReadAllBytes(Path.Combine(
                     GetBaseDirectory().FullName, "Textures/AppLauncher.png"
                 )));
 
-                _texture = texture;
+                _appLauncherTexture = texture;
             }
         }
 
@@ -76,6 +81,69 @@ namespace Ketchup.Behaviors
             GameEvents.onPartAttach.Remove(OnPartAttach);
             GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
             GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiApplicationLauncherReady);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        public void OnGUI()
+        {
+            if (_showWindow && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
+            {
+                GUI.skin = HighLogic.Skin;
+
+                if (_windowRect == default(Rect))
+                {
+                    var windowWidth = Screen.width / 2;
+                    var windowHeight = Screen.height / 2;
+                    var windowLeft = (Screen.width - windowWidth) / 2;
+                    var windowTop = (Screen.height - windowHeight) / 2;
+
+                    _windowRect = new Rect(windowLeft, windowTop, windowWidth, windowHeight);
+                }
+
+                _windowRect = GUILayout.Window(50, _windowRect, OnWindow, "Computer");
+            }
+        }
+
+        private void OnWindow(int windowId)
+        {
+            List<ModuleKetchupComputer> computers = null;
+
+            if (HighLogic.LoadedSceneIsEditor)
+            {
+                computers = _editorLogic
+                    .ship
+                    .Parts
+                    .SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>())
+                    .ToList();
+            }
+            else if (HighLogic.LoadedSceneIsFlight)
+            {
+                computers = FlightGlobals
+                    .ActiveVessel
+                    .Parts
+                    .SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>())
+                    .ToList();
+            }
+
+            if (computers != null)
+            {
+                foreach (var computer in computers)
+                {
+                    GUILayout.Label(
+                        computer.part.partInfo.title,
+                        new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold }
+                    );
+
+                    GUILayout.Box(String.Empty, GUILayout.MinHeight(40));
+
+                    foreach (var connection in computer.GetDeviceConnections())
+                    {
+                        GUILayout.Button(connection.ToString());
+                    }
+                }
+            }
+
+            GUI.DragWindow();
         }
 
         private void OnGuiApplicationLauncherReady()
@@ -159,11 +227,15 @@ namespace Ketchup.Behaviors
         private void OnButtonTrue()
         {
             Log(LogLevel.Debug, "OnButtonTrue()");
+
+            _showWindow = true;
         }
 
         private void OnButtonFalse()
         {
             Log(LogLevel.Debug, "OnButtonFalse()");
+
+            _showWindow = false;
         }
 
         private void OnButtonHover()
@@ -243,7 +315,7 @@ namespace Ketchup.Behaviors
                                 OnButtonEnable,
                                 OnButtonDisable,
                                 ButtonScenes,
-                                _texture
+                                _appLauncherTexture
                             );
                         }
                     }

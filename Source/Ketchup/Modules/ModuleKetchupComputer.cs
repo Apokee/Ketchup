@@ -271,6 +271,11 @@ namespace Ketchup.Modules
             }
         }
 
+        public IEnumerable<DeviceConnection> GetDeviceConnections()
+        {
+            return _deviceConnections;
+        }
+
         #region Helper Methods
 
         private void TimeWarpThrottleIfNecessary()
