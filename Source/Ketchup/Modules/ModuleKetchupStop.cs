@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Ketchup.Api.v0;
 using Ketchup.Extensions;
 using Ketchup.Utility;
@@ -7,6 +6,9 @@ using UnityEngine;
 
 namespace Ketchup.Modules
 {
+    /// <summary>
+    /// Space-Time Orientation & Position (STOP) sensor.
+    /// </summary>
     [KSPModule("Device: STOP")]
     internal sealed class ModuleKetchupStop : PartModule, IDevice
     {
@@ -23,7 +25,7 @@ namespace Ketchup.Modules
 
         public string FriendlyName
         {
-            get { return "KSG STOP Device"; }
+            get { return "STOP Sensor"; }
         }
 
         public uint ManufacturerId
