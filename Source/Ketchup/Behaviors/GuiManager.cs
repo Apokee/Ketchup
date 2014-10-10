@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Ketchup.Api.v0;
 using Ketchup.Modules;
 using Ketchup.Services;
 using UnityEngine;
@@ -106,40 +106,26 @@ namespace Ketchup.Behaviors
 
         private void OnWindow(int windowId)
         {
-            List<ModuleKetchupComputer> computers = null;
+            List<Part> parts = null;
 
             if (HighLogic.LoadedSceneIsEditor)
             {
-                computers = _editorLogic
-                    .ship
-                    .Parts
-                    .SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>())
-                    .ToList();
+                parts = _editorLogic.ship.Parts;
             }
             else if (HighLogic.LoadedSceneIsFlight)
             {
-                computers = FlightGlobals
-                    .ActiveVessel
-                    .Parts
-                    .SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>())
-                    .ToList();
+                parts = FlightGlobals.ActiveVessel.Parts;
             }
 
-            if (computers != null)
+            if (parts != null)
             {
-                foreach (var computer in computers)
+                var devices = parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
+
+                foreach (var device in devices)
                 {
-                    GUILayout.Label(
-                        computer.part.partInfo.title,
-                        new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold }
-                    );
-
-                    GUILayout.Box(String.Empty, GUILayout.MinHeight(40));
-
-                    foreach (var connection in computer.GetDeviceConnections())
-                    {
-                        GUILayout.Button(connection.ToString());
-                    }
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(device.FriendlyName, new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+                    GUILayout.EndHorizontal();
                 }
             }
 
@@ -152,7 +138,8 @@ namespace Ketchup.Behaviors
             {
                 Log(LogLevel.Debug, "Adding AppLauncher button");
 
-                _canShowButton = true;
+                // TODO: Enable this when there's a GUI worth using
+                //_canShowButton = true;
 
                 UpdateButtonState(checkParts: false);
             }
