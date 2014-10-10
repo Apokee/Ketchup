@@ -7,5 +7,6 @@ obj/
 
 *.suo
 *.user
+*.orig
 
 /build.yml
