@@ -10,7 +10,7 @@ using Ketchup.Utility;
 namespace Ketchup.Modules
 {
     /// <summary>
-    /// Centrally Regulated Avionic Subsystem Handler (CRASH) device.
+    /// Centrally Regulated Avionic Subsystem Handler (CRASH) controller.
     /// </summary>
     [KSPModule("Device: CRASH")]
     internal sealed class ModuleKetchupCrash : PartModule, IDevice
@@ -123,7 +123,7 @@ namespace Ketchup.Modules
 
         public string FriendlyName
         {
-            get { return "KSG CRASH Controller"; }
+            get { return "CRASH Controller"; }
         }
 
         public uint ManufacturerId
