@@ -260,24 +260,31 @@ namespace Ketchup.Behaviors
                 case Mode.Editor:
                     Log(LogLevel.Debug, "RecalculateConnections(): In Editor, proceeding");
 
-                    var computers = GetComputers(parts).ToList();
-                    var devices = GetDevices(parts);
-
-                    if (computers.Count > 0)
+                    // Reset the connections of all computers in the vessel
+                    foreach (var computer in GetComputers(parts))
                     {
-                        var computer = computers[0];
-
                         computer.ResetDeviceConnections();
+                    }
+
+                    foreach (var part in parts)
+                    {
+                        var devices = part.FindModulesImplementing<IDevice>();
+
                         foreach (var device in devices)
                         {
-                            if (device.Port == null)
-                            {   // TODO: When there is a common DeviceModule base class, this should be moved
-                                device.Port = new Port(PortScope.Craft, Guid.NewGuid());
-                            }
+                            var closetComputers = FindClosestComputers(part).ToList();
 
-                            computer.AddDeviceConnection(
-                                new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
-                            );
+                            if (closetComputers.Count == 1)
+                            {
+                                if (device.Port == null)
+                                {   // TODO: When there is a common DeviceModule base class, this should be moved
+                                    device.Port = new Port(PortScope.Craft, Guid.NewGuid());
+                                }
+
+                                closetComputers[0].AddDeviceConnection(
+                                    new DeviceConnection(DeviceConnectionType.Automatic, device.Port, null)
+                                );
+                            }
                         }
                     }
                     break;
@@ -313,11 +320,55 @@ namespace Ketchup.Behaviors
             return parts.SelectMany(i => i.FindModulesImplementing<ModuleKetchupComputer>());
         }
 
-        private static IEnumerable<IDevice> GetDevices(IEnumerable<Part> parts)
+        private static IEnumerable<ModuleKetchupComputer> FindClosestComputers(Part from)
         {
-            return parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
+            var queue = new Queue<PartDistance>(new [] { new PartDistance { Part = from, Distance = 0 } });
+
+            uint? closestDistance = null;
+            var closestComputers = new List<ModuleKetchupComputer>();
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+
+                var computers = current.Part.FindModulesImplementing<ModuleKetchupComputer>();
+
+                if (computers.Count > 0)
+                {
+                    if (closestDistance == null)
+                    {
+                        closestDistance = current.Distance;
+                    }
+
+                    if (closestDistance == current.Distance)
+                    {
+                        closestComputers.AddRange(computers);
+                    }
+                }
+                else
+                {
+                    if (closestComputers.Count == 0)
+                    {
+                        queue.Enqueue(
+                            new PartDistance { Part = current.Part.parent, Distance = current.Distance + 1 }
+                        );
+
+                        foreach (var child in current.Part.children)
+                        {
+                            queue.Enqueue(new PartDistance { Part = child, Distance = current.Distance + 1 });
+                        }
+                    }
+                }
+            }
+
+            return closestComputers;
         }
 
+        private class PartDistance
+        {
+            public Part Part { get; set; }
+            public uint Distance { get; set; }
+        }
         #endregion
         
     }
