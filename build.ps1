@@ -5,10 +5,12 @@ $NugetExe           = "$NugetDir/NuGet.exe"
 $PackagesConfigFile = "$NugetDir/packages.config"
 $DependenciesDir    = "$RootDir/Dependencies"
 $PackagesDir        = "$DependenciesDir/NuGet"
-$FakeExe            = "$PackagesDir/FAKE/tools/FAKE.exe"
+$FakeVersionXPath   = "//package[@id='FAKE'][1]/@version"
+$FakeVersion        = (Select-Xml -Xml ([xml](Get-Content $PackagesConfigFile)) -XPath $FakeVersionXPath).Node.Value
+$FakeExe            = "$PackagesDir/FAKE.$FakeVersion/tools/FAKE.exe"
 
 # Install build packages
-iex "$NugetExe install `"$PackagesConfigFile`" -ExcludeVersion -OutputDirectory `"$PackagesDir`""
+iex "$NugetExe install `"$PackagesConfigFile`" -OutputDirectory `"$PackagesDir`""
 
 # Run FAKE
 iex "$FakeExe $args"

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Ketchup.Api.v0;
+using Ketchup.Extensions;
 
 namespace Ketchup.Modules
 {
@@ -15,6 +16,7 @@ namespace Ketchup.Modules
         private const string ConfigKeyElapsedTicks = "ElapsedTicks";
         private const string ConfigKeyInterruptMessage = "InterruptMessage";
         private const string ConfigKeyTimeUntilNextTick = "TimeUntilNextTick";
+        
 
         private const uint ConfigVersion = 1;
 
@@ -53,6 +55,8 @@ namespace Ketchup.Modules
         {
             get { return 0x0001; }
         }
+
+        public Port Port { get; set; }
 
         #endregion
 
@@ -142,6 +146,8 @@ namespace Ketchup.Modules
                 {
                     _timeUntilNextTick = timeUntilNextTick;
                 }
+
+                this.LoadDevicePort(node);
             }
         }
 
@@ -153,6 +159,8 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyElapsedTicks, _elapsedTicks);
             node.AddValue(ConfigKeyInterruptMessage, _interruptMessage);
             node.AddValue(ConfigKeyTimeUntilNextTick, _timeUntilNextTick);
+
+            this.SaveDevicePort(node);
         }
 
         public override void OnUpdate()

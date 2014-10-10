@@ -49,6 +49,8 @@
     <Compile Include="v0\IDcpu16.cs" />
     <Compile Include="v0\IDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="v0\Port.cs" />
+    <Compile Include="v0\PortScope.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

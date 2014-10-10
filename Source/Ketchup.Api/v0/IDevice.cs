@@ -25,6 +25,8 @@
         /// </summary>
         ushort Version { get; }
 
+        Port Port { get; set; }
+
         /// <summary>
         /// Called when the device is connected to the CPU. CPU should be notified of connection separately. Behavior
         /// is undefined if performed during execution.
@@ -38,7 +40,6 @@
         /// performed during execution.
         /// </summary>
         void OnDisconnect();
-
 
         /// <summary>
         /// Called when the device receives an interrupt.

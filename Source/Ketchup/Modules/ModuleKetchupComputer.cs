@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
+using Ketchup.Data;
 using Ketchup.Extensions;
 using Ketchup.Interop;
 using Ketchup.IO;
+using Ketchup.Services;
 using Tomato;
 using UnityEngine;
 
@@ -23,6 +25,7 @@ namespace Ketchup.Modules
         private const string ConfigKeyShowWindow = "ShowWindow";
         private const string ConfigKeyDcpu16State = "Dcpu16State";
         private const string ConfigKeyIsPowerOn = "IsPowerOn";
+        private const string ConfigNodeConnection = "DEVICE_CONNECTION";
 
         private const uint ConfigVersion = 1;
 
@@ -34,7 +37,7 @@ namespace Ketchup.Modules
         private static bool _isStyleInit;
 
         #endregion
-
+        
         #region Instance Fields
 
         private TomatoDcpu16Adapter _dcpu16;
@@ -53,9 +56,13 @@ namespace Ketchup.Modules
 
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
-        
 
         private string _dcpu16State;
+
+        // TODO: We maintain both a list of devices and device connections, this should be simplified
+        // TODO: DeviceConnections do too much, they represent both connections that have and do not have a HWID
+        // TODO: Tomato also maintains its own list of devices...
+        private List<DeviceConnection> _deviceConnections = new List<DeviceConnection>();
 
         #endregion
 
@@ -81,7 +88,7 @@ namespace Ketchup.Modules
                 RenderingManager.AddToPostDrawQueue(1, OnDraw);
 
                 if (_isPowerOn)
-                    TurnOn(useState: true);
+                    TurnOn(coldStart: false);
                 else
                     TurnOff();
             }
@@ -119,6 +126,11 @@ namespace Ketchup.Modules
                 }
 
                 _dcpu16State = node.GetValue(ConfigKeyDcpu16State);
+
+                foreach (var deviceConnectionNode in node.GetNodes(ConfigNodeConnection))
+                {
+                    _deviceConnections.Add(new DeviceConnection(deviceConnectionNode));
+                }
             }
         }
 
@@ -136,6 +148,15 @@ namespace Ketchup.Modules
                 var state = _dcpu16StateManager.Save();
 
                 node.AddValue(ConfigKeyDcpu16State, state);
+            }
+
+            foreach (var deviceConnection in _deviceConnections)
+            {
+                var deviceConnectionNode = new ConfigNode(ConfigNodeConnection);
+
+                deviceConnection.Save(deviceConnectionNode);
+
+                node.AddNode(deviceConnectionNode);
             }
         }
 
@@ -191,11 +212,82 @@ namespace Ketchup.Modules
 
         #endregion
 
+        public void AddDeviceConnection(DeviceConnection deviceConnection)
+        {
+            _deviceConnections.Add(deviceConnection);
+        }
+
+        public void ResetDeviceConnections()
+        {
+            _deviceConnections.Clear();
+        }
+
+        public void UpdateDeviceConnections(Dictionary<Port, Port> updates)
+        {
+            _deviceConnections = _deviceConnections
+                .Select(i => updates.ContainsKey(i.Port) ? new DeviceConnection(i.Type, updates[i.Port], null) : i)
+                .ToList();
+        }
+
+        public void EnsureDeviceConnections()
+        {
+            var vesselDevices = vessel.Parts.SelectMany(i => i.FindModulesImplementing<IDevice>());
+
+            var missingDevices = _connectedDevices
+                .Where(i => !(i is DisconnectedDevice))
+                .Except(vesselDevices)
+                .ToList();
+            var missingPorts = new HashSet<Port>(missingDevices.Select(i => i.Port));
+            var missingConnections = _deviceConnections.Where(i => missingPorts.Contains(i.Port)).ToList();
+
+
+            foreach(var missingConnection in missingConnections)
+            {
+                Service.Debug.Log(
+                    "ModuleKetchupComputer", LogLevel.Debug, "Removing missing connection: {0}", missingConnection
+                );
+                _deviceConnections.Remove(missingConnection);
+            }
+
+            if (_isPowerOn)
+            {
+                foreach (var missingDevice in missingDevices)
+                {
+                    var index = _connectedDevices.IndexOf(missingDevice);
+
+                    if (index >= 0)
+                    {
+                        Service.Debug.Log("ModuleKetchupComputer", LogLevel.Debug,
+                            "{0} with HWID {1} was disconnected",
+                            missingDevice.FriendlyName,
+                            index
+                        );
+
+                        _dcpu16.OnDisconnect((ushort)index);
+                        missingDevice.OnDisconnect();
+                        _connectedDevices[index] = new DisconnectedDevice();
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<DeviceConnection> GetDeviceConnections()
+        {
+            return _deviceConnections;
+        }
+
         #region Helper Methods
 
         private void TimeWarpThrottleIfNecessary()
         {
-            if ((_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted()) && TimeWarp.WarpMode == TimeWarp.Modes.HIGH)
+            // TODO: Possibly use this to control time warp
+            //HighLogic.CurrentGame.Parameters.Flight.CanTimeWarpHigh = false;
+
+            if (
+                (_dcpu16.IsPendingWakeUp() || !_dcpu16.IsHalted())
+                && TimeWarp.WarpMode == TimeWarp.Modes.HIGH
+                && TimeWarp.CurrentRate > 1
+            )
             {
                 var condition = String.Empty;
 
@@ -296,25 +388,25 @@ namespace Ketchup.Modules
             if (_isPowerOn)
                 TurnOff();
             else
-                TurnOn(useState: false);
+                TurnOn(coldStart: true);
         }
 
-        private void TurnOn(bool useState)
+        private void TurnOn(bool coldStart)
         {
             InitializeDcpu16();
+            InitializeDevices(coldStart);
 
-            var firmware = GetFirmware();
-
-            Connect(firmware);
-            Connect(DeviceScan());
-
-            if (useState && HasPersistedState())
+            if (coldStart || !HasPersistedState())
             {
-                _dcpu16StateManager.Load(_dcpu16State);
+                if (_connectedDevices.Count > 0)
+                {
+                    // The first device *should* be the firmware device unless the user does something screwy
+                    _connectedDevices[0].OnInterrupt();
+                }
             }
             else
             {
-                firmware.OnInterrupt();
+                _dcpu16StateManager.Load(_dcpu16State);
             }
 
             _isPowerOn = true;
@@ -347,28 +439,66 @@ namespace Ketchup.Modules
             _dcpu16StateManager = dcpu16StateManager;
         }
 
-        private ModuleKetchupFirmware GetFirmware()
+        private void InitializeDevices(bool coldStart)
         {
-            return part.Modules.OfType<ModuleKetchupFirmware>().Single();
-        }
+            var connectedGlobalDeviceIds = new HashSet<Port>(_deviceConnections.Select(i => i.Port));
+            var connectedDevices = vessel
+                .Parts
+                .SelectMany(i => i.FindModulesImplementing<IDevice>())
+                .Where(i => connectedGlobalDeviceIds.Contains(i.Port))
+                .ToList();
 
-        private IEnumerable<IDevice> DeviceScan()
-        {
-            return vessel.Parts.SelectMany(i => i.Modules.OfType<IDevice>()).Where(i => !(i is ModuleKetchupFirmware)).ToList();
-        }
+            var orderedDevices = new List<IDevice>();
 
-        private void Connect(IEnumerable<IDevice> devices)
-        {
-            foreach (var device in devices)
+            if (coldStart)
             {
-                Connect(device);
+                var firmware = connectedDevices.FirstOrDefault(i => i is ModuleKetchupFirmware);
+                var others = connectedDevices.Where(i => i != firmware);
+
+
+                if (firmware != null)
+                {
+                    orderedDevices.Add(firmware);
+                }
+
+                orderedDevices.AddRange(others);
+
+                var newConnections = new List<DeviceConnection>();
+                for (ushort i = 0; i < orderedDevices.Count; i++)
+                {
+                    var device = orderedDevices[i];
+                    var connection = _deviceConnections.Single(c => c.Port == device.Port);
+
+                    newConnections.Add(new DeviceConnection(connection.Type, connection.Port, i));
+                }
+                _deviceConnections = newConnections;
+            }
+            else
+            {
+                orderedDevices.AddRange(
+                    _deviceConnections
+                        .Where(i => i.HardwareId != null)
+                        .Select(i => new { 
+                            HardwareId = i.HardwareId.Value,
+                            Device = connectedDevices.Single(d => d.Port == i.Port)
+                        })
+                        .OrderBy(i => i.HardwareId)
+                        .Select(i => i.Device)
+                );
+            }
+
+            foreach (var device in orderedDevices)
+            {
+                if (device != null)
+                {
+                    _connectedDevices.Add(device);
+                    TriggerConnection(device);
+                }
             }
         }
 
-        private void Connect(IDevice device)
+        private void TriggerConnection(IDevice device)
         {
-            _connectedDevices.Add(device);
-
             _dcpu16.OnConnect(device);
             device.OnConnect(_dcpu16);
 

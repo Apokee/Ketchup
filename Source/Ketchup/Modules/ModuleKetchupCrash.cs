@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
+using Ketchup.Extensions;
 using Ketchup.Utility;
 
 namespace Ketchup.Modules
@@ -139,6 +140,8 @@ namespace Ketchup.Modules
         {
             get { return 0x0001; }
         }
+
+        public Port Port { get; set; }
 
         #endregion
 
@@ -277,6 +280,16 @@ namespace Ketchup.Modules
             sb.AppendLine("Equipped");
 
             return sb.ToString();
+        }
+
+        public override void OnLoad(ConfigNode node)
+        {
+            this.LoadDevicePort(node);
+        }
+
+        public override void OnSave(ConfigNode node)
+        {
+            this.SaveDevicePort(node);
         }
 
         public override void OnStart(StartState state)

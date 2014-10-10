@@ -1,5 +1,5 @@
-#r "Dependencies/NuGet/FAKE/tools/FakeLib.dll"
-#r "Dependencies/NuGet/YamlDotNet/lib/net35/YamlDotNet.dll"
+#r "Dependencies/NuGet/FAKE.3.5.8/tools/FakeLib.dll"
+#r "Dependencies/NuGet/YamlDotNet.3.3.0/lib/net35/YamlDotNet.dll"
 open System.IO
 open System.Collections.Generic
 open Fake
@@ -70,8 +70,9 @@ let kspDepDir = lazy (kspDir.Force() + "/KSP_Data/Managed")
 let kspDeployDir = lazy (kspDir.Force() + "/GameData/" + kspDeployName)
 let kspFirmwareDir = lazy (kspDir.Force() + "/saves/" + kspProfile.Force() + "/Ketchup/Firmware")
 let kspLocalDepDir = "./Dependencies/KSP"
-let kspAssemblies = ["Assembly-CSharp.dll"; "UnityEngine.dll"]
+let kspAssemblies = ["Assembly-CSharp.dll"; "Assembly-CSharp-firstpass.dll"; "UnityEngine.dll"]
 
+let artworkDir = "./Dependencies/NuGet/Apokee.Artwork.0.1.0.1/Content" // TODO: make this dynamic
 let contribDir = "./Contrib"
 let partsDir = "./Parts"
 let patchesDir = "./Patches"
@@ -144,6 +145,9 @@ Target "Stage" (fun _ ->
     CopyDir (stageModDir + "/Parts") partsDir (fun f -> true)
     CopyDir (stageModDir + "/Patches") patchesDir (fun f -> true)
     CopyDir (stageModDir + "/Plugins") (buildDir + "/" + buildConfig) (fun f -> true)
+
+    CleanDir (stageModDir + "/Textures")
+    CopyFile (stageModDir + "/Textures/AppLauncher.png") (artworkDir + "/logo-ketchup-38x38-white.png")
 )
 
 Target "Deploy" (fun _ ->

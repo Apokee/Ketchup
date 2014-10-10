@@ -38,12 +38,17 @@
       <HintPath>..\..\Dependencies\KSP\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+<<<<<<< HEAD
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\Dependencies\KSP\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
-	</Reference>
+    </Reference>
+    <Reference Include="SharpCompress.Portable">
+      <HintPath>..\..\Dependencies\SharpCompress\SharpCompress.Portable.dll</HintPath>
+=======
     <Reference Include="SharpCompress">
       <HintPath>..\..\Dependencies\SharpCompress\SharpCompress.dll</HintPath>
+>>>>>>> development
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

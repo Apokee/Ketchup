@@ -116,6 +116,8 @@ namespace Ketchup.Modules
             get { return 0x1802; }
         }
 
+        public Port Port { get; set; }
+
         #endregion
 
         #region Constructors
@@ -242,6 +244,8 @@ namespace Ketchup.Modules
                 {
                     _imageScale = imageScale;
                 }
+
+                this.LoadDevicePort(node);
             }
         }
 
@@ -256,6 +260,8 @@ namespace Ketchup.Modules
             node.AddValue(ConfigKeyPaletteMap, _paletteMap);
             node.AddValue(ConfigKeyBorderColorValue, _borderColorValue);
             node.AddValue(ConfigKeyImageScale, _imageScale);
+
+            this.SaveDevicePort(node);
         }
 
         public override void OnStart(StartState state)
