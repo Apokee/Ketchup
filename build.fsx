@@ -141,6 +141,10 @@ Target "Test" (fun _ ->
 )
 
 Target "Stage" (fun _ ->
+    CleanDir stageModDir
+
+    CopyFile stageModDir "./LICENSE"
+
     CopyDir (stageModDir + "/Contrib") contribDir (fun f -> true)
     CopyDir (stageModDir + "/Parts") partsDir (fun f -> true)
     CopyDir (stageModDir + "/Patches") patchesDir (fun f -> true)
