@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
 using Ketchup.Extensions;
+using Ketchup.Services;
 using UnityEngine;
 
 namespace Ketchup.Modules
@@ -151,6 +152,7 @@ namespace Ketchup.Modules
 
         private Rect _windowRect;
         private bool _showWindow;
+        private readonly int _windowId = Service.Gui.GetNewWindowId();
 
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
@@ -355,8 +357,8 @@ namespace Ketchup.Modules
             if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
-                
-                _windowRect = GUILayout.Window(2, _windowRect, OnWindow, "Keyboard");
+
+                _windowRect = GUILayout.Window(_windowId, _windowRect, OnWindow, "Keyboard");
             }
         }
 

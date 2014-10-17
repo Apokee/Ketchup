@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Ketchup.Api.v0;
 using Ketchup.Extensions;
+using Ketchup.Services;
 using UnityEngine;
 
 namespace Ketchup.Modules
@@ -88,6 +89,7 @@ namespace Ketchup.Modules
         private Rect _windowPosition;
         private bool _showWindow;
         private bool _isWindowPositionInit;
+        private readonly int _windowId = Service.Gui.GetNewWindowId();
 
         private bool _blinkOn;
         private float _timeUntilNextBlinkToggle = BlinkRate;
@@ -303,8 +305,8 @@ namespace Ketchup.Modules
             if (vessel.isActiveVessel && _showWindow)
             {
                 GUI.skin = HighLogic.Skin;
-                
-                _windowPosition = GUILayout.Window(3, _windowPosition, OnWindow, "LEM-1802");
+
+                _windowPosition = GUILayout.Window(_windowId, _windowPosition, OnWindow, "LEM-1802");
             }
         }
 

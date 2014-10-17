@@ -7,6 +7,7 @@ using Ketchup.Api.v0;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;
+using Ketchup.Services;
 using UnityEngine;
 
 namespace Ketchup.Modules
@@ -64,6 +65,7 @@ namespace Ketchup.Modules
 
         private Rect _windowRect;
         private bool _showWindow;
+        private readonly int _windowId = Service.Gui.GetNewWindowId();
 
         private bool _isWindowPositionInit;
         private bool _flashingRom;
@@ -221,7 +223,7 @@ namespace Ketchup.Modules
             {
                 GUI.skin = HighLogic.Skin;
 
-                _windowRect = GUILayout.Window(5, _windowRect, OnWindow, "Firmware");
+                _windowRect = GUILayout.Window(_windowId, _windowRect, OnWindow, "Firmware");
             }
         }
 

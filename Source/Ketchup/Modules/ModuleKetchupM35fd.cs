@@ -8,6 +8,7 @@ using Ketchup.Api.v0;
 using Ketchup.Exceptions;
 using Ketchup.Extensions;
 using Ketchup.IO;
+using Ketchup.Services;
 using UnityEngine;
 
 namespace Ketchup.Modules
@@ -71,6 +72,7 @@ namespace Ketchup.Modules
         private Rect _windowPosition;
         private bool _showWindow;
         private bool _isWindowPositionInit;
+        private readonly int _windowId = Service.Gui.GetNewWindowId();
         private GuiMode _guiMode;
         private readonly Dictionary<FloppyDisk, string> _disksBeingLabeled = new Dictionary<FloppyDisk, string>();
 
@@ -446,7 +448,7 @@ namespace Ketchup.Modules
                 GUI.skin = HighLogic.Skin;
 
                 _windowPosition = new Rect(_windowPosition) { width = 300 };
-                _windowPosition = GUILayout.Window(4, _windowPosition, OnM35FdWindow, "M35FD");
+                _windowPosition = GUILayout.Window(_windowId, _windowPosition, OnM35FdWindow, "M35FD");
             }
         }
 
