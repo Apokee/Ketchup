@@ -27,6 +27,7 @@ namespace Ketchup.Behaviors
 
         private bool _showWindow;
         private Rect _windowRect;
+        private readonly int _windowId = Service.Gui.GetNewWindowId();
 
         public void Awake()
         {
@@ -100,7 +101,7 @@ namespace Ketchup.Behaviors
                     _windowRect = new Rect(windowLeft, windowTop, windowWidth, windowHeight);
                 }
 
-                _windowRect = GUILayout.Window(50, _windowRect, OnWindow, "Computer");
+                _windowRect = GUILayout.Window(_windowId, _windowRect, OnWindow, "Computer");
             }
         }
 

@@ -53,6 +53,7 @@ namespace Ketchup.Modules
 
         private Rect _windowRect;
         private bool _showWindow;
+        private readonly int _windowId = Service.Gui.GetNewWindowId();
 
         private bool _isWindowPositionInit;
         private bool _isWindowSizeInit;
@@ -315,7 +316,7 @@ namespace Ketchup.Modules
             {
                 GUI.skin = HighLogic.Skin;
 
-                _windowRect = GUILayout.Window(1, _windowRect, OnWindow, part.partInfo.title);
+                _windowRect = GUILayout.Window(_windowId, _windowRect, OnWindow, part.partInfo.title);
             }
         }
         

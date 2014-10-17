@@ -41,7 +41,7 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\Dependencies\KSP\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
-	</Reference>
+    </Reference>
     <Reference Include="SharpCompress">
       <HintPath>..\..\Dependencies\SharpCompress\SharpCompress.dll</HintPath>
     </Reference>
@@ -86,6 +86,8 @@
     <Compile Include="Modules\ModuleKetchupLem1802.cs" />
     <Compile Include="Modules\ModuleKetchupM35fd.cs" />
     <Compile Include="Modules\ModuleKetchupStop.cs" />
+    <Compile Include="Services\GuiService.cs" />
+    <Compile Include="Services\IGuiService.cs" />
     <Compile Include="Services\IDebugService.cs" />
     <Compile Include="Services\LogLevel.cs" />
     <Compile Include="Services\Service.cs" />
