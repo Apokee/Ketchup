@@ -275,6 +275,14 @@ namespace Ketchup.Modules
             }
         }
 
+        public override void OnInactive()
+        {
+            if (_isWindowPositionInit)
+            {
+                RenderingManager.RemoveFromPostDrawQueue(1, OnDraw);
+            }
+        }
+
         public override void OnUpdate()
         {
             _timeUntilNextBlinkToggle -= TimeWarp.deltaTime;

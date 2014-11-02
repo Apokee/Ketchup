@@ -169,6 +169,14 @@ namespace Ketchup.Modules
             }
         }
 
+        public override void OnInactive()
+        {
+            base.OnInactive(); if (_isWindowPositionInit)
+            {
+                RenderingManager.RemoveFromPostDrawQueue(1, OnDraw);
+            }
+        }
+
         public override void OnLoad(ConfigNode node)
         {
             uint version;
