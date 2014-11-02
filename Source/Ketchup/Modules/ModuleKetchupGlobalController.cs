@@ -1,5 +1,4 @@
-﻿using System;
-using Ketchup.Api.v0;
+﻿using Ketchup.Api.v0;
 
 namespace Ketchup.Modules
 {
@@ -16,7 +15,11 @@ namespace Ketchup.Modules
 
         #endregion
 
+        #region Instance Members
+
         private IDcpu16 _dcpu16;
+
+        #endregion
 
         #region IDevice
 
@@ -32,7 +35,17 @@ namespace Ketchup.Modules
 
         public int OnInterrupt()
         {
-            throw new NotImplementedException();
+            switch(_dcpu16.A)
+            {
+                case 0x0000: // TODO: Test
+                    _dcpu16.A = (ushort)(((uint)vessel.missionTime) >> 16);
+                    break;
+                case 0x0001: // TODO: Test
+                    _dcpu16.A = (ushort)(((uint)vessel.missionTime) & 0x00001111);
+                    break;
+            }
+
+            return 0; // FIXME: unspecified
         }
 
         #endregion
