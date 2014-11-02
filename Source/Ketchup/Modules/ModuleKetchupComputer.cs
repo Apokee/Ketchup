@@ -165,7 +165,8 @@ namespace Ketchup.Modules
         {
             // TODO: this code is gnarly, refactor for clarity
             // Do we really need to keep track of a halt condition in two places?
-            if (_isPowerOn && _dcpu16 != null)
+            // TODO: Only execute when we're the active vessel
+            if (_isPowerOn && _dcpu16 != null && FlightGlobals.ActiveVessel == vessel)
             {
                 var cyclesToExecute = 0;
 
