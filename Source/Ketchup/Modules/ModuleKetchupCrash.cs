@@ -128,7 +128,7 @@ namespace Ketchup.Modules
 
         public uint ManufacturerId
         {
-            get { return (uint)Constants.ManufacturerId.KerbalSystems; }
+            get { return (uint)Constants.ManufacturerId.Apokee; }
         }
 
         public uint DeviceId
