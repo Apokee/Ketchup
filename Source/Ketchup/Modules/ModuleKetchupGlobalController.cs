@@ -49,6 +49,9 @@ namespace Ketchup.Modules
                 case 0x0004: // TODO: Test
                     _dcpu16.A = (ushort)(((uint)Planetarium.GetUniversalTime()) & 0x00001111);
                     break;
+                case 0x0005: // TODO: Test
+                    _dcpu16.A = (ushort)(FlightInputHandler.state.mainThrottle * 100);
+                    break;
             }
 
             return 0; // FIXME: unspecified
