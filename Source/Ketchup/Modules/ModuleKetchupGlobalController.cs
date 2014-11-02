@@ -46,11 +46,17 @@ namespace Ketchup.Modules
                 case 0x0002: // TODO: Test
                     _dcpu16.A = (ushort)(((uint)Planetarium.GetUniversalTime()) >> 16);
                     break;
-                case 0x0004: // TODO: Test
+                case 0x0003: // TODO: Test
                     _dcpu16.A = (ushort)(((uint)Planetarium.GetUniversalTime()) & 0x00001111);
                     break;
-                case 0x0005: // TODO: Test
+                case 0x0004: // TODO: Test
                     _dcpu16.A = (ushort)(FlightInputHandler.state.mainThrottle * 100);
+                    break;
+                case 0x0005:
+                    // FIXME: The total number of stages in a rocket isn't really defined.
+                    break;
+                case 0x0006:
+                    _dcpu16.A = (ushort)vessel.currentStage;
                     break;
             }
 
