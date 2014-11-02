@@ -43,6 +43,12 @@ namespace Ketchup.Modules
                 case 0x0001: // TODO: Test
                     _dcpu16.A = (ushort)(((uint)vessel.missionTime) & 0x00001111);
                     break;
+                case 0x0002: // TODO: Test
+                    _dcpu16.A = (ushort)(((uint)Planetarium.GetUniversalTime()) >> 16);
+                    break;
+                case 0x0004: // TODO: Test
+                    _dcpu16.A = (ushort)(((uint)Planetarium.GetUniversalTime()) & 0x00001111);
+                    break;
             }
 
             return 0; // FIXME: unspecified
