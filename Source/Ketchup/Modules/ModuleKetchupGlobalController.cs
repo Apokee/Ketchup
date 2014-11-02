@@ -52,6 +52,7 @@ namespace Ketchup.Modules
                     _dcpu16.A = (ushort)(((uint)Planetarium.GetUniversalTime()) & 0x00001111);
                     break;
                 case 0x0004: // TODO: Test
+                    // QUESTION: What if not the active vessel?
                     _dcpu16.A = (ushort)(FlightInputHandler.state.mainThrottle * 100);
                     break;
                 case 0x0005:
