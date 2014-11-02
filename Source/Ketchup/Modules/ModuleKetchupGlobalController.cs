@@ -1,4 +1,5 @@
-﻿using Ketchup.Api.v0;
+﻿using System;
+using Ketchup.Api.v0;
 
 namespace Ketchup.Modules
 {
@@ -57,6 +58,43 @@ namespace Ketchup.Modules
                     break;
                 case 0x0006:
                     _dcpu16.A = (ushort)vessel.currentStage;
+                    break;
+                case 0x0007:
+                    if (vessel.altitude >= 0)
+                    {
+                        _dcpu16.A = (ushort)(((uint)vessel.altitude) >> 16);
+                    }
+                    else
+                    {
+                        // FIXME: Undefined when altitude is negative (below sea-level)
+                    }
+                    break;
+                case 0x0008:
+                    if (vessel.altitude >= 0)
+                    {
+                        _dcpu16.A = (ushort)(((uint)vessel.altitude) & 0x000011116);
+                    }
+                    else
+                    {
+                        // FIXME: Undefined when altitude is negative (below sea-level)
+                    }
+                    break;
+                case 0x0009:
+                    if (vessel.terrainAltitude >= 0)
+                    {
+                        if (vessel.terrainAltitude <= UInt16.MaxValue)
+                        {
+                            _dcpu16.A = (ushort)vessel.terrainAltitude;
+                        }
+                        else
+                        {
+                            // FIXME: Undefined when terrain altitude exceeds UInt16.MaxValue
+                        }
+                    }
+                    else
+                    {
+                        // FIXME: Undefined when terrain altitude is negative (below water)
+                    }
                     break;
             }
 
