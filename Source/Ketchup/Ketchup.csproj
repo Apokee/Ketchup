@@ -83,6 +83,7 @@
     <Compile Include="IO\BinaryStateWriter.cs" />
     <Compile Include="IO\Dcpu16StateManager.cs" />
     <Compile Include="IO\IoUtility.cs" />
+    <Compile Include="Modules\ModuleKetchupGlobalController.cs" />
     <Compile Include="Modules\ModuleKetchupLem1802.cs" />
     <Compile Include="Modules\ModuleKetchupM35fd.cs" />
     <Compile Include="Modules\ModuleKetchupStop.cs" />
