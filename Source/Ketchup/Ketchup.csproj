@@ -94,6 +94,7 @@
     <Compile Include="Services\Service.cs" />
     <Compile Include="Utility\ConfigDictionary.cs" />
     <Compile Include="Services\DebugService.cs" />
+    <Compile Include="Utility\FixedPoint.cs" />
     <Compile Include="Utility\NedReferenceFrame.cs" />
     <Compile Include="Utility\VesselReferenceFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

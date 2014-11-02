@@ -1,5 +1,6 @@
 ﻿using System;
 using Ketchup.Api.v0;
+using Ketchup.Utility;
 
 namespace Ketchup.Modules
 {
@@ -95,6 +96,9 @@ namespace Ketchup.Modules
                     {
                         // FIXME: Undefined when terrain altitude is negative (below water)
                     }
+                    break;
+                case 0x000a:
+                    _dcpu16.A = FixedPoint.Convert(vessel.staticPressure);
                     break;
             }
 
