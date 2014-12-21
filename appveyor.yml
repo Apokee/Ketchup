@@ -1,7 +1,7 @@
 version: "{build}"
 
 environment:
-  KETCHUP_KSPDEPS: "http://build.apokee.com/dependencies/ksp/0.25"
+  KETCHUP_KSPDEPS: "http://build.apokee.com/dependencies/ksp/0.90"
 
   matrix:
   - KETCHUP_CONFIGURATION: Debug
